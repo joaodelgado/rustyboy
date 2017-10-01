@@ -4,12 +4,7 @@ use std::env;
 use std::process;
 
 use rustboy::Config;
-mod cpu;
-
-fn to_hex_string(bytes: &[u8]) -> String {
-    let strs: Vec<String> = bytes.iter().map(|b| format!("{:02X}", b)).collect();
-    strs.join(" ")
-}
+use rustboy::utils::to_hex_string;
 
 fn main() {
     let config = Config::new(env::args()).unwrap_or_else(|e| {

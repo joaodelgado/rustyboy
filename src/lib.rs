@@ -2,6 +2,9 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::error::Error;
 
+pub mod utils;
+mod cpu;
+
 pub struct Config {
     pub rom_name: String,
 }

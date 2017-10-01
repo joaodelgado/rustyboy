@@ -9,7 +9,7 @@ pub struct Cpu {
     H: u8,
     sp: u16,
     pc: u16,
-    status: u8 // status flag: sign, zero, parity, carry, aux carry
+    status: u8, // status flag: sign, zero, parity, carry, aux carry
 }
 
 pub enum StatusRegBit {
@@ -17,7 +17,7 @@ pub enum StatusRegBit {
     Zero,
     Parity,
     Carry,
-    AuxCarry
+    AuxCarry,
 }
 
 impl Cpu {
@@ -33,32 +33,31 @@ impl Cpu {
             H: 0,
             sp: 0x100,
             pc: 0xFFFE,
-            status: 0
+            status: 0,
         };
         cpu
     }
 
     // Check if a certain flag is set
-    pub fn status_is_set(&self, bit_enum: StatusRegBit) -> bool
-    {
+    pub fn status_is_set(&self, bit_enum: StatusRegBit) -> bool {
         match bit_enum {
-            StatusRegBit::Sign  => (self.status & 0b10000000) == 0b10000000,
-            StatusRegBit::Zero  => (self.status & 0b01000000) == 0b01000000,
-            StatusRegBit::Parity  => (self.status & 0b00100000) == 0b00100000,
-            StatusRegBit::Carry  => (self.status & 0b00010000) == 0b00010000,
-            StatusRegBit::AuxCarry  => (self.status & 0b000010000) == 0b00010000,
+            StatusRegBit::Sign => (self.status & 0b10000000) == 0b10000000,
+            StatusRegBit::Zero => (self.status & 0b01000000) == 0b01000000,
+            StatusRegBit::Parity => (self.status & 0b00100000) == 0b00100000,
+            StatusRegBit::Carry => (self.status & 0b00010000) == 0b00010000,
+            StatusRegBit::AuxCarry => (self.status & 0b000010000) == 0b00010000,
         }
     }
 
     // Set the defined status flag
     pub fn status_set(&mut self, bit_enum: StatusRegBit) {
         match bit_enum {
-            StatusRegBit::Sign  => self.status |= 0b10000000,
-            StatusRegBit::Zero  => self.status |= 0b01000000,
-            StatusRegBit::Parity  => self.status |= 0b00100000,
-            StatusRegBit::Carry  => self.status |= 0b00010000,
-            StatusRegBit::AuxCarry  => self.status |= 0b000010000,
-        }        
+            StatusRegBit::Sign => self.status |= 0b10000000,
+            StatusRegBit::Zero => self.status |= 0b01000000,
+            StatusRegBit::Parity => self.status |= 0b00100000,
+            StatusRegBit::Carry => self.status |= 0b00010000,
+            StatusRegBit::AuxCarry => self.status |= 0b000010000,
+        }
     }
 }
 
