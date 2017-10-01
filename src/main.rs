@@ -1,4 +1,4 @@
-extern crate rustboy;
+extern crate rustyboy;
 
 use std::env;
 use std::process;
