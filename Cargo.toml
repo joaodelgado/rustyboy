@@ -1,6 +1,6 @@
 [package]
 name = "rustboy"
 version = "0.1.0"
-authors = ["João Delgado <joaomtdelgado@gmail.com>"]
+authors = ["João Delgado <joaomtdelgado@gmail.com>", "Tiago Marques <samarques.tiago@gmail.com>"]
 
 [dependencies]
