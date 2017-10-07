@@ -3,8 +3,6 @@
 use std::error::Error;
 
 use utils;
-use Config;
-use read_file;
 
 macro_rules! KB {
     ( $x:expr ) => { $x * 1024 };
@@ -85,24 +83,24 @@ pub struct Cartridge {
 }
 
 impl Cartridge {
-    pub fn new(config: &Config) -> Result<Cartridge, Box<Error>> {
-        Ok(Cartridge { raw_data: read_file(&config.rom_name)? })
+    pub fn new(raw_data: Vec<u8>) -> Result<Cartridge, Box<Error>> {
+        Ok(Cartridge { raw_data: raw_data })
     }
 
     pub fn entry_point(&self) -> u32 {
-        utils::to_u32(&self.raw_data[0x100..0x104])
+        utils::to_u32(&self.raw_data[0x100..0x103])
     }
 
     pub fn nintendo_logo(&self) -> &[u8] {
-        &self.raw_data[0x104..0x134]
+        &self.raw_data[0x104..0x133]
     }
 
     pub fn title(&self) -> String {
-        String::from_utf8_lossy(&self.raw_data[0x134..0x144]).into_owned()
+        String::from_utf8_lossy(&self.raw_data[0x134..0x143]).into_owned()
     }
 
     pub fn manufactor_code(&self) -> String {
-        String::from_utf8_lossy(&self.raw_data[0x13f..0x143]).into_owned()
+        String::from_utf8_lossy(&self.raw_data[0x13f..0x142]).into_owned()
     }
 
     pub fn sgb(&self) -> bool {

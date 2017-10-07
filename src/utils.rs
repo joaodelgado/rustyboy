@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 
 pub fn to_u32(b: &[u8]) -> u32 {
     assert!(b.len() >= 4);

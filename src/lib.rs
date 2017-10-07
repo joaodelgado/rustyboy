@@ -1,7 +1,7 @@
+mod cartridge;
 mod cpu;
-mod game_boy;
-pub mod cartridge;
-pub mod utils;
+mod utils;
+pub mod game_boy;
 
 use std::fs::File;
 use std::io::prelude::*;
