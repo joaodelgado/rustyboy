@@ -1,4 +1,5 @@
 mod cpu;
+mod game_boy;
 pub mod cartridge;
 pub mod utils;
 
