@@ -1,5 +1,15 @@
 #![allow(dead_code)]
 
+///
+///  16bit Hi   Lo   Name/Function
+///  AF    A    -    Accumulator & Flags
+///  BC    B    C    BC
+///  DE    D    E    DE
+///  HL    H    L    HL
+///  SP    -    -    Stack Pointer
+///  PC    -    -    Program Counter/Pointer
+///
+#[derive(Default)]
 pub struct Cpu {
     a: u8,
     b: u8,
@@ -7,8 +17,8 @@ pub struct Cpu {
     d: u8,
     e: u8,
     f: u8,
-    g: u8,
     h: u8,
+    l: u8,
     sp: u16,
     pc: u16,
     status: u8, // status flag: sign, zero, parity, carry, aux carry
@@ -23,21 +33,35 @@ pub enum StatusRegBit {
 }
 
 impl Cpu {
-    pub fn new() -> Cpu {
-        let cpu = Cpu {
-            a: 0,
-            b: 0,
-            c: 0,
-            d: 0,
-            e: 0,
-            f: 0,
-            g: 0,
-            h: 0,
-            sp: 0x100,
-            pc: 0xFFFE,
-            status: 0,
-        };
-        cpu
+    pub fn init(&mut self) {
+        // TODO I'm assuming that we are running on a GB for now.
+        // When we support multiple types, the value of the A register must change
+        // accordingly:
+        //  A=$01-GB/SGB, $FF-GBP, $11-GBC
+        self.set_af(0x01b0);
+        self.set_bc(0x0013);
+        self.set_de(0x00d8);
+        self.set_hl(0x014d);
+    }
+
+    fn set_af(&mut self, n: u16) {
+        self.a = (n >> 8) as u8;
+        self.f = n as u8;
+    }
+
+    fn set_bc(&mut self, n: u16) {
+        self.b = (n >> 8) as u8;
+        self.c = n as u8;
+    }
+
+    fn set_de(&mut self, n: u16) {
+        self.d = (n >> 8) as u8;
+        self.e = n as u8;
+    }
+
+    fn set_hl(&mut self, n: u16) {
+        self.h = (n >> 8) as u8;
+        self.l = n as u8;
     }
 
     // Check if a certain flag is set
