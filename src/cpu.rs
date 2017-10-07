@@ -1,12 +1,14 @@
+#![allow(dead_code)]
+
 pub struct Cpu {
-    A: u8,
-    B: u8,
-    C: u8,
-    D: u8,
-    E: u8,
-    F: u8,
-    G: u8,
-    H: u8,
+    a: u8,
+    b: u8,
+    c: u8,
+    d: u8,
+    e: u8,
+    f: u8,
+    g: u8,
+    h: u8,
     sp: u16,
     pc: u16,
     status: u8, // status flag: sign, zero, parity, carry, aux carry
@@ -23,14 +25,14 @@ pub enum StatusRegBit {
 impl Cpu {
     pub fn new() -> Cpu {
         let cpu = Cpu {
-            A: 0,
-            B: 0,
-            C: 0,
-            D: 0,
-            E: 0,
-            F: 0,
-            G: 0,
-            H: 0,
+            a: 0,
+            b: 0,
+            c: 0,
+            d: 0,
+            e: 0,
+            f: 0,
+            g: 0,
+            h: 0,
             sp: 0x100,
             pc: 0xFFFE,
             status: 0,
