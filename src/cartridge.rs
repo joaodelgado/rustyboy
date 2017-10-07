@@ -150,4 +150,8 @@ impl Cartridge {
         // 15 014E-014F - Global Checksum
         unimplemented!();
     }
+
+    pub fn power_up_memory(&self) -> &[u8] {
+        &self.raw_data[0x104..0x133]
+    }
 }

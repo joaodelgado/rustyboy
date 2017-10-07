@@ -30,12 +30,28 @@ impl GameBoy {
         let mut ram = [0; RAM_SIZE];
         ram[MEM_CARTRIDGE_HEADER_BEGIN..MEM_CARTRIDGE_HEADER_END]
             .copy_from_slice(cartridge.header());
-
-        Ok(GameBoy {
+        let gb = GameBoy {
             cpu: Cpu::new(),
             cartridge: cartridge,
             ram: ram,
             vram: [0; VRAM_SIZE],
-        })
+        };
+
+        gb.power_up()?;
+        Ok(gb)
+    }
+
+    fn power_up(&self) -> Result<(), &'static str> {
+        let logo = self.cartridge.nintendo_logo();
+        // TODO scroll logo in screen
+        // TODO play musical notes
+
+        let sum = self.cartridge.power_up_memory().iter()
+            .fold(25, |sum, v| (sum as u8).wrapping_add(*v));
+
+        match sum {
+                0 => Err("Failed power up"),
+                _ => Ok(())
+            }
     }
 }
