@@ -4,7 +4,7 @@ use std::env;
 use std::process;
 
 use rustyboy::Config;
-use rustyboy::Cartridge;
+use rustyboy::cartridge::Cartridge;
 
 fn main() {
     let config = Config::new(env::args()).unwrap_or_else(|e| {
