@@ -93,7 +93,8 @@ mod tests {
 
     #[test]
     fn test_status_reg() {
-        let mut cpu = Cpu::new();
+        let mut cpu = Cpu::default();
+        cpu.init();
 
         cpu.status_set(StatusRegBit::Sign);
         assert_eq!(cpu.status_is_set(StatusRegBit::Sign), true);
