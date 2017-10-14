@@ -87,3 +87,7 @@
     - RET
     - RET cc
     - RETI
+
+## Utilities
+
+- Macro to simplify print and return on all instruction implementations
