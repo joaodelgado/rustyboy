@@ -1,7 +1,6 @@
-use std::error::Error;
-
 use cpu::Cpu;
 use cartridge::Cartridge;
+use errors::{Error, ErrorKind, Result};
 use Config;
 use read_file;
 
@@ -60,7 +59,7 @@ pub struct GameBoy {
 }
 
 impl GameBoy {
-    pub fn new(config: &Config) -> Result<GameBoy, Box<Error>> {
+    pub fn new(config: &Config) -> Result<GameBoy> {
         // Initialize cartridge
         let cartridge_data = read_file(&config.rom_name)?;
         let cartridge = Cartridge::new(cartridge_data);
@@ -72,7 +71,7 @@ impl GameBoy {
         })
     }
 
-    pub fn run(&mut self) -> Result<(), Box<Error>> {
+    pub fn run(&mut self) -> Result<()> {
         self.init_memory();
         self.cpu.init();
 
@@ -86,7 +85,7 @@ impl GameBoy {
         Ok(())
     }
 
-    fn check_rom(&self) -> Result<(), &'static str> {
+    fn check_rom(&self) -> Result<()> {
         // Validate ROM checksum
         let sum = self.ram[MEM_CHECKSUM_BEGIN..MEM_CHECKSUM_END].iter().fold(
             25u8,
@@ -94,7 +93,10 @@ impl GameBoy {
         );
 
         match sum {
-            0 => Err("ROM failed checksum validation"),
+            0 => Err(Error::new(
+                ErrorKind::Validation,
+                "ROM failed checksum validation",
+            )),
             _ => Ok(()),
         }
     }
