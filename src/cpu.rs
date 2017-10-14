@@ -136,6 +136,7 @@ impl Cpu {
     pub fn tick(&mut self) -> Result<()> {
         match self.get_next() {
             0x00 => self.nop(),
+            0xc3 => self.jp_nn(),
             s => Err(Error::new(
                 ErrorKind::UnknownInstruction,
                 format!(
@@ -164,11 +165,21 @@ impl Cpu {
         Ok(())
     }
 
-    // fn jp(&mut self) -> Result<()> {
-    // let addr = self.get_next();
-    // println!("JP\t{:04x}", addr);
-    // Ok(())
-    // }
+    ///**Description:**
+    /// Jump to address nn.
+    ///
+    ///**Use with:**
+    /// nn = two byte immediate value. (LS byte first.)
+    ///
+    fn jp_nn(&mut self) -> Result<()> {
+        let fst_byte = self.get_next() as u16;
+        let snd_byte = self.get_next() as u16;
+
+        let addr = (snd_byte << 8) | fst_byte;
+        self.pc = addr;
+        println!("JP\t{:04x}", addr);
+        Ok(())
+    }
 }
 
 #[cfg(test)]
@@ -197,5 +208,20 @@ mod tests {
 
         cpu.status = 0;
         assert_eq!(cpu.status_is_set(StatusRegBit::AuxCarry), false);
+    }
+
+    #[test]
+    fn test_jp_nn() {
+        let mut cpu = Cpu::new();
+        cpu.mem[0] = 0xc3;
+        cpu.mem[1] = 0;
+        cpu.mem[2] = 0x01;
+
+        match cpu.tick() {
+            Err(e) => println!("{}", e),
+            Ok(_) => {},
+        }
+
+        assert_eq!(cpu.pc, 0x100);
     }
 }
