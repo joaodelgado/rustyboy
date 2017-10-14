@@ -4,15 +4,12 @@ use errors::{Error, ErrorKind, Result};
 use Config;
 use read_file;
 
-const RAM_SIZE: usize = 64 * 1024;
-
-
 const MEM_CARTRIDGE_INTERRUPTS_BEGIN: usize = 0x0000;
-const MEM_CARTRIDGE_INTERRUPTS_END: usize   = 0x00ff;
-const MEM_CARTRIDGE_HEADER_BEGIN: usize     = 0x0100;
-const MEM_CARTRIDGE_HEADER_END: usize       = 0x014f;
-const MEM_CARTRIDGE_BANK_0_BEGIN: usize     = 0x0150;
-const MEM_CARTRIDGE_BANK_0_END: usize       = 0x3fff;
+const MEM_CARTRIDGE_INTERRUPTS_END: usize = 0x00ff;
+const MEM_CARTRIDGE_HEADER_BEGIN: usize = 0x0100;
+const MEM_CARTRIDGE_HEADER_END: usize = 0x014f;
+const MEM_CARTRIDGE_BANK_0_BEGIN: usize = 0x0150;
+const MEM_CARTRIDGE_BANK_0_END: usize = 0x3fff;
 
 const MEM_CHECKSUM_BEGIN: usize = 0x104;
 const MEM_CHECKSUM_END: usize = 0x133;
@@ -60,7 +57,6 @@ const IE: usize = 0xffff;
 pub struct GameBoy {
     cpu: Cpu,
     cartridge: Cartridge,
-    ram: [u8; RAM_SIZE],
 }
 
 impl GameBoy {
@@ -70,9 +66,8 @@ impl GameBoy {
         let cartridge = Cartridge::new(cartridge_data);
 
         Ok(GameBoy {
-            cpu: Cpu::default(),
+            cpu: Cpu::new(),
             cartridge: cartridge,
-            ram: [0; RAM_SIZE],
         })
     }
 
@@ -92,10 +87,10 @@ impl GameBoy {
 
     fn check_rom(&self) -> Result<()> {
         // Validate ROM checksum
-        let sum = self.ram[MEM_CHECKSUM_BEGIN..MEM_CHECKSUM_END].iter().fold(
-            25u8,
-            |sum, v| sum.wrapping_add(*v),
-        );
+        let sum = self.cpu
+            .get_mem_range(MEM_CHECKSUM_BEGIN, MEM_CHECKSUM_END)
+            .iter()
+            .fold(25u8, |sum, v| sum.wrapping_add(*v));
 
         match sum {
             0 => Err(Error::new(
@@ -108,45 +103,54 @@ impl GameBoy {
 
     fn init_memory(&mut self) {
         // Copy cartridge
-        self.ram[MEM_CARTRIDGE_INTERRUPTS_BEGIN..MEM_CARTRIDGE_INTERRUPTS_END]
-            .copy_from_slice(self.cartridge.interrupts());
-        self.ram[MEM_CARTRIDGE_HEADER_BEGIN..MEM_CARTRIDGE_HEADER_END]
-            .copy_from_slice(self.cartridge.header());
-        self.ram[MEM_CARTRIDGE_BANK_0_BEGIN..MEM_CARTRIDGE_BANK_0_END]
-            .copy_from_slice(self.cartridge.bank0());
+        self.cpu.set_mem_range(
+            MEM_CARTRIDGE_INTERRUPTS_BEGIN,
+            MEM_CARTRIDGE_INTERRUPTS_END,
+            self.cartridge.interrupts(),
+        );
+        self.cpu.set_mem_range(
+            MEM_CARTRIDGE_HEADER_BEGIN,
+            MEM_CARTRIDGE_HEADER_END,
+            self.cartridge.header(),
+        );
+        self.cpu.set_mem_range(
+            MEM_CARTRIDGE_BANK_0_BEGIN,
+            MEM_CARTRIDGE_BANK_0_END,
+            self.cartridge.bank0(),
+        );
 
         // Initialize IO registers
-        self.ram[TIMA] = 0x00;
-        self.ram[TMA] = 0x00;
-        self.ram[TAC] = 0x00;
-        self.ram[NR10] = 0x80;
-        self.ram[NR11] = 0xbf;
-        self.ram[NR12] = 0xf3;
-        self.ram[NR14] = 0xbf;
-        self.ram[NR21] = 0x3f;
-        self.ram[NR22] = 0x00;
-        self.ram[NR24] = 0xbf;
-        self.ram[NR30] = 0x7f;
-        self.ram[NR31] = 0xff;
-        self.ram[NR32] = 0x9f;
-        self.ram[NR33] = 0xbf;
-        self.ram[NR41] = 0xff;
-        self.ram[NR42] = 0x00;
-        self.ram[NR43] = 0x00;
-        self.ram[NR44] = 0xbf;
-        self.ram[NR50] = 0x77;
-        self.ram[NR51] = 0xf3;
-        self.ram[NR52] = 0xf1; // TODO This assumes we are running on a GB
-        self.ram[LCDC] = 0x91;
-        self.ram[SCY] = 0x00;
-        self.ram[SCX] = 0x00;
-        self.ram[LYC] = 0x00;
-        self.ram[BGP] = 0xfc;
-        self.ram[OBP0] = 0xff;
-        self.ram[OBP1] = 0xff;
-        self.ram[WY] = 0x00;
-        self.ram[WX] = 0x00;
+        self.cpu.set_mem(TIMA, 0x00);
+        self.cpu.set_mem(TMA, 0x00);
+        self.cpu.set_mem(TAC, 0x00);
+        self.cpu.set_mem(NR10, 0x80);
+        self.cpu.set_mem(NR11, 0xbf);
+        self.cpu.set_mem(NR12, 0xf3);
+        self.cpu.set_mem(NR14, 0xbf);
+        self.cpu.set_mem(NR21, 0x3f);
+        self.cpu.set_mem(NR22, 0x00);
+        self.cpu.set_mem(NR24, 0xbf);
+        self.cpu.set_mem(NR30, 0x7f);
+        self.cpu.set_mem(NR31, 0xff);
+        self.cpu.set_mem(NR32, 0x9f);
+        self.cpu.set_mem(NR33, 0xbf);
+        self.cpu.set_mem(NR41, 0xff);
+        self.cpu.set_mem(NR42, 0x00);
+        self.cpu.set_mem(NR43, 0x00);
+        self.cpu.set_mem(NR44, 0xbf);
+        self.cpu.set_mem(NR50, 0x77);
+        self.cpu.set_mem(NR51, 0xf3);
+        self.cpu.set_mem(NR52, 0xf1); // TODO This assumes we are running on a GB
+        self.cpu.set_mem(LCDC, 0x91);
+        self.cpu.set_mem(SCY, 0x00);
+        self.cpu.set_mem(SCX, 0x00);
+        self.cpu.set_mem(LYC, 0x00);
+        self.cpu.set_mem(BGP, 0xfc);
+        self.cpu.set_mem(OBP0, 0xff);
+        self.cpu.set_mem(OBP1, 0xff);
+        self.cpu.set_mem(WY, 0x00);
+        self.cpu.set_mem(WX, 0x00);
 
-        self.ram[IE] = 0x00;
+        self.cpu.set_mem(IE, 0x00);
     }
 }

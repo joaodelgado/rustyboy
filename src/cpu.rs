@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 
+const MEM_SIZE: usize = 64 * 1024;
+
 ///
 ///  16bit Hi   Lo   Name/Function
 ///  AF    A    -    Accumulator & Flags
@@ -9,7 +11,6 @@
 ///  SP    -    -    Stack Pointer
 ///  PC    -    -    Program Counter/Pointer
 ///
-#[derive(Default)]
 pub struct Cpu {
     a: u8,
     b: u8,
@@ -22,6 +23,7 @@ pub struct Cpu {
     sp: u16,
     pc: u16,
     status: u8, // status flag: sign, zero, parity, carry, aux carry
+    mem: [u8; MEM_SIZE],
 }
 
 pub enum StatusRegBit {
@@ -33,6 +35,23 @@ pub enum StatusRegBit {
 }
 
 impl Cpu {
+    pub fn new() -> Cpu {
+        Cpu {
+            a: 0,
+            b: 0,
+            c: 0,
+            d: 0,
+            e: 0,
+            f: 0,
+            h: 0,
+            l: 0,
+            sp: 0,
+            pc: 0,
+            status: 0,
+            mem: [0; MEM_SIZE],
+        }
+    }
+
     pub fn init(&mut self) {
         // TODO I'm assuming that we are running on a GB for now.
         // When we support multiple types, the value of the A register must change
@@ -42,6 +61,18 @@ impl Cpu {
         self.set_bc(0x0013);
         self.set_de(0x00d8);
         self.set_hl(0x014d);
+    }
+
+    pub fn set_mem(&mut self, i: usize, value: u8) {
+        self.mem[i] = value
+    }
+
+    pub fn get_mem_range(&self, i: usize, j: usize) -> &[u8] {
+        &self.mem[i..j]
+    }
+
+    pub fn set_mem_range(&mut self, i: usize, j: usize, data: &[u8]) {
+        self.mem[i..j].copy_from_slice(data);
     }
 
     fn set_af(&mut self, n: u16) {
@@ -93,7 +124,7 @@ mod tests {
 
     #[test]
     fn test_status_reg() {
-        let mut cpu = Cpu::default();
+        let mut cpu = Cpu::new();
         cpu.init();
 
         cpu.status_set(StatusRegBit::Sign);
