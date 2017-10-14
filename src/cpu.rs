@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+use {u8_to_u16, u16_to_u8};
 use errors::{Error, ErrorKind, Result};
 
 const MEM_SIZE: usize = 64 * 1024;
@@ -86,28 +87,44 @@ impl Cpu {
     // Manage registers
     //
 
+    fn get_af(&mut self) -> u16 {
+        u8_to_u16(self.a, self.f)
+    }
+
     fn set_af(&mut self, n: u16) {
-        self.a = (n >> 8) as u8;
-        self.f = n as u8;
+        let (a, f) = u16_to_u8(n);
+        self.a = a;
+        self.f = f;
+    }
+
+    fn get_bc(&mut self) -> u16 {
+        u8_to_u16(self.b, self.c)
     }
 
     fn set_bc(&mut self, n: u16) {
-        self.b = (n >> 8) as u8;
-        self.c = n as u8;
+        let (b, c) = u16_to_u8(n);
+        self.b = b;
+        self.c = c;
+    }
+
+    fn get_de(&mut self) -> u16 {
+        u8_to_u16(self.d, self.e)
     }
 
     fn set_de(&mut self, n: u16) {
-        self.d = (n >> 8) as u8;
-        self.e = n as u8;
+        let (d, e) = u16_to_u8(n);
+        self.d = d;
+        self.e = e;
     }
 
     fn get_hl(&mut self) -> u16 {
-        ((self.h as u16)) << 8 | self.l as u16
+        u8_to_u16(self.h, self.l)
     }
 
     fn set_hl(&mut self, n: u16) {
-        self.h = (n >> 8) as u8;
-        self.l = n as u8;
+        let (h, l) = u16_to_u8(n);
+        self.h = h;
+        self.l = l;
     }
 
     // Check if a certain flag is set
@@ -170,10 +187,10 @@ impl Cpu {
     ///
     /// Put nn into Stack Pointer (SP).
     fn ld_sp_nn(&mut self) -> Result<()> {
-        let snd_byte = self.get_next() as u16;
-        let fst_byte = self.get_next() as u16;
+        let fst_byte = self.get_next();
+        let snd_byte = self.get_next();
 
-        let addr = (snd_byte << 8) | fst_byte;
+        let addr = u8_to_u16(fst_byte, snd_byte);
         self.sp = addr;
 
         println!("LD\tSP,{:04x}", addr);
@@ -187,11 +204,12 @@ impl Cpu {
     /// nn = two byte immediate value. (LS byte first.)
     ///
     fn jp_nn(&mut self) -> Result<()> {
-        let snd_byte = self.get_next() as u16;
-        let fst_byte = self.get_next() as u16;
+        let snd_byte = self.get_next();
+        let fst_byte = self.get_next();
 
-        let addr = (fst_byte << 8) | snd_byte;
+        let addr = u8_to_u16(fst_byte, snd_byte);
         self.pc = addr;
+
         println!("JP\t{:04x}", addr);
         Ok(())
     }
@@ -237,10 +255,10 @@ impl Cpu {
     ///**Use with:**
     /// nn = two byte immediate value. (LS byte first.)
     fn jp_cc_nn(&mut self, opcode: u8) -> Result<()> {
-        let addr_snd_byte = self.get_next() as u16;
-        let addr_fst_byte = self.get_next() as u16;
+        let addr_snd_byte = self.get_next();
+        let addr_fst_byte = self.get_next();
 
-        let addr = ((addr_fst_byte << 8) | addr_snd_byte) as u16;
+        let addr = u8_to_u16(addr_fst_byte, addr_snd_byte);
 
         match opcode {
             0xc2 =>

@@ -1,6 +1,5 @@
 mod cartridge;
 mod cpu;
-mod utils;
 mod errors;
 pub mod game_boy;
 
@@ -39,4 +38,31 @@ pub fn read_file(file_name: &String) -> Result<Vec<u8>> {
     file.read_to_end(&mut data)?;
 
     Ok(data)
+}
+
+#[inline]
+pub fn u8_to_u16(b1: u8, b2: u8) -> u16 {
+    ((b1 as u16) << 8) | (b2 as u16)
+}
+
+#[inline]
+pub fn u16_to_u8(n: u16) -> (u8, u8) {
+    (((n >> 8) as u8), (n as u8))
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_u8_to_u16() {
+        assert_eq!(u8_to_u16(0xff, 0xff), 0xffff);
+        assert_eq!(u8_to_u16(0xf0, 0x77), 0xf077);
+    }
+
+    #[test]
+    fn test_u16_to_u8() {
+        assert_eq!(u16_to_u8(0xffff), (0xff, 0xff));
+        assert_eq!(u16_to_u8(0xf077), (0xf0, 0x77));
+    }
 }

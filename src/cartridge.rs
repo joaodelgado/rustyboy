@@ -1,7 +1,5 @@
 #![allow(dead_code)]
 
-use utils;
-
 macro_rules! KB {
     ( $x:expr ) => { $x * 1024 };
 }
@@ -102,10 +100,6 @@ impl Cartridge {
 
     pub fn bank0(&self) -> &[u8] {
         &self.raw_data[BANK0_BEGIN..BANK0_END]
-    }
-
-    pub fn entry_point(&self) -> u32 {
-        utils::to_u32(&self.raw_data[0x100..0x103])
     }
 
     pub fn nintendo_logo(&self) -> &[u8] {
