@@ -75,7 +75,7 @@
     - SET b,r
     - RES b,r
     - JP nn
-    - JP (HL)
+    - ~~JP (HL)~~
     - JR cc, n
     - ~~JP nn~~
     - ~~JP cc,nn~~

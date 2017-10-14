@@ -157,6 +157,7 @@ impl Cpu {
             0x00 => self.nop(),
             0x31 => self.ld_sp_nn(),
             0xc3 => self.jp_nn(),
+            0xe9 => self.jp_hl(),
             0xf9 => self.ld_sp_hl(),
             0xf3 => self.di(),
             0xc2 | 0xca | 0xd2 | 0xda => self.jp_cc_nn(opcode),
@@ -208,6 +209,17 @@ impl Cpu {
         let fst_byte = self.get_next();
 
         let addr = u8_to_u16(fst_byte, snd_byte);
+        self.pc = addr;
+
+        println!("JP\t{:04x}", addr);
+        Ok(())
+    }
+
+    /// **Description:**
+    /// Jump to address contained in HL.
+    ///
+    fn jp_hl(&mut self) -> Result<()> {
+        let addr = self.get_hl();
         self.pc = addr;
 
         println!("JP\t{:04x}", addr);
@@ -403,6 +415,16 @@ mod tests {
 
         cpu.tick().unwrap();
         assert_eq!(cpu.pc, 0x100);
+    }
+
+    #[test]
+    fn test_jp_hl() {
+        let mut cpu = Cpu::new();
+        cpu.mem[0] = 0xe9;
+        cpu.set_hl(0x0134);
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.pc, 0x0134);
     }
 
     #[test]
