@@ -102,6 +102,10 @@ impl Cpu {
         self.e = n as u8;
     }
 
+    fn get_hl(&mut self) -> u16 {
+        ((self.h as u16)) << 8 | self.l as u16
+    }
+
     fn set_hl(&mut self, n: u16) {
         self.h = (n >> 8) as u8;
         self.l = n as u8;
@@ -137,6 +141,7 @@ impl Cpu {
         match self.get_next() {
             0x00 => self.nop(),
             0xc3 => self.jp_nn(),
+            0xf9 => self.ld_sp_hl(),
             0xf3 => self.di(),
             s => Err(Error::new(
                 ErrorKind::UnknownInstruction,
@@ -161,15 +166,10 @@ impl Cpu {
     // Opcodes
     //
 
-    fn nop(&self) -> Result<()> {
-        println!("NOP");
-        Ok(())
-    }
-
-    ///**Description:**
+    /// **Description:**
     /// Jump to address nn.
     ///
-    ///**Use with:**
+    /// **Use with:**
     /// nn = two byte immediate value. (LS byte first.)
     ///
     fn jp_nn(&mut self) -> Result<()> {
@@ -179,6 +179,16 @@ impl Cpu {
         let addr = (snd_byte << 8) | fst_byte;
         self.pc = addr;
         println!("JP\t{:04x}", addr);
+        Ok(())
+    }
+
+    /// **Descriptio**
+    ///
+    /// Put HL into Stack Pointer (SP).
+    fn ld_sp_hl(&mut self) -> Result<()> {
+        self.sp = self.get_hl();
+
+        println!("LD\tSP,HL");
         Ok(())
     }
 
@@ -192,10 +202,14 @@ impl Cpu {
     ///
     /// None
     fn di(&self) -> Result<()> {
-        println!("DI");
-
         // TODO implement this
 
+        println!("DI");
+        Ok(())
+    }
+
+    fn nop(&self) -> Result<()> {
+        println!("NOP");
         Ok(())
     }
 }
@@ -237,6 +251,18 @@ mod tests {
 
         cpu.tick().unwrap();
         assert_eq!(cpu.pc, 0x100);
+    }
+
+    #[test]
+    fn test_ld_sp_hl() {
+        let mut cpu = Cpu::new();
+        cpu.mem[0] = 0xf9;
+        cpu.sp = 0;
+        cpu.h = 0x01;
+        cpu.l = 0x34;
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.sp, 0x0134);
     }
 
     #[test]
