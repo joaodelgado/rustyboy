@@ -306,6 +306,82 @@ mod tests {
     }
 
     #[test]
+    fn test_get_af() {
+        let mut cpu = Cpu::new();
+        cpu.a = 0x3f;
+        cpu.f = 0x7c;
+
+        assert_eq!(cpu.get_af(), 0x3f7c);
+    }
+
+    #[test]
+    fn test_set_af() {
+        let mut cpu = Cpu::new();
+        cpu.set_af(0x3f7c);
+
+        assert_eq!(cpu.a, 0x3f);
+        assert_eq!(cpu.f, 0x7c);
+    }
+
+    #[test]
+    fn test_get_bc() {
+        let mut cpu = Cpu::new();
+        cpu.b = 0x3f;
+        cpu.c = 0x7c;
+
+        assert_eq!(cpu.get_bc(), 0x3f7c);
+    }
+
+    #[test]
+    fn test_set_bc() {
+        let mut cpu = Cpu::new();
+        cpu.set_bc(0x3f7c);
+
+        assert_eq!(cpu.b, 0x3f);
+        assert_eq!(cpu.c, 0x7c);
+    }
+
+    #[test]
+    fn test_get_de() {
+        let mut cpu = Cpu::new();
+        cpu.d = 0x3f;
+        cpu.e = 0x7c;
+
+        assert_eq!(cpu.get_de(), 0x3f7c);
+    }
+
+    #[test]
+    fn test_set_de() {
+        let mut cpu = Cpu::new();
+        cpu.set_de(0x3f7c);
+
+        assert_eq!(cpu.d, 0x3f);
+        assert_eq!(cpu.e, 0x7c);
+    }
+
+    #[test]
+    fn test_get_hl() {
+        let mut cpu = Cpu::new();
+        cpu.h = 0x3f;
+        cpu.l = 0x7c;
+
+        assert_eq!(cpu.get_hl(), 0x3f7c);
+    }
+
+    #[test]
+    fn test_set_hl() {
+        let mut cpu = Cpu::new();
+        cpu.set_hl(0x3f7c);
+
+        assert_eq!(cpu.h, 0x3f);
+        assert_eq!(cpu.l, 0x7c);
+    }
+
+    //
+    // Instructions
+    //
+
+    #[test]
     fn test_ld_sp_nn() {
         let mut cpu = Cpu::new();
         cpu.mem[0] = 0x31;
