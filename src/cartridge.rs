@@ -76,8 +76,12 @@ impl CartridgeType {
     }
 }
 
-const HEADER_BEGIN: usize = 0x100;
-const HEADER_END: usize = 0x14f;
+const INTERRUPTS_BEGIN: usize = 0x0000;
+const INTERRUPTS_END: usize = 0x00ff;
+const HEADER_BEGIN: usize = 0x0100;
+const HEADER_END: usize = 0x014f;
+const BANK0_BEGIN: usize = 0x0150;
+const BANK0_END: usize = 0x3fff;
 
 pub struct Cartridge {
     raw_data: Vec<u8>,
@@ -88,8 +92,16 @@ impl Cartridge {
         Cartridge { raw_data: raw_data }
     }
 
+    pub fn interrupts(&self) -> &[u8] {
+        &self.raw_data[INTERRUPTS_BEGIN..INTERRUPTS_END]
+    }
+
     pub fn header(&self) -> &[u8] {
         &self.raw_data[HEADER_BEGIN..HEADER_END]
+    }
+
+    pub fn bank0(&self) -> &[u8] {
+        &self.raw_data[BANK0_BEGIN..BANK0_END]
     }
 
     pub fn entry_point(&self) -> u32 {

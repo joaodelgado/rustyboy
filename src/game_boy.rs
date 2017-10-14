@@ -6,8 +6,13 @@ use read_file;
 
 const RAM_SIZE: usize = 64 * 1024;
 
-const MEM_CARTRIDGE_HEADER_BEGIN: usize = 0x100;
-const MEM_CARTRIDGE_HEADER_END: usize = 0x14f;
+
+const MEM_CARTRIDGE_INTERRUPTS_BEGIN: usize = 0x0000;
+const MEM_CARTRIDGE_INTERRUPTS_END: usize   = 0x00ff;
+const MEM_CARTRIDGE_HEADER_BEGIN: usize     = 0x0100;
+const MEM_CARTRIDGE_HEADER_END: usize       = 0x014f;
+const MEM_CARTRIDGE_BANK_0_BEGIN: usize     = 0x0150;
+const MEM_CARTRIDGE_BANK_0_END: usize       = 0x3fff;
 
 const MEM_CHECKSUM_BEGIN: usize = 0x104;
 const MEM_CHECKSUM_END: usize = 0x133;
@@ -102,11 +107,15 @@ impl GameBoy {
     }
 
     fn init_memory(&mut self) {
-        // Initialize ram
-        // Copy cartridge header
+        // Copy cartridge
+        self.ram[MEM_CARTRIDGE_INTERRUPTS_BEGIN..MEM_CARTRIDGE_INTERRUPTS_END]
+            .copy_from_slice(self.cartridge.interrupts());
         self.ram[MEM_CARTRIDGE_HEADER_BEGIN..MEM_CARTRIDGE_HEADER_END]
             .copy_from_slice(self.cartridge.header());
+        self.ram[MEM_CARTRIDGE_BANK_0_BEGIN..MEM_CARTRIDGE_BANK_0_END]
+            .copy_from_slice(self.cartridge.bank0());
 
+        // Initialize IO registers
         self.ram[TIMA] = 0x00;
         self.ram[TMA] = 0x00;
         self.ram[TAC] = 0x00;
@@ -137,6 +146,7 @@ impl GameBoy {
         self.ram[OBP1] = 0xff;
         self.ram[WY] = 0x00;
         self.ram[WX] = 0x00;
+
         self.ram[IE] = 0x00;
     }
 }
