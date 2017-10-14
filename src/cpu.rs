@@ -140,6 +140,7 @@ impl Cpu {
     pub fn tick(&mut self) -> Result<()> {
         match self.get_next() {
             0x00 => self.nop(),
+            0x31 => self.ld_sp_nn(),
             0xc3 => self.jp_nn(),
             0xf9 => self.ld_sp_hl(),
             0xf3 => self.di(),
@@ -166,6 +167,20 @@ impl Cpu {
     // Opcodes
     //
 
+    /// **Description**
+    ///
+    /// Put nn into Stack Pointer (SP).
+    fn ld_sp_nn(&mut self) -> Result<()> {
+        let snd_byte = self.get_next() as u16;
+        let fst_byte = self.get_next() as u16;
+
+        let addr = (snd_byte << 8) | fst_byte;
+        self.sp = addr;
+
+        println!("LD\tSP,{:04x}", addr);
+        Ok(())
+    }
+
     /// **Description:**
     /// Jump to address nn.
     ///
@@ -173,10 +188,10 @@ impl Cpu {
     /// nn = two byte immediate value. (LS byte first.)
     ///
     fn jp_nn(&mut self) -> Result<()> {
-        let fst_byte = self.get_next() as u16;
         let snd_byte = self.get_next() as u16;
+        let fst_byte = self.get_next() as u16;
 
-        let addr = (snd_byte << 8) | fst_byte;
+        let addr = (fst_byte << 8) | snd_byte;
         self.pc = addr;
         println!("JP\t{:04x}", addr);
         Ok(())
@@ -240,6 +255,18 @@ mod tests {
 
         cpu.status = 0;
         assert_eq!(cpu.status_is_set(StatusRegBit::AuxCarry), false);
+    }
+
+    #[test]
+    fn test_ld_sp_nn() {
+        let mut cpu = Cpu::new();
+        cpu.mem[0] = 0x31;
+        cpu.mem[1] = 0x01;
+        cpu.mem[2] = 0x34;
+        cpu.sp = 0;
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.sp, 0x0134);
     }
 
     #[test]
