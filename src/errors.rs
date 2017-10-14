@@ -27,6 +27,7 @@ pub enum ErrorKind {
     IO,
     InvalidInput,
     Validation,
+    UnknownInstruction,
 }
 
 
@@ -36,6 +37,7 @@ impl ErrorKind {
             ErrorKind::IO => "IO error",
             ErrorKind::InvalidInput => "Invalid input",
             ErrorKind::Validation => "Validation error",
+            ErrorKind::UnknownInstruction => "Unknown instruction",
         }
     }
 }

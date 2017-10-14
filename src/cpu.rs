@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 
+use errors::{Error, ErrorKind, Result};
+
 const MEM_SIZE: usize = 64 * 1024;
 
 ///
@@ -61,7 +63,13 @@ impl Cpu {
         self.set_bc(0x0013);
         self.set_de(0x00d8);
         self.set_hl(0x014d);
+
+        self.pc = 0x100;
     }
+
+    //
+    // Manage memory
+    //
 
     pub fn set_mem(&mut self, i: usize, value: u8) {
         self.mem[i] = value
@@ -74,6 +82,10 @@ impl Cpu {
     pub fn set_mem_range(&mut self, i: usize, j: usize, data: &[u8]) {
         self.mem[i..j].copy_from_slice(data);
     }
+
+    //
+    // Manage registers
+    //
 
     fn set_af(&mut self, n: u16) {
         self.a = (n >> 8) as u8;
@@ -96,7 +108,7 @@ impl Cpu {
     }
 
     // Check if a certain flag is set
-    pub fn status_is_set(&self, bit_enum: StatusRegBit) -> bool {
+    fn status_is_set(&self, bit_enum: StatusRegBit) -> bool {
         match bit_enum {
             StatusRegBit::Sign => (self.status & 0b10000000) == 0b10000000,
             StatusRegBit::Zero => (self.status & 0b01000000) == 0b01000000,
@@ -107,7 +119,7 @@ impl Cpu {
     }
 
     // Set the defined status flag
-    pub fn status_set(&mut self, bit_enum: StatusRegBit) {
+    fn status_set(&mut self, bit_enum: StatusRegBit) {
         match bit_enum {
             StatusRegBit::Sign => self.status |= 0b10000000,
             StatusRegBit::Zero => self.status |= 0b01000000,
@@ -116,6 +128,47 @@ impl Cpu {
             StatusRegBit::AuxCarry => self.status |= 0b000010000,
         }
     }
+
+    //
+    // Tick
+    //
+
+    pub fn tick(&mut self) -> Result<()> {
+        match self.get_next() {
+            0x00 => self.nop(),
+            s => Err(Error::new(
+                ErrorKind::UnknownInstruction,
+                format!(
+                    "Unimplemented opcode {:02x}@{:04x}",
+                    s,
+                    self.pc - 1,
+                ),
+            )),
+        }
+    }
+
+    fn get_next(&mut self) -> u8 {
+        let result = self.mem[self.pc as usize];
+
+        self.pc += 1;
+
+        result
+    }
+
+    //
+    // Opcodes
+    //
+
+    fn nop(&self) -> Result<()> {
+        println!("NOP");
+        Ok(())
+    }
+
+    // fn jp(&mut self) -> Result<()> {
+    // let addr = self.get_next();
+    // println!("JP\t{:04x}", addr);
+    // Ok(())
+    // }
 }
 
 #[cfg(test)]

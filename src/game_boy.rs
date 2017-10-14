@@ -81,8 +81,9 @@ impl GameBoy {
 
         // TODO game loop
         println!("Running rom with title: {}", self.cartridge.title());
-
-        Ok(())
+        loop {
+            self.cpu.tick()?
+        }
     }
 
     fn check_rom(&self) -> Result<()> {
