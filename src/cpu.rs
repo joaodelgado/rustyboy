@@ -135,12 +135,14 @@ impl Cpu {
     //
 
     pub fn tick(&mut self) -> Result<()> {
-        match self.get_next() {
+        let opcode = self.get_next();
+        match opcode {
             0x00 => self.nop(),
             0x31 => self.ld_sp_nn(),
             0xc3 => self.jp_nn(),
             0xf9 => self.ld_sp_hl(),
             0xf3 => self.di(),
+            0xc2 | 0xca | 0xd2 | 0xda => self.jp_cc_nn(opcode),
             s => Err(Error::new(
                 ErrorKind::UnknownInstruction,
                 format!(
@@ -224,6 +226,43 @@ impl Cpu {
         println!("NOP");
         Ok(())
     }
+
+    ///**Description:**
+    /// Jump to address n if following condition is true:
+    /// cc = NZ, Jump if Z flag is reset
+    /// cc = Z, Jump if Z flag is set
+    /// cc = NC, Jump if C flag is reset
+    /// cc = C, Jump if C flag is set
+    ///
+    ///**Use with:**
+    /// nn = two byte immediate value. (LS byte first.)
+    fn jp_cc_nn(&mut self, opcode: u8) -> Result<()> {
+        let addr_snd_byte = self.get_next() as u16;
+        let addr_fst_byte = self.get_next() as u16;
+
+        let addr = ((addr_fst_byte << 8) | addr_snd_byte) as u16;
+
+        match opcode {
+            0xc2 =>
+                if !self.status_is_set(StatusRegBit::Zero) {
+                    self.pc = addr;
+                },
+            0xca =>
+                if self.status_is_set(StatusRegBit::Zero) {
+                    self.pc = addr;
+                },
+            0xd2 =>
+                if !self.status_is_set(StatusRegBit::Carry) {
+                    self.pc = addr;
+                },
+            _ => // 0xda
+                if self.status_is_set(StatusRegBit::Carry) {
+                    self.pc = addr;
+                },
+        }
+        println!("JP cc\t{:04x}", addr);
+        Ok(())
+    }
 }
 
 #[cfg(test)]
@@ -289,5 +328,47 @@ mod tests {
         cpu.mem[0] = 0xf3;
 
         cpu.tick().unwrap();
+    }
+
+    fn test_jp_cc_nn() {
+        let mut cpu = Cpu::new();
+
+        // check zero flag not set
+        cpu.mem[0] = 0xc2;
+        cpu.mem[1] = 0;
+        cpu.mem[2] = 0x01;
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.pc, 0x100);
+
+        // check zero flag set
+        cpu.mem[0] = 0xca;
+        cpu.mem[1] = 0;
+        cpu.mem[2] = 0x01;
+        cpu.pc = 0;
+
+        cpu.status_set(StatusRegBit::Zero);
+        cpu.tick().unwrap();
+
+        assert_eq!(cpu.pc, 0x100);
+
+        // check carry flag not set
+        cpu.mem[0] = 0xd2;
+        cpu.mem[1] = 0;
+        cpu.mem[2] = 0x01;
+        cpu.pc = 0;
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.pc, 0x100);
+
+        // check carry flag set
+        cpu.mem[0] = 0xda;
+        cpu.mem[1] = 0;
+        cpu.mem[2] = 0x01;
+        cpu.pc = 0;
+
+        cpu.status_set(StatusRegBit::Carry);
+        cpu.tick().unwrap();
+        assert_eq!(cpu.pc, 0x100);
     }
 }
