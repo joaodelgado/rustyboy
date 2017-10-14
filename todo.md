@@ -91,3 +91,4 @@
 ## Utilities
 
 - Macro to simplify print and return on all instruction implementations
+- inline functions/macros to convert two u8s in u16 and vice versa
