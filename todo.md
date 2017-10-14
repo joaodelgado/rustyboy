@@ -2,11 +2,11 @@
 
 ## general
 
-	- Power up sequence
-	  - Beep sounds
-	  - Nintendo logo scroll
-	  - Developer validation
+  - Power up sequence
+    - Beep sounds
+    - Nintendo logo scroll
+    - Developer validation
 
 ## cpu
 
-	- read opcodes
+  - read opcodes
