@@ -425,6 +425,7 @@ mod tests {
         cpu.tick().unwrap();
     }
 
+    #[test]
     fn test_jp_cc_nn() {
         let mut cpu = Cpu::new();
 
