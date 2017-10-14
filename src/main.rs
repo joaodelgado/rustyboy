@@ -12,10 +12,14 @@ fn main() {
         process::exit(1);
     });
 
-    let game_boy = GameBoy::new(&config).unwrap_or_else(|e| {
+    let mut game_boy = GameBoy::new(&config).unwrap_or_else(|e| {
         eprintln!("Error reading rom: {}", e);
         process::exit(1);
     });
 
-    println!("Read rom with title: {}", game_boy.cartridge.title());
+    game_boy.run().unwrap_or_else(|e| {
+        eprintln!("Unexpected error while running: {}", e);
+        process::exit(1);
+    });
+
 }

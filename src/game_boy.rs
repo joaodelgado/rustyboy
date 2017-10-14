@@ -6,7 +6,6 @@ use Config;
 use read_file;
 
 const RAM_SIZE: usize = 64 * 1024;
-const VRAM_SIZE: usize = 8 * 1024;
 
 const MEM_CARTRIDGE_HEADER_BEGIN: usize = 0x100;
 const MEM_CARTRIDGE_HEADER_END: usize = 0x14f;
@@ -52,10 +51,9 @@ const IE: usize = 0xffff;
 
 
 pub struct GameBoy {
-    pub cpu: Cpu,
-    pub cartridge: Cartridge,
-    pub ram: [u8; RAM_SIZE],
-    pub vram: [u8; VRAM_SIZE],
+    cpu: Cpu,
+    cartridge: Cartridge,
+    ram: [u8; RAM_SIZE],
 }
 
 impl GameBoy {
@@ -64,39 +62,43 @@ impl GameBoy {
         let cartridge_data = read_file(&config.rom_name)?;
         let cartridge = Cartridge::new(cartridge_data);
 
-        let mut game_boy = GameBoy {
+        Ok(GameBoy {
             cpu: Cpu::default(),
             cartridge: cartridge,
             ram: [0; RAM_SIZE],
-            vram: [0; VRAM_SIZE],
-        };
-
-        game_boy.power_up()?;
-
-        game_boy.init();
-        Ok(game_boy)
+        })
     }
 
-    fn power_up(&self) -> Result<(), &'static str> {
-        // TODO scroll logo in screen
-        // TODO play musical notes
+    pub fn run(&mut self) -> Result<(), Box<Error>> {
+        self.init_memory();
+        self.cpu.init();
 
-        let sum = self.cartridge.power_up_memory().iter().fold(25, |sum, v| {
-            (sum as u8).wrapping_add(*v)
-        });
+        self.check_rom()?;
+
+        // TODO Boot sequence (logo screen and musical notes)
+
+        // TODO game loop
+        println!("Running rom with title: {}", self.cartridge.title());
+
+        Ok(())
+    }
+
+    fn check_rom(&self) -> Result<(), &'static str> {
+        // Validate ROM checksum
+        let sum = self.cartridge.power_up_memory().iter().fold(
+            25u8,
+            |sum, v| {
+                sum.wrapping_add(*v)
+            },
+        );
 
         match sum {
-            0 => Err("Failed power up"),
+            0 => Err("ROM failed checksum validation"),
             _ => Ok(()),
         }
     }
 
-    fn init(&mut self) {
-        self.init_ram();
-        self.cpu.init();
-    }
-
-    fn init_ram(&mut self) {
+    fn init_memory(&mut self) {
         // Initialize ram
         // Copy cartridge header
         self.ram[MEM_CARTRIDGE_HEADER_BEGIN..MEM_CARTRIDGE_HEADER_END]
