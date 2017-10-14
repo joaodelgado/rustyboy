@@ -10,6 +10,9 @@ const RAM_SIZE: usize = 64 * 1024;
 const MEM_CARTRIDGE_HEADER_BEGIN: usize = 0x100;
 const MEM_CARTRIDGE_HEADER_END: usize = 0x14f;
 
+const MEM_CHECKSUM_BEGIN: usize = 0x104;
+const MEM_CHECKSUM_END: usize = 0x133;
+
 //
 // Memory map
 //
@@ -85,11 +88,9 @@ impl GameBoy {
 
     fn check_rom(&self) -> Result<(), &'static str> {
         // Validate ROM checksum
-        let sum = self.cartridge.power_up_memory().iter().fold(
+        let sum = self.ram[MEM_CHECKSUM_BEGIN..MEM_CHECKSUM_END].iter().fold(
             25u8,
-            |sum, v| {
-                sum.wrapping_add(*v)
-            },
+            |sum, v| sum.wrapping_add(*v),
         );
 
         match sum {
