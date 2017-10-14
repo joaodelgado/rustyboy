@@ -137,6 +137,7 @@ impl Cpu {
         match self.get_next() {
             0x00 => self.nop(),
             0xc3 => self.jp_nn(),
+            0xf3 => self.di(),
             s => Err(Error::new(
                 ErrorKind::UnknownInstruction,
                 format!(
@@ -180,6 +181,23 @@ impl Cpu {
         println!("JP\t{:04x}", addr);
         Ok(())
     }
+
+    /// **Description**
+    ///
+    /// This instruction disables interrupts but not
+    /// immediately. Interrupts are disabled after
+    /// instruction after DI is executed.
+    ///
+    /// **Flags affected**
+    ///
+    /// None
+    fn di(&self) -> Result<()> {
+        println!("DI");
+
+        // TODO implement this
+
+        Ok(())
+    }
 }
 
 #[cfg(test)]
@@ -214,14 +232,18 @@ mod tests {
     fn test_jp_nn() {
         let mut cpu = Cpu::new();
         cpu.mem[0] = 0xc3;
-        cpu.mem[1] = 0;
+        cpu.mem[1] = 0x00;
         cpu.mem[2] = 0x01;
 
-        match cpu.tick() {
-            Err(e) => println!("{}", e),
-            Ok(_) => {},
-        }
-
+        cpu.tick().unwrap();
         assert_eq!(cpu.pc, 0x100);
+    }
+
+    #[test]
+    fn test_di() {
+        let mut cpu = Cpu::new();
+        cpu.mem[0] = 0xf3;
+
+        cpu.tick().unwrap();
     }
 }
