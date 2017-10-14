@@ -273,10 +273,11 @@ impl Cpu {
                 if !self.status_is_set(StatusRegBit::Carry) {
                     self.pc = addr;
                 },
-            _ => // 0xda
+            0xda => // 0xda
                 if self.status_is_set(StatusRegBit::Carry) {
                     self.pc = addr;
                 },
+            _ => unreachable!(),
         }
         println!("JP cc\t{:04x}", addr);
         Ok(())
