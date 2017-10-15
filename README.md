@@ -4,4 +4,4 @@
 
 Gameboy emulator written in rust.
 
-This project it's still in the very early stages and does virtually nothing.
+This project it's still in the very early stages and does basically nothing.
