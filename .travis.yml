@@ -1,8 +1,1 @@
 language: rust
-notifications:
-    webhooks:
-        urls:
-            - https://discordapp.com/api/webhooks/369204391607140363/b7Ur8s9EKJBvbwe3V47isryiAh16X-kA0Gj5SViTAVjVvcU4RBZkcTAPOyVAb5T6StnO
-        on_success: always
-        on_failure: always
-        on_start: always
