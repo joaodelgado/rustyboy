@@ -5,6 +5,7 @@ pub const JP_NC_NN: u8 = 0xd2;
 pub const JP_NN: u8 = 0xc3;
 pub const JP_NZ_NN: u8 = 0xc2;
 pub const JP_Z_NN: u8 = 0xca;
+pub const LD_NN_A: u8 = 0xea;
 pub const LD_SP_HL: u8 = 0xf9;
 pub const LD_SP_NN: u8 = 0x31;
 pub const NOP: u8 = 0x00;

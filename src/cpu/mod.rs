@@ -163,6 +163,7 @@ impl Cpu {
             opcodes::JP_Z_NN |
             opcodes::JP_C_NN |
             opcodes::JP_NC_NN => self.jp_cc_nn(opcode),
+            opcodes::LD_NN_A => self.ld_nn_a(),
             opcodes::LD_SP_HL => self.ld_sp_hl(),
             opcodes::LD_SP_NN => self.ld_sp_nn(),
             opcodes::NOP => self.nop(),
@@ -188,6 +189,24 @@ impl Cpu {
     //
     // Opcodes
     //
+
+    /// **Descriptio**
+    ///
+    /// Put value A into nn.
+    ///
+    /// **Use with**:
+    ///
+    /// nn = two byte immediate value. (LS byte first)
+    fn ld_nn_a(&mut self) -> Result<()> {
+        let snd_byte = self.get_next();
+        let fst_byte = self.get_next();
+
+        let addr = u8_to_u16(fst_byte, snd_byte) as usize;
+        self.mem[addr] = self.a;
+
+        println!("LD\tnn,A");
+        Ok(())
+    }
 
     /// **Description**
     ///
@@ -398,6 +417,18 @@ mod tests {
     //
     // Instructions
     //
+
+    #[test]
+    fn test_ld_nn_a() {
+        let mut cpu = Cpu::new();
+        cpu.a = 0x72;
+        cpu.mem[0] = opcodes::LD_NN_A;
+        cpu.mem[1] = 0x01;
+        cpu.mem[2] = 0x34;
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.mem[0x3401], 0x72);
+    }
 
     #[test]
     fn test_ld_sp_nn() {
