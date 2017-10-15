@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 
+mod opcodes;
+
 use {u8_to_u16, u16_to_u8};
 use errors::{Error, ErrorKind, Result};
 
@@ -154,13 +156,16 @@ impl Cpu {
     pub fn tick(&mut self) -> Result<()> {
         let opcode = self.get_next();
         match opcode {
-            0x00 => self.nop(),
-            0x31 => self.ld_sp_nn(),
-            0xc3 => self.jp_nn(),
-            0xe9 => self.jp_hl(),
-            0xf9 => self.ld_sp_hl(),
-            0xf3 => self.di(),
-            0xc2 | 0xca | 0xd2 | 0xda => self.jp_cc_nn(opcode),
+            opcodes::DI => self.di(),
+            opcodes::JP_HL => self.jp_hl(),
+            opcodes::JP_NN => self.jp_nn(),
+            opcodes::JP_NZ_NN |
+            opcodes::JP_Z_NN |
+            opcodes::JP_C_NN |
+            opcodes::JP_NC_NN => self.jp_cc_nn(opcode),
+            opcodes::LD_SP_HL => self.ld_sp_hl(),
+            opcodes::LD_SP_NN => self.ld_sp_nn(),
+            opcodes::NOP => self.nop(),
             s => Err(Error::new(
                 ErrorKind::UnknownInstruction,
                 format!(
@@ -273,19 +278,19 @@ impl Cpu {
         let addr = u8_to_u16(addr_fst_byte, addr_snd_byte);
 
         match opcode {
-            0xc2 =>
+            opcodes::JP_NZ_NN =>
                 if !self.status_is_set(StatusRegBit::Zero) {
                     self.pc = addr;
                 },
-            0xca =>
+            opcodes::JP_Z_NN =>
                 if self.status_is_set(StatusRegBit::Zero) {
                     self.pc = addr;
                 },
-            0xd2 =>
+            opcodes::JP_NC_NN =>
                 if !self.status_is_set(StatusRegBit::Carry) {
                     self.pc = addr;
                 },
-            0xda => // 0xda
+            opcodes::JP_C_NN => // 0xda
                 if self.status_is_set(StatusRegBit::Carry) {
                     self.pc = addr;
                 },
