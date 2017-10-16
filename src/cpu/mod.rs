@@ -157,15 +157,18 @@ impl Cpu {
         let opcode = self.get_next();
         match opcode {
             opcodes::DI => self.di(),
-            opcodes::JP_HL => self.jp_hl(),
+
             opcodes::JP_NN => self.jp_nn(),
-            opcodes::JP_NZ_NN |
-            opcodes::JP_Z_NN |
-            opcodes::JP_C_NN |
-            opcodes::JP_NC_NN => self.jp_cc_nn(opcode),
+            opcodes::JP_HL => self.jp_hl(),
+            opcodes::JP_C_NN => self.jp_cc_nn(|cpu| cpu.status_is_set(StatusRegBit::Carry)),
+            opcodes::JP_NC_NN => self.jp_cc_nn(|cpu| !cpu.status_is_set(StatusRegBit::Carry)),
+            opcodes::JP_Z_NN => self.jp_cc_nn(|cpu| cpu.status_is_set(StatusRegBit::Zero)),
+            opcodes::JP_NZ_NN => self.jp_cc_nn(|cpu| !cpu.status_is_set(StatusRegBit::Zero)),
+
             opcodes::LD_NN_A => self.ld_nn_a(),
             opcodes::LD_SP_HL => self.ld_sp_hl(),
             opcodes::LD_SP_NN => self.ld_sp_nn(),
+
             opcodes::NOP => self.nop(),
             s => Err(Error::new(
                 ErrorKind::UnknownInstruction,
@@ -290,31 +293,19 @@ impl Cpu {
     ///
     ///**Use with:**
     /// nn = two byte immediate value. (LS byte first.)
-    fn jp_cc_nn(&mut self, opcode: u8) -> Result<()> {
+    fn jp_cc_nn<F>(&mut self, condition: F) -> Result<()>
+    where
+        F: Fn(&Cpu) -> bool,
+    {
         let addr_snd_byte = self.get_next();
         let addr_fst_byte = self.get_next();
 
         let addr = u8_to_u16(addr_fst_byte, addr_snd_byte);
 
-        match opcode {
-            opcodes::JP_NZ_NN =>
-                if !self.status_is_set(StatusRegBit::Zero) {
-                    self.pc = addr;
-                },
-            opcodes::JP_Z_NN =>
-                if self.status_is_set(StatusRegBit::Zero) {
-                    self.pc = addr;
-                },
-            opcodes::JP_NC_NN =>
-                if !self.status_is_set(StatusRegBit::Carry) {
-                    self.pc = addr;
-                },
-            opcodes::JP_C_NN => // 0xda
-                if self.status_is_set(StatusRegBit::Carry) {
-                    self.pc = addr;
-                },
-            _ => unreachable!(),
+        if condition(&self) {
+            self.pc = addr;
         }
+
         println!("JP cc\t{:04x}", addr);
         Ok(())
     }
