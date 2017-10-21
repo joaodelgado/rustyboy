@@ -275,6 +275,22 @@ impl Cpu {
             opcodes::POP_A16_D1 => self.pop_a16(|cpu, n| cpu.set_de(n)),
             opcodes::POP_A16_E1 => self.pop_a16(|cpu, n| cpu.set_hl(n)),
             opcodes::NOP => self.nop(),
+            opcodes::INC_A16_BC => {
+                let curr_value = self.get_bc();
+                self.inc_a16(curr_value, |cpu, n| cpu.set_bc(n))
+            }
+            opcodes::INC_A16_DE => {
+                let curr_value = self.get_de();
+                self.inc_a16(curr_value, |cpu, n| cpu.set_de(n))
+            }
+            opcodes::INC_A16_HL => {
+                let curr_value = self.get_hl();
+                self.inc_a16(curr_value, |cpu, n| cpu.set_hl(n))
+            }
+            opcodes::INC_A16_SP => {
+                let curr_value = self.sp;
+                self.inc_a16(curr_value, |cpu, n| cpu.sp = n)
+            }
             s => Err(Error::new(
                 ErrorKind::UnknownInstruction,
                 format!(
@@ -605,6 +621,20 @@ impl Cpu {
         let value = self.pop_stack_u16();
         f(self, value);
         println!("POP\t{:04x}", value);
+        Ok(())
+    }
+
+    ///**Description:**
+    /// Increment register nn.
+    ///
+    ///**Use with:**
+    /// nn = BC,DE,HL,SP
+    fn inc_a16<F>(&mut self, curr_value: u16, f: F) -> Result<()>
+    where
+        F: Fn(&mut Cpu, u16),
+    {
+        f(self, curr_value+1);
+        println!("INC nn\t{:04x}", curr_value+1);
         Ok(())
     }
 }
@@ -1062,5 +1092,31 @@ mod tests {
 
         cpu.tick().unwrap();
         assert_eq!(cpu.get_hl(), 0xfee2);
+    }
+
+    #[test]
+    fn test_inc_a16() {
+        let mut cpu = Cpu::new();
+        cpu.set_bc(0xfff9);
+        cpu.set_de(0x1234);
+        cpu.set_hl(0xfee2);
+        cpu.sp = 0;
+
+        cpu.mem[0] = opcodes::INC_A16_BC;
+        cpu.mem[1] = opcodes::INC_A16_DE;
+        cpu.mem[2] = opcodes::INC_A16_HL;
+        cpu.mem[3] = opcodes::INC_A16_SP;
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.get_bc(), 0xfffa);
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.get_de(), 0x1235);
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.get_hl(), 0xfee3);
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.sp, 1);
     }
 }

@@ -30,3 +30,7 @@ pub const POP_A16_D1: u8 = 0xd1;
 pub const POP_A16_E1: u8 = 0xe1;
 pub const NOP: u8 = 0x00;
 pub const RET: u8 = 0xc9;
+pub const INC_A16_BC: u8 = 0x03;
+pub const INC_A16_DE: u8 = 0x13;
+pub const INC_A16_HL: u8 = 0x23;
+pub const INC_A16_SP: u8 = 0x33;

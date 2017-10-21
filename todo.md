@@ -49,7 +49,7 @@
     - [ ] DEC n
     - [ ] ADD HL,n
     - [ ] ADD SP,n
-    - [ ] INC nn
+    - [X] INC nn
     - [ ] DEC nn
     - [ ] SWAP n
     - [ ] DAA
