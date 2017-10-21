@@ -159,7 +159,7 @@ impl Cpu {
     // Manage registers
     //
 
-    fn get_af(&mut self) -> u16 {
+    fn get_af(&self) -> u16 {
         u8_to_u16(self.a, self.f)
     }
 
@@ -169,7 +169,7 @@ impl Cpu {
         self.f = f;
     }
 
-    fn get_bc(&mut self) -> u16 {
+    fn get_bc(&self) -> u16 {
         u8_to_u16(self.b, self.c)
     }
 
@@ -179,7 +179,7 @@ impl Cpu {
         self.c = c;
     }
 
-    fn get_de(&mut self) -> u16 {
+    fn get_de(&self) -> u16 {
         u8_to_u16(self.d, self.e)
     }
 
@@ -189,7 +189,7 @@ impl Cpu {
         self.e = e;
     }
 
-    fn get_hl(&mut self) -> u16 {
+    fn get_hl(&self) -> u16 {
         u8_to_u16(self.h, self.l)
     }
 
@@ -254,43 +254,22 @@ impl Cpu {
             opcodes::LDH_A8_A => self.ldh_a8_a(),
             opcodes::RET => self.ret(),
 
-            opcodes::PUSH_A16_F5 => {
-                let reg_value = self.get_af();
-                self.push_a16(reg_value)
-            }
-            opcodes::PUSH_A16_C5 => {
-                let reg_value = self.get_bc();
-                self.push_a16(reg_value)
-            }
-            opcodes::PUSH_A16_D5 => {
-                let reg_value = self.get_de();
-                self.push_a16(reg_value)
-            }
-            opcodes::PUSH_A16_E5 => {
-                let reg_value = self.get_hl();
-                self.push_a16(reg_value)
-            }
-            opcodes::POP_A16_F1 => self.pop_a16(|cpu, n| cpu.set_af(n)),
-            opcodes::POP_A16_C1 => self.pop_a16(|cpu, n| cpu.set_bc(n)),
-            opcodes::POP_A16_D1 => self.pop_a16(|cpu, n| cpu.set_de(n)),
-            opcodes::POP_A16_E1 => self.pop_a16(|cpu, n| cpu.set_hl(n)),
+            opcodes::PUSH_A16_AF => self.push_a16(Cpu::get_af),
+            opcodes::PUSH_A16_BC => self.push_a16(Cpu::get_bc),
+            opcodes::PUSH_A16_DE => self.push_a16(Cpu::get_de),
+            opcodes::PUSH_A16_HL => self.push_a16(Cpu::get_hl),
+
+            opcodes::POP_A16_AF => self.pop_r16(Cpu::set_af),
+            opcodes::POP_A16_BC => self.pop_r16(Cpu::set_bc),
+            opcodes::POP_A16_DE => self.pop_r16(Cpu::set_de),
+            opcodes::POP_A16_HL => self.pop_r16(Cpu::set_hl),
+
+            opcodes::INC_A16_BC => self.inc_r16(Cpu::get_bc, Cpu::set_bc),
+            opcodes::INC_A16_DE => self.inc_r16(Cpu::get_de, Cpu::set_de),
+            opcodes::INC_A16_HL => self.inc_r16(Cpu::get_hl, Cpu::set_hl),
+            opcodes::INC_A16_SP => self.inc_r16(|cpu| cpu.sp, |cpu, n| cpu.sp = n),
+
             opcodes::NOP => self.nop(),
-            opcodes::INC_A16_BC => {
-                let curr_value = self.get_bc();
-                self.inc_a16(curr_value, |cpu, n| cpu.set_bc(n))
-            }
-            opcodes::INC_A16_DE => {
-                let curr_value = self.get_de();
-                self.inc_a16(curr_value, |cpu, n| cpu.set_de(n))
-            }
-            opcodes::INC_A16_HL => {
-                let curr_value = self.get_hl();
-                self.inc_a16(curr_value, |cpu, n| cpu.set_hl(n))
-            }
-            opcodes::INC_A16_SP => {
-                let curr_value = self.sp;
-                self.inc_a16(curr_value, |cpu, n| cpu.sp = n)
-            }
             s => Err(Error::new(
                 ErrorKind::UnknownInstruction,
                 format!(
@@ -602,7 +581,11 @@ impl Cpu {
     ///
     ///**Use with:**
     /// nn = AF,BC,DE,HL
-    fn push_a16(&mut self, reg_value: u16) -> Result<()> {
+    fn push_a16<G>(&mut self, getter: G) -> Result<()>
+    where
+        G: Fn(&Cpu) -> u16,
+    {
+        let reg_value = getter(self);
         self.push_stack_u16(reg_value);
         println!("PUSH\t{:04x}", reg_value);
         Ok(())
@@ -614,12 +597,12 @@ impl Cpu {
     ///
     ///**Use with:**
     /// nn = AF,BC,DE,HL
-    fn pop_a16<F>(&mut self, f: F) -> Result<()>
+    fn pop_r16<F>(&mut self, setter: F) -> Result<()>
     where
         F: Fn(&mut Cpu, u16),
     {
         let value = self.pop_stack_u16();
-        f(self, value);
+        setter(self, value);
         println!("POP\t{:04x}", value);
         Ok(())
     }
@@ -629,12 +612,15 @@ impl Cpu {
     ///
     ///**Use with:**
     /// nn = BC,DE,HL,SP
-    fn inc_a16<F>(&mut self, curr_value: u16, f: F) -> Result<()>
+    fn inc_r16<G, S>(&mut self, getter: G, setter: S) -> Result<()>
     where
-        F: Fn(&mut Cpu, u16),
+        G: Fn(&Cpu) -> u16,
+        S: Fn(&mut Cpu, u16),
     {
-        f(self, curr_value+1);
-        println!("INC nn\t{:04x}", curr_value+1);
+        let curr_value = getter(self);
+        setter(self, curr_value + 1);
+
+        println!("INC nn\t{:04x}", curr_value);
         Ok(())
     }
 }
@@ -1044,10 +1030,10 @@ mod tests {
         cpu.set_de(0x1234);
         cpu.set_hl(0xfee2);
 
-        cpu.mem[0] = opcodes::PUSH_A16_F5;
-        cpu.mem[1] = opcodes::PUSH_A16_C5;
-        cpu.mem[2] = opcodes::PUSH_A16_D5;
-        cpu.mem[3] = opcodes::PUSH_A16_E5;
+        cpu.mem[0] = opcodes::PUSH_A16_AF;
+        cpu.mem[1] = opcodes::PUSH_A16_BC;
+        cpu.mem[2] = opcodes::PUSH_A16_DE;
+        cpu.mem[3] = opcodes::PUSH_A16_HL;
 
         cpu.tick().unwrap();
 
@@ -1076,10 +1062,10 @@ mod tests {
         cpu.push_stack_u16(0x1234);
         cpu.push_stack_u16(0xfee2);
 
-        cpu.mem[0] = opcodes::POP_A16_F1;
-        cpu.mem[1] = opcodes::POP_A16_C1;
-        cpu.mem[2] = opcodes::POP_A16_D1;
-        cpu.mem[3] = opcodes::POP_A16_E1;
+        cpu.mem[0] = opcodes::POP_A16_AF;
+        cpu.mem[1] = opcodes::POP_A16_BC;
+        cpu.mem[2] = opcodes::POP_A16_DE;
+        cpu.mem[3] = opcodes::POP_A16_HL;
 
         cpu.tick().unwrap();
         assert_eq!(cpu.get_af(), 0xff15);
