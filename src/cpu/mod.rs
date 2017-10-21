@@ -37,6 +37,7 @@ pub struct Cpu {
     pc: u16,
     status: u8, // status flag: sign, zero, parity, carry, aux carry
     mem: [u8; MEM_SIZE],
+    aux_str: String,
 }
 
 impl fmt::Display for Cpu {
@@ -92,6 +93,7 @@ impl Cpu {
             pc: 0,
             status: 0,
             mem: [0; MEM_SIZE],
+            aux_str: String::new(),
         }
     }
 
@@ -233,10 +235,22 @@ impl Cpu {
             opcodes::JP_A16 => self.jp_a16(),
             opcodes::JP_HL => self.jp_hl(),
             opcodes::JR_R8 => self.jr_r8(),
-            opcodes::JP_C_A16 => self.jp_cc_a16(|cpu| cpu.status_is_set(StatusRegBit::Carry)),
-            opcodes::JP_NC_A16 => self.jp_cc_a16(|cpu| !cpu.status_is_set(StatusRegBit::Carry)),
-            opcodes::JP_Z_A16 => self.jp_cc_a16(|cpu| cpu.status_is_set(StatusRegBit::Zero)),
-            opcodes::JP_NZ_A16 => self.jp_cc_a16(|cpu| !cpu.status_is_set(StatusRegBit::Zero)),
+            opcodes::JP_C_A16 => {
+                self.aux_str = String::from("C");
+                self.jp_cc_a16(|cpu| cpu.status_is_set(StatusRegBit::Carry))
+            }
+            opcodes::JP_NC_A16 => {
+                self.aux_str = String::from("NC");
+                self.jp_cc_a16(|cpu| !cpu.status_is_set(StatusRegBit::Carry))
+            }
+            opcodes::JP_Z_A16 => {
+                self.aux_str = String::from("Z");
+                self.jp_cc_a16(|cpu| cpu.status_is_set(StatusRegBit::Zero))
+            }
+            opcodes::JP_NZ_A16 => {
+                self.aux_str = String::from("NZ");
+                self.jp_cc_a16(|cpu| !cpu.status_is_set(StatusRegBit::Zero))
+            }
 
             opcodes::LD_A16_A => self.ld_a16_a(),
             opcodes::LD_A_D8 => self.ld_a_d8(),
@@ -254,20 +268,56 @@ impl Cpu {
             opcodes::LDH_A8_A => self.ldh_a8_a(),
             opcodes::RET => self.ret(),
 
-            opcodes::PUSH_A16_AF => self.push_a16(Cpu::get_af),
-            opcodes::PUSH_A16_BC => self.push_a16(Cpu::get_bc),
-            opcodes::PUSH_A16_DE => self.push_a16(Cpu::get_de),
-            opcodes::PUSH_A16_HL => self.push_a16(Cpu::get_hl),
+            opcodes::PUSH_A16_AF => {
+                self.aux_str = String::from("AF");
+                self.push_a16(Cpu::get_af)
+            }
+            opcodes::PUSH_A16_BC => {
+                self.aux_str = String::from("BC");
+                self.push_a16(Cpu::get_bc)
+            }
+            opcodes::PUSH_A16_DE => {
+                self.aux_str = String::from("DE");
+                self.push_a16(Cpu::get_de)
+            }
+            opcodes::PUSH_A16_HL => {
+                self.aux_str = String::from("HL");
+                self.push_a16(Cpu::get_hl)
+            }
 
-            opcodes::POP_A16_AF => self.pop_r16(Cpu::set_af),
-            opcodes::POP_A16_BC => self.pop_r16(Cpu::set_bc),
-            opcodes::POP_A16_DE => self.pop_r16(Cpu::set_de),
-            opcodes::POP_A16_HL => self.pop_r16(Cpu::set_hl),
+            opcodes::POP_A16_AF => {
+                self.aux_str = String::from("AF");
+                self.pop_r16(Cpu::set_af)
+            }
+            opcodes::POP_A16_BC => {
+                self.aux_str = String::from("BC");
+                self.pop_r16(Cpu::set_bc)
+            }
+            opcodes::POP_A16_DE => {
+                self.aux_str = String::from("DE");
+                self.pop_r16(Cpu::set_de)
+            }
+            opcodes::POP_A16_HL => {
+                self.aux_str = String::from("HL");
+                self.pop_r16(Cpu::set_hl)
+            }
 
-            opcodes::INC_A16_BC => self.inc_r16(Cpu::get_bc, Cpu::set_bc),
-            opcodes::INC_A16_DE => self.inc_r16(Cpu::get_de, Cpu::set_de),
-            opcodes::INC_A16_HL => self.inc_r16(Cpu::get_hl, Cpu::set_hl),
-            opcodes::INC_A16_SP => self.inc_r16(|cpu| cpu.sp, |cpu, n| cpu.sp = n),
+            opcodes::INC_A16_BC => {
+                self.aux_str = String::from("BC");
+                self.inc_r16(Cpu::get_bc, Cpu::set_bc)
+            }
+            opcodes::INC_A16_DE => {
+                self.aux_str = String::from("DE");
+                self.inc_r16(Cpu::get_de, Cpu::set_de)
+            }
+            opcodes::INC_A16_HL => {
+                self.aux_str = String::from("HL");
+                self.inc_r16(Cpu::get_hl, Cpu::set_hl)
+            }
+            opcodes::INC_A16_SP => {
+                self.aux_str = String::from("SP");
+                self.inc_r16(|cpu| cpu.sp, |cpu, n| cpu.sp = n)
+            }
 
             opcodes::NOP => self.nop(),
             s => Err(Error::new(
@@ -548,7 +598,7 @@ impl Cpu {
             self.pc = addr;
         }
 
-        println!("JP cc\t{:04x}", addr);
+        println!("JP\t{},{:04x}", self.aux_str, addr);
         Ok(())
     }
 
@@ -587,7 +637,7 @@ impl Cpu {
     {
         let reg_value = getter(self);
         self.push_stack_u16(reg_value);
-        println!("PUSH\t{:04x}", reg_value);
+        println!("PUSH\t{},{:04x}", self.aux_str, reg_value);
         Ok(())
     }
 
@@ -603,7 +653,7 @@ impl Cpu {
     {
         let value = self.pop_stack_u16();
         setter(self, value);
-        println!("POP\t{:04x}", value);
+        println!("POP\t{},{:04x}", self.aux_str, value);
         Ok(())
     }
 
@@ -620,7 +670,7 @@ impl Cpu {
         let curr_value = getter(self);
         setter(self, curr_value + 1);
 
-        println!("INC nn\t{:04x}", curr_value);
+        println!("INC\t{},{:04x}", self.aux_str, curr_value);
         Ok(())
     }
 }
