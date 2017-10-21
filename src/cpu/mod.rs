@@ -301,7 +301,7 @@ impl Cpu {
         self.print_curr();
 
         let opcode = self.consume_byte();
-        let result = match opcode {
+        match opcode {
             opcodes::CALL_A16 => self.call_a16(),
 
             opcodes::DI => self.di(),
@@ -346,19 +346,21 @@ impl Cpu {
             opcodes::INC_A16_SP => self.inc_r16(|cpu| cpu.sp, |cpu, n| cpu.sp = n),
 
             opcodes::NOP => self.nop(),
-            s => Err(Error::new(
-                ErrorKind::UnknownInstruction,
-                format!(
+            s => {
+                return Err(Error::new(
+                    ErrorKind::UnknownInstruction,
+                    format!(
                     "Unimplemented opcode {:02x}@{:04x}",
                     s,
                     self.pc - 1,
                 ),
-            )),
+                ))
+            }
         };
 
         println!("{}", self);
 
-        result
+        Ok(())
     }
 
     fn consume_byte(&mut self) -> u8 {
@@ -394,7 +396,7 @@ impl Cpu {
     /// **Use with**:
     ///
     /// a16 = two byte immediate value. (LS byte first)
-    fn call_a16(&mut self) -> Result<()> {
+    fn call_a16(&mut self) {
         let addr = self.consume_16_addr();
 
         // copy pc because self needs to be borrowed mutably
@@ -403,8 +405,6 @@ impl Cpu {
         self.push_stack_u16(pc);
 
         self.pc = addr;
-
-        Ok(())
     }
 
     /// **Description**
@@ -414,74 +414,58 @@ impl Cpu {
     /// **Use with**:
     ///
     /// nn = two byte immediate value. (LS byte first)
-    fn ld_a16_a(&mut self) -> Result<()> {
+    fn ld_a16_a(&mut self) {
         let addr = self.consume_16_addr() as usize;
         self.mem[addr] = self.a;
-
-        Ok(())
     }
 
     /// **Description**
     ///
     /// Put value of A into A.
-    fn ld_a_a(&mut self) -> Result<()> {
+    fn ld_a_a(&mut self) {
         self.a = self.a;
-
-        Ok(())
     }
 
     /// **Description**
     ///
     /// Put value of B into A.
-    fn ld_a_b(&mut self) -> Result<()> {
+    fn ld_a_b(&mut self) {
         self.a = self.b;
-
-        Ok(())
     }
 
     /// **Description**
     ///
     /// Put value of C into A.
-    fn ld_a_c(&mut self) -> Result<()> {
+    fn ld_a_c(&mut self) {
         self.a = self.c;
-
-        Ok(())
     }
 
     /// **Description**
     ///
     /// Put value of D into A.
-    fn ld_a_d(&mut self) -> Result<()> {
+    fn ld_a_d(&mut self) {
         self.a = self.d;
-
-        Ok(())
     }
 
     /// **Description**
     ///
     /// Put value of E into A.
-    fn ld_a_e(&mut self) -> Result<()> {
+    fn ld_a_e(&mut self) {
         self.a = self.e;
-
-        Ok(())
     }
 
     /// **Description**
     ///
     /// Put value of H into A.
-    fn ld_a_h(&mut self) -> Result<()> {
+    fn ld_a_h(&mut self) {
         self.a = self.h;
-
-        Ok(())
     }
 
     /// **Description**
     ///
     /// Put value of L into A.
-    fn ld_a_l(&mut self) -> Result<()> {
+    fn ld_a_l(&mut self) {
         self.a = self.l;
-
-        Ok(())
     }
 
     /// **Description**
@@ -491,11 +475,9 @@ impl Cpu {
     /// **Use with**:
     ///
     /// d8 = one byte immediate value.
-    fn ld_a_d8(&mut self) -> Result<()> {
+    fn ld_a_d8(&mut self) {
         let n = self.consume_byte();
         self.a = n;
-
-        Ok(())
     }
 
     /// **Description**
@@ -505,21 +487,17 @@ impl Cpu {
     /// **Use with**:
     ///
     /// d16 = two byte immediate value.
-    fn ld_hl_d16(&mut self) -> Result<()> {
+    fn ld_hl_d16(&mut self) {
         let n = self.consume_16_imm();
         self.set_hl(n);
-
-        Ok(())
     }
 
     /// **Description**
     ///
     /// Put d16 into Stack Pointer (SP).
-    fn ld_sp_d16(&mut self) -> Result<()> {
+    fn ld_sp_d16(&mut self) {
         let addr = self.consume_16_imm();
         self.sp = addr;
-
-        Ok(())
     }
 
     /// **Description:**
@@ -528,21 +506,17 @@ impl Cpu {
     /// **Use with:**
     /// nn = two byte immediate value. (LS byte first.)
     ///
-    fn jp_a16(&mut self) -> Result<()> {
+    fn jp_a16(&mut self) {
         let addr = self.consume_16_addr();
         self.pc = addr;
-
-        Ok(())
     }
 
     /// **Description:**
     /// Jump to address contained in HL.
     ///
-    fn jp_hl(&mut self) -> Result<()> {
+    fn jp_hl(&mut self) {
         let addr = self.get_hl();
         self.pc = addr;
-
-        Ok(())
     }
 
     /// **Description:**
@@ -552,20 +526,16 @@ impl Cpu {
     /// **Use with:**
     ///
     ///  n = one byte signed immediate value
-    fn jr_r8(&mut self) -> Result<()> {
+    fn jr_r8(&mut self) {
         let n = self.consume_byte() as u16;
         self.pc += n;
-
-        Ok(())
     }
 
     /// **Description:**
     ///
     /// Put HL into Stack Pointer (SP).
-    fn ld_sp_hl(&mut self) -> Result<()> {
+    fn ld_sp_hl(&mut self) {
         self.sp = self.get_hl();
-
-        Ok(())
     }
 
     /// **Description**
@@ -577,14 +547,11 @@ impl Cpu {
     /// **Flags affected**
     ///
     /// None
-    fn di(&self) -> Result<()> {
+    fn di(&self) {
         // TODO implement this
-        Ok(())
     }
 
-    fn nop(&self) -> Result<()> {
-        Ok(())
-    }
+    fn nop(&self) {}
 
     ///**Description:**
     /// Jump to address n if following condition is true:
@@ -595,7 +562,7 @@ impl Cpu {
     ///
     ///**Use with:**
     /// nn = two byte immediate value. (LS byte first.)
-    fn jp_cc_a16<F>(&mut self, condition: F) -> Result<()>
+    fn jp_cc_a16<F>(&mut self, condition: F)
     where
         F: Fn(&Cpu) -> bool,
     {
@@ -604,8 +571,6 @@ impl Cpu {
         if condition(&self) {
             self.pc = addr;
         }
-
-        Ok(())
     }
 
     ///**Description:**
@@ -613,20 +578,15 @@ impl Cpu {
     ///
     ///**Use with:**
     /// n = one byte immediate value.
-    fn ldh_a8_a(&mut self) -> Result<()> {
+    fn ldh_a8_a(&mut self) {
         let n = self.consume_byte() as usize;
-
         self.mem[MEM_HW_IO_REG_OFFSET + n] = self.a;
-
-        Ok(())
     }
 
     ///**Description:**
     /// Pop two bytes from stack & jump to that address.
-    fn ret(&mut self) -> Result<()> {
+    fn ret(&mut self) {
         self.pc = self.pop_stack_u16();
-
-        Ok(())
     }
 
     ///
@@ -635,13 +595,12 @@ impl Cpu {
     ///
     ///**Use with:**
     /// nn = AF,BC,DE,HL
-    fn push_a16<G>(&mut self, getter: G) -> Result<()>
+    fn push_a16<G>(&mut self, getter: G)
     where
         G: Fn(&Cpu) -> u16,
     {
         let reg_value = getter(self);
         self.push_stack_u16(reg_value);
-        Ok(())
     }
 
     ///**Description:
@@ -650,13 +609,12 @@ impl Cpu {
     ///
     ///**Use with:**
     /// nn = AF,BC,DE,HL
-    fn pop_r16<F>(&mut self, setter: F) -> Result<()>
+    fn pop_r16<F>(&mut self, setter: F)
     where
         F: Fn(&mut Cpu, u16),
     {
         let value = self.pop_stack_u16();
         setter(self, value);
-        Ok(())
     }
 
     ///**Description:**
@@ -664,15 +622,13 @@ impl Cpu {
     ///
     ///**Use with:**
     /// nn = BC,DE,HL,SP
-    fn inc_r16<G, S>(&mut self, getter: G, setter: S) -> Result<()>
+    fn inc_r16<G, S>(&mut self, getter: G, setter: S)
     where
         G: Fn(&Cpu) -> u16,
         S: Fn(&mut Cpu, u16),
     {
         let curr_value = getter(self);
         setter(self, curr_value + 1);
-
-        Ok(())
     }
 }
 
