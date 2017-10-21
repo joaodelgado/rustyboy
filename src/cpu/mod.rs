@@ -195,7 +195,7 @@ impl Cpu {
     //
 
     pub fn tick(&mut self) -> Result<()> {
-        let opcode = self.get_next();
+        let opcode = self.read_byte();
         let result = match opcode {
             opcodes::DI => self.di(),
 
@@ -230,12 +230,26 @@ impl Cpu {
         result
     }
 
-    fn get_next(&mut self) -> u8 {
+    fn read_byte(&mut self) -> u8 {
         let result = self.mem[self.pc as usize];
 
         self.pc += 1;
 
         result
+    }
+
+    fn read_two_bytes_le(&mut self) -> u16 {
+        let fst_byte = self.read_byte();
+        let snd_byte = self.read_byte();
+
+        u8_to_u16(fst_byte, snd_byte)
+    }
+
+    fn read_two_bytes_be(&mut self) -> u16 {
+        let snd_byte = self.read_byte();
+        let fst_byte = self.read_byte();
+
+        u8_to_u16(fst_byte, snd_byte)
     }
 
     //
@@ -250,10 +264,7 @@ impl Cpu {
     ///
     /// nn = two byte immediate value. (LS byte first)
     fn ld_a16_a(&mut self) -> Result<()> {
-        let snd_byte = self.get_next();
-        let fst_byte = self.get_next();
-
-        let addr = u8_to_u16(fst_byte, snd_byte) as usize;
+        let addr = self.read_two_bytes_be() as usize;
         self.mem[addr] = self.a;
 
         println!("LD\t{:04x},A", addr);
@@ -268,8 +279,7 @@ impl Cpu {
     ///
     /// d8 = one byte immediate value.
     fn ld_a_d8(&mut self) -> Result<()> {
-        let n = self.get_next();
-
+        let n = self.read_byte();
         self.a = n;
 
         println!("LD\tA,{:02x}", n);
@@ -284,10 +294,7 @@ impl Cpu {
     ///
     /// d16 = two byte immediate value.
     fn ld_hl_d16(&mut self) -> Result<()> {
-        let fst_byte = self.get_next();
-        let snd_byte = self.get_next();
-
-        let n = u8_to_u16(fst_byte, snd_byte);
+        let n = self.read_two_bytes_le();
         self.set_hl(n);
 
         println!("LD\tHL,{:04x}", n);
@@ -298,10 +305,7 @@ impl Cpu {
     ///
     /// Put nn into Stack Pointer (SP).
     fn ld_sp_nn(&mut self) -> Result<()> {
-        let fst_byte = self.get_next();
-        let snd_byte = self.get_next();
-
-        let addr = u8_to_u16(fst_byte, snd_byte);
+        let addr = self.read_two_bytes_le();
         self.sp = addr;
 
         println!("LD\tSP,{:04x}", addr);
@@ -315,10 +319,7 @@ impl Cpu {
     /// nn = two byte immediate value. (LS byte first.)
     ///
     fn jp_a16(&mut self) -> Result<()> {
-        let snd_byte = self.get_next();
-        let fst_byte = self.get_next();
-
-        let addr = u8_to_u16(fst_byte, snd_byte);
+        let addr = self.read_two_bytes_be();
         self.pc = addr;
 
         println!("JP\t{:04x}", addr);
@@ -380,10 +381,7 @@ impl Cpu {
     where
         F: Fn(&Cpu) -> bool,
     {
-        let addr_snd_byte = self.get_next();
-        let addr_fst_byte = self.get_next();
-
-        let addr = u8_to_u16(addr_fst_byte, addr_snd_byte);
+        let addr = self.read_two_bytes_be();
 
         if condition(&self) {
             self.pc = addr;
@@ -399,7 +397,7 @@ impl Cpu {
     ///**Use with:**
     /// n = one byte immediate value.
     fn ldh_a8_a(&mut self) -> Result<()> {
-        let n = self.get_next() as usize;
+        let n = self.read_byte() as usize;
 
         self.mem[MEM_HW_IO_REG_OFFSET + n] = self.a;
 
