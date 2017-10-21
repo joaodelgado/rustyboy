@@ -36,7 +36,7 @@
     - [ ] LDHL SP,n
     - [X] LD (nn),SP
     - [ ] PUSH nn
-    - [ ] POP nn
+    - [X] POP nn
     - [ ] ADD A,n
     - [ ] ADC A,n
     - [ ] SUB n

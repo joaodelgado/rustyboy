@@ -270,10 +270,11 @@ impl Cpu {
                 let reg_value = self.get_hl();
                 self.push_a16(reg_value)
             }
-
+            opcodes::POP_A16_F1 => self.pop_a16(|cpu, n| cpu.set_af(n)),
+            opcodes::POP_A16_C1 => self.pop_a16(|cpu, n| cpu.set_bc(n)),
+            opcodes::POP_A16_D1 => self.pop_a16(|cpu, n| cpu.set_de(n)),
+            opcodes::POP_A16_E1 => self.pop_a16(|cpu, n| cpu.set_hl(n)),
             opcodes::NOP => self.nop(),
-
-            opcodes::RET => self.ret(),
             s => Err(Error::new(
                 ErrorKind::UnknownInstruction,
                 format!(
@@ -588,6 +589,22 @@ impl Cpu {
     fn push_a16(&mut self, reg_value: u16) -> Result<()> {
         self.push_stack_u16(reg_value);
         println!("PUSH\t{:04x}", reg_value);
+        Ok(())
+    }
+
+    ///**Description:
+    /// Pop two bytes off stack into register pair nn.
+    /// Increment Stack Pointer (SP) twice.
+    ///
+    ///**Use with:**
+    /// nn = AF,BC,DE,HL
+    fn pop_a16<F>(&mut self, f: F) -> Result<()>
+    where
+        F: Fn(&mut Cpu, u16),
+    {
+        let value = self.pop_stack_u16();
+        f(self, value);
+        println!("POP\t{:04x}", value);
         Ok(())
     }
 }
@@ -1020,4 +1037,30 @@ mod tests {
         assert_eq!(cpu.mem[0x122d], 0xfe);
     }
 
+
+    fn test_pop_a16() {
+        let mut cpu = Cpu::new();
+        cpu.sp = 0x1234;
+        cpu.push_stack_u16(0xff15);
+        cpu.push_stack_u16(0xffff);
+        cpu.push_stack_u16(0x1234);
+        cpu.push_stack_u16(0xfee2);
+
+        cpu.mem[0] = opcodes::POP_A16_F1;
+        cpu.mem[1] = opcodes::POP_A16_C1;
+        cpu.mem[2] = opcodes::POP_A16_D1;
+        cpu.mem[3] = opcodes::POP_A16_E1;
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.get_af(), 0xff15);
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.get_bc(), 0xffff);
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.get_de(), 0x1234);
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.get_hl(), 0xfee2);
+    }
 }
