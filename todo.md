@@ -35,7 +35,7 @@
     - [ ] LD HL, SP+n
     - [ ] LDHL SP,n
     - [X] LD (nn),SP
-    - [ ] PUSH nn
+    - [X] PUSH nn
     - [X] POP nn
     - [ ] ADD A,n
     - [ ] ADC A,n
@@ -79,10 +79,10 @@
     - [X] JR n
     - [X] JP nn
     - [X] JP cc,nn
-    - [ ] CALL nn
+    - [X] CALL nn
     - [ ] CALL cc,nn
     - [ ] RST n
-    - [ ] RET
+    - [X] RET
     - [ ] RET cc
     - [ ] RETI
 
