@@ -252,6 +252,7 @@ impl Cpu {
             opcodes::LD_SP_NN => self.ld_sp_nn(),
 
             opcodes::LDH_A8_A => self.ldh_a8_a(),
+            opcodes::RET => self.ret(),
 
             opcodes::PUSH_A16_F5 => {
                 let reg_value = self.get_af();
