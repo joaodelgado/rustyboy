@@ -2,6 +2,8 @@
 
 mod opcodes;
 
+use std::fmt;
+
 use {u8_to_u16, u16_to_u8};
 use errors::{Error, ErrorKind, Result};
 
@@ -29,6 +31,37 @@ pub struct Cpu {
     pc: u16,
     status: u8, // status flag: sign, zero, parity, carry, aux carry
     mem: [u8; MEM_SIZE],
+}
+
+impl fmt::Display for Cpu {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        return write!(f,
+                      "CPU [
+    a: {:02x},
+    b: {:02x},
+    c: {:02x},
+    d: {:02x},
+    e: {:02x},
+    f: {:02x},
+    h: {:02x},
+    l: {:02x},
+    status: {:02x},
+    sp: {:04x},
+    pc: {:04x},
+]",
+            self.a,
+            self.b,
+            self.c,
+            self.d,
+            self.e,
+            self.f,
+            self.h,
+            self.l,
+            self.status,
+            self.sp,
+            self.pc,
+        );
+    }
 }
 
 pub enum StatusRegBit {
@@ -67,6 +100,8 @@ impl Cpu {
         self.set_hl(0x014d);
 
         self.pc = 0x100;
+
+        println!("{}", self);
     }
 
     //
@@ -155,7 +190,7 @@ impl Cpu {
 
     pub fn tick(&mut self) -> Result<()> {
         let opcode = self.get_next();
-        match opcode {
+        let result = match opcode {
             opcodes::DI => self.di(),
 
             opcodes::JP_A16 => self.jp_a16(),
@@ -179,7 +214,11 @@ impl Cpu {
                     self.pc - 1,
                 ),
             )),
-        }
+        };
+
+        println!("{}", self);
+
+        result
     }
 
     fn get_next(&mut self) -> u8 {
