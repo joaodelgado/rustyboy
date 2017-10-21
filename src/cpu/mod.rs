@@ -106,6 +106,7 @@ impl Cpu {
         self.set_hl(0x014d);
 
         self.pc = 0x100;
+        self.sp = 0xfffe;
 
         println!("{}", self);
     }
