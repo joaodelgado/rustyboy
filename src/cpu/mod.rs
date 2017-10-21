@@ -165,7 +165,8 @@ impl Cpu {
             opcodes::JP_Z_A16 => self.jp_cc_a16(|cpu| cpu.status_is_set(StatusRegBit::Zero)),
             opcodes::JP_NZ_A16 => self.jp_cc_a16(|cpu| !cpu.status_is_set(StatusRegBit::Zero)),
 
-            opcodes::LD_NN_A => self.ld_nn_a(),
+            opcodes::LD_A16_A => self.ld_a16_a(),
+            opcodes::LD_A_D8 => self.ld_a_d8(),
             opcodes::LD_SP_HL => self.ld_sp_hl(),
             opcodes::LD_SP_NN => self.ld_sp_nn(),
 
@@ -193,21 +194,37 @@ impl Cpu {
     // Opcodes
     //
 
-    /// **Descriptio**
+    /// **Description**
     ///
     /// Put value A into nn.
     ///
     /// **Use with**:
     ///
     /// nn = two byte immediate value. (LS byte first)
-    fn ld_nn_a(&mut self) -> Result<()> {
+    fn ld_a16_a(&mut self) -> Result<()> {
         let snd_byte = self.get_next();
         let fst_byte = self.get_next();
 
         let addr = u8_to_u16(fst_byte, snd_byte) as usize;
         self.mem[addr] = self.a;
 
-        println!("LD\tnn,A");
+        println!("LD\t{:04x},A", addr);
+        Ok(())
+    }
+
+    /// **Description**
+    ///
+    /// Put value d8 into A.
+    ///
+    /// **Use with**:
+    ///
+    /// d8 = one byte immediate value.
+    fn ld_a_d8(&mut self) -> Result<()> {
+        let n = self.get_next();
+
+        self.a = n;
+
+        println!("LD\tA,{}", n);
         Ok(())
     }
 
@@ -410,10 +427,10 @@ mod tests {
     //
 
     #[test]
-    fn test_ld_nn_a() {
+    fn test_ld_a16_a() {
         let mut cpu = Cpu::new();
         cpu.a = 0x72;
-        cpu.mem[0] = opcodes::LD_NN_A;
+        cpu.mem[0] = opcodes::LD_A16_A;
         cpu.mem[1] = 0x01;
         cpu.mem[2] = 0x34;
 
