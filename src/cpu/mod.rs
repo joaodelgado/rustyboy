@@ -208,6 +208,7 @@ impl Cpu {
 
             opcodes::LD_A16_A => self.ld_a16_a(),
             opcodes::LD_A_D8 => self.ld_a_d8(),
+            opcodes::LD_HL_D16 => self.ld_hl_d16(),
             opcodes::LD_SP_HL => self.ld_sp_hl(),
             opcodes::LD_SP_NN => self.ld_sp_nn(),
 
@@ -272,6 +273,24 @@ impl Cpu {
         self.a = n;
 
         println!("LD\tA,{:02x}", n);
+        Ok(())
+    }
+
+    /// **Description**
+    ///
+    /// Put value d16 into HL.
+    ///
+    /// **Use with**:
+    ///
+    /// d16 = two byte immediate value.
+    fn ld_hl_d16(&mut self) -> Result<()> {
+        let fst_byte = self.get_next();
+        let snd_byte = self.get_next();
+
+        let n = u8_to_u16(fst_byte, snd_byte);
+        self.set_hl(n);
+
+        println!("LD\tHL,{:04x}", n);
         Ok(())
     }
 
@@ -605,6 +624,17 @@ mod tests {
 
         cpu.tick().unwrap();
         assert_eq!(0x54, cpu.mem[MEM_HW_IO_REG_OFFSET + 0x04]);
+    }
+
+    #[test]
+    fn test_ld_hl_d16() {
+        let mut cpu = Cpu::new();
+        cpu.mem[0] = opcodes::LD_HL_D16;
+        cpu.mem[1] = 0x24;
+        cpu.mem[2] = 0x35;
+
+        cpu.tick().unwrap();
+        assert_eq!(0x2435, cpu.get_hl());
     }
 
 }
