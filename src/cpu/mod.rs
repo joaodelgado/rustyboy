@@ -9,6 +9,12 @@ use errors::{Error, ErrorKind, Result};
 
 const MEM_SIZE: usize = 64 * 1024;
 
+//
+// Memory offsets
+//
+
+const MEM_HW_IO_REG_OFFSET: usize = 0xff00;
+
 ///
 ///  16bit Hi   Lo   Name/Function
 ///  AF    A    -    Accumulator & Flags
@@ -205,6 +211,8 @@ impl Cpu {
             opcodes::LD_SP_HL => self.ld_sp_hl(),
             opcodes::LD_SP_NN => self.ld_sp_nn(),
 
+            opcodes::LDH_A8_A => self.ldh_a8_a(),
+
             opcodes::NOP => self.nop(),
             s => Err(Error::new(
                 ErrorKind::UnknownInstruction,
@@ -363,6 +371,20 @@ impl Cpu {
         }
 
         println!("JP cc\t{:04x}", addr);
+        Ok(())
+    }
+
+    ///**Description:**
+    /// Put A into memory address $FF00+n.
+    ///
+    ///**Use with:**
+    /// n = one byte immediate value.
+    fn ldh_a8_a(&mut self) -> Result<()> {
+        let n = self.get_next() as usize;
+
+        self.mem[MEM_HW_IO_REG_OFFSET + n] = self.a;
+
+        println!("LDH\t{:02x},A", n);
         Ok(())
     }
 }
@@ -572,4 +594,17 @@ mod tests {
         cpu.tick().unwrap();
         assert_eq!(cpu.pc, 0x100);
     }
+
+    #[test]
+    fn test_ldh_a8_a() {
+        let mut cpu = Cpu::new();
+        cpu.mem[0] = opcodes::LDH_A8_A;
+        cpu.mem[1] = 0x04;
+        cpu.a = 0x54;
+
+
+        cpu.tick().unwrap();
+        assert_eq!(0x54, cpu.mem[MEM_HW_IO_REG_OFFSET + 0x04]);
+    }
+
 }

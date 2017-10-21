@@ -9,4 +9,5 @@ pub const LD_A16_A: u8 = 0xea;
 pub const LD_A_D8: u8 = 0x3e;
 pub const LD_SP_HL: u8 = 0xf9;
 pub const LD_SP_NN: u8 = 0x31;
+pub const LDH_A8_A: u8 = 0xe0;
 pub const NOP: u8 = 0x00;
