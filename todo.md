@@ -76,11 +76,9 @@
     - [ ] RES b,r
     - [ ] JP nn
     - [X] JP (HL)
-    - [ ] JR cc, n
+    - [X] JR n
     - [X] JP nn
     - [X] JP cc,nn
-    - [ ] JP (HL)
-    - [ ] JR cc,n
     - [ ] CALL nn
     - [ ] CALL cc,nn
     - [ ] RST n

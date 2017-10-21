@@ -2,6 +2,7 @@ pub const DI: u8 = 0xf3;
 pub const JP_A16: u8 = 0xc3;
 pub const JP_C_A16: u8 = 0xda;
 pub const JP_HL: u8 = 0xe9;
+pub const JR_R8: u8 = 0x18;
 pub const JP_NC_A16: u8 = 0xd2;
 pub const JP_NZ_A16: u8 = 0xc2;
 pub const JP_Z_A16: u8 = 0xca;

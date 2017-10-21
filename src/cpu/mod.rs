@@ -201,6 +201,7 @@ impl Cpu {
 
             opcodes::JP_A16 => self.jp_a16(),
             opcodes::JP_HL => self.jp_hl(),
+            opcodes::JR_R8 => self.jr_r8(),
             opcodes::JP_C_A16 => self.jp_cc_a16(|cpu| cpu.status_is_set(StatusRegBit::Carry)),
             opcodes::JP_NC_A16 => self.jp_cc_a16(|cpu| !cpu.status_is_set(StatusRegBit::Carry)),
             opcodes::JP_Z_A16 => self.jp_cc_a16(|cpu| cpu.status_is_set(StatusRegBit::Zero)),
@@ -334,6 +335,19 @@ impl Cpu {
         self.pc = addr;
 
         println!("JP\t{:04x}", addr);
+        Ok(())
+    }
+
+    // **Description:**
+    //
+    //  Add n to current address and jump to it.
+    //
+    // **Use with:**
+    //
+    //  n = one byte signed immediate value
+    fn jr_r8(&mut self) -> Result<()> {
+        let n = self.read_byte() as u16;
+        self.pc += n;
         Ok(())
     }
 
@@ -529,7 +543,7 @@ mod tests {
     }
 
     #[test]
-    fn test_jp_nn() {
+    fn test_jp_a16() {
         let mut cpu = Cpu::new();
         cpu.mem[0] = 0xc3;
         cpu.mem[1] = 0x00;
@@ -547,6 +561,16 @@ mod tests {
 
         cpu.tick().unwrap();
         assert_eq!(cpu.pc, 0x0134);
+    }
+
+    #[test]
+    fn test_jp_r8() {
+        let mut cpu = Cpu::new();
+        cpu.mem[0] = opcodes::JR_R8;
+        cpu.mem[1] = 15;
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.pc, 17);
     }
 
     #[test]
