@@ -253,6 +253,23 @@ impl Cpu {
 
             opcodes::LDH_A8_A => self.ldh_a8_a(),
 
+            opcodes::PUSH_A16_F5 => {
+                let reg_value = self.get_af();
+                self.push_a16(reg_value)
+            }
+            opcodes::PUSH_A16_C5 => {
+                let reg_value = self.get_bc();
+                self.push_a16(reg_value)
+            }
+            opcodes::PUSH_A16_D5 => {
+                let reg_value = self.get_de();
+                self.push_a16(reg_value)
+            }
+            opcodes::PUSH_A16_E5 => {
+                let reg_value = self.get_hl();
+                self.push_a16(reg_value)
+            }
+
             opcodes::NOP => self.nop(),
 
             opcodes::RET => self.ret(),
@@ -558,6 +575,18 @@ impl Cpu {
         self.pc = self.pop_stack_u16();
 
         println!("RET");
+        Ok(())
+    }
+
+    ///
+    /// Push register pair nn onto stack.
+    /// Decrement Stack Pointer (SP) twice.
+    ///
+    ///**Use with:**
+    /// nn = AF,BC,DE,HL
+    fn push_a16(&mut self, reg_value: u16) -> Result<()> {
+        self.push_stack_u16(reg_value);
+        println!("PUSH\t{:04x}", reg_value);
         Ok(())
     }
 }
@@ -958,6 +987,36 @@ mod tests {
 
         assert_eq!(0xfffe, cpu.sp);
         assert_eq!(0x3524, cpu.pc);
+    }
+    fn test_push_16() {
+        let mut cpu = Cpu::new();
+        cpu.sp = 0x1234;
+        cpu.set_af(0xff15);
+        cpu.set_bc(0xffff);
+        cpu.set_de(0x1234);
+        cpu.set_hl(0xfee2);
+
+        cpu.mem[0] = opcodes::PUSH_A16_F5;
+        cpu.mem[1] = opcodes::PUSH_A16_C5;
+        cpu.mem[2] = opcodes::PUSH_A16_D5;
+        cpu.mem[3] = opcodes::PUSH_A16_E5;
+
+        cpu.tick().unwrap();
+
+        assert_eq!(cpu.mem[0x1234], 0x15);
+        assert_eq!(cpu.mem[0x1233], 0xff);
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.mem[0x1232], 0xff);
+        assert_eq!(cpu.mem[0x1231], 0xff);
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.mem[0x1230], 0x34);
+        assert_eq!(cpu.mem[0x122f], 0x12);
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.mem[0x122e], 0xe2);
+        assert_eq!(cpu.mem[0x122d], 0xfe);
     }
 
 }
