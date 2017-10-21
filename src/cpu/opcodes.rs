@@ -1,3 +1,4 @@
+pub const CALL_A16: u8 = 0xcd;
 pub const DI: u8 = 0xf3;
 pub const JP_A16: u8 = 0xc3;
 pub const JP_C_A16: u8 = 0xda;

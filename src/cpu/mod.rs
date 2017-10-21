@@ -120,11 +120,25 @@ impl Cpu {
     }
 
     pub fn get_mem_range(&self, i: usize, j: usize) -> &[u8] {
-        &self.mem[i..j]
+        &self.mem[i..j + 1]
     }
 
     pub fn set_mem_range(&mut self, i: usize, j: usize, data: &[u8]) {
-        self.mem[i..j].copy_from_slice(data);
+        self.mem[i..j + 1].copy_from_slice(data);
+    }
+
+    pub fn push_stack(&mut self, data: &[u8]) {
+        let top = self.sp as usize;
+        let bottom = top - data.len();
+
+        self.set_mem_range(bottom + 1, top, data);
+
+        self.sp = bottom as u16;
+    }
+
+    pub fn push_stack_u16(&mut self, n: u16) {
+        let (b1, b2) = u16_to_u8(n);
+        self.push_stack(&[b1, b2]);
     }
 
     //
@@ -198,6 +212,8 @@ impl Cpu {
     pub fn tick(&mut self) -> Result<()> {
         let opcode = self.read_byte();
         let result = match opcode {
+            opcodes::CALL_A16 => self.call_a16(),
+
             opcodes::DI => self.di(),
 
             opcodes::JP_A16 => self.jp_a16(),
@@ -257,6 +273,27 @@ impl Cpu {
     //
     // Opcodes
     //
+
+    /// **Description**
+    ///
+    /// Push address of next instruction onto stack and then jump to address a16.
+    ///
+    /// **Use with**:
+    ///
+    /// a16 = two byte immediate value. (LS byte first)
+    fn call_a16(&mut self) -> Result<()> {
+        let addr = self.read_two_bytes_be();
+
+        // copy pc because self needs to be borrowed mutably
+        // when pushing to the stack
+        let pc = self.pc;
+        self.push_stack_u16(pc);
+
+        self.pc = addr;
+
+        println!("CALL\t{:04x}", addr);
+        Ok(())
+    }
 
     /// **Description**
     ///
@@ -515,6 +552,31 @@ mod tests {
         assert_eq!(cpu.l, 0x7c);
     }
 
+    #[test]
+    fn test_push_stack() {
+        let mut cpu = Cpu::new();
+        cpu.sp = 0xfffe;
+
+        cpu.push_stack(&[0xff, 0xee, 0xcc]);
+
+        assert_eq!(0xcc, cpu.mem[0xfffe]);
+        assert_eq!(0xee, cpu.mem[0xfffd]);
+        assert_eq!(0xff, cpu.mem[0xfffc]);
+        assert_eq!(0xfffb, cpu.sp);
+    }
+
+    #[test]
+    fn test_push_stack_u16() {
+        let mut cpu = Cpu::new();
+        cpu.sp = 0xfffe;
+
+        cpu.push_stack_u16(0xffee);
+
+        assert_eq!(0xee, cpu.mem[0xfffe]);
+        assert_eq!(0xff, cpu.mem[0xfffd]);
+        assert_eq!(0xfffc, cpu.sp);
+    }
+
     //
     // Instructions
     //
@@ -658,6 +720,24 @@ mod tests {
 
         cpu.tick().unwrap();
         assert_eq!(0x2435, cpu.get_hl());
+    }
+
+    #[test]
+    fn test_call_a16() {
+        let mut cpu = Cpu::new();
+        cpu.pc = 0xff13;
+        cpu.sp = 0xfffe;
+
+        cpu.mem[0xff13] = opcodes::CALL_A16;
+        cpu.mem[0xff14] = 0x24;
+        cpu.mem[0xff15] = 0x35;
+
+        cpu.tick().unwrap();
+
+        assert_eq!(0xfffc, cpu.sp);
+        assert_eq!(0x3524, cpu.pc);
+        assert_eq!(0x16, cpu.mem[0xfffe]);
+        assert_eq!(0xff, cpu.mem[0xfffd]);
     }
 
 }
