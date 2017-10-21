@@ -158,12 +158,12 @@ impl Cpu {
         match opcode {
             opcodes::DI => self.di(),
 
-            opcodes::JP_NN => self.jp_nn(),
+            opcodes::JP_A16 => self.jp_a16(),
             opcodes::JP_HL => self.jp_hl(),
-            opcodes::JP_C_NN => self.jp_cc_nn(|cpu| cpu.status_is_set(StatusRegBit::Carry)),
-            opcodes::JP_NC_NN => self.jp_cc_nn(|cpu| !cpu.status_is_set(StatusRegBit::Carry)),
-            opcodes::JP_Z_NN => self.jp_cc_nn(|cpu| cpu.status_is_set(StatusRegBit::Zero)),
-            opcodes::JP_NZ_NN => self.jp_cc_nn(|cpu| !cpu.status_is_set(StatusRegBit::Zero)),
+            opcodes::JP_C_A16 => self.jp_cc_a16(|cpu| cpu.status_is_set(StatusRegBit::Carry)),
+            opcodes::JP_NC_A16 => self.jp_cc_a16(|cpu| !cpu.status_is_set(StatusRegBit::Carry)),
+            opcodes::JP_Z_A16 => self.jp_cc_a16(|cpu| cpu.status_is_set(StatusRegBit::Zero)),
+            opcodes::JP_NZ_A16 => self.jp_cc_a16(|cpu| !cpu.status_is_set(StatusRegBit::Zero)),
 
             opcodes::LD_NN_A => self.ld_nn_a(),
             opcodes::LD_SP_HL => self.ld_sp_hl(),
@@ -231,7 +231,7 @@ impl Cpu {
     /// **Use with:**
     /// nn = two byte immediate value. (LS byte first.)
     ///
-    fn jp_nn(&mut self) -> Result<()> {
+    fn jp_a16(&mut self) -> Result<()> {
         let snd_byte = self.get_next();
         let fst_byte = self.get_next();
 
@@ -293,7 +293,7 @@ impl Cpu {
     ///
     ///**Use with:**
     /// nn = two byte immediate value. (LS byte first.)
-    fn jp_cc_nn<F>(&mut self, condition: F) -> Result<()>
+    fn jp_cc_a16<F>(&mut self, condition: F) -> Result<()>
     where
         F: Fn(&Cpu) -> bool,
     {
@@ -475,7 +475,7 @@ mod tests {
     }
 
     #[test]
-    fn test_jp_cc_nn() {
+    fn test_jp_cc_a16() {
         let mut cpu = Cpu::new();
 
         // check zero flag not set

@@ -1,10 +1,10 @@
 pub const DI: u8 = 0xf3;
-pub const JP_C_NN: u8 = 0xda;
+pub const JP_C_A16: u8 = 0xda;
 pub const JP_HL: u8 = 0xe9;
-pub const JP_NC_NN: u8 = 0xd2;
-pub const JP_NN: u8 = 0xc3;
-pub const JP_NZ_NN: u8 = 0xc2;
-pub const JP_Z_NN: u8 = 0xca;
+pub const JP_NC_A16: u8 = 0xd2;
+pub const JP_A16: u8 = 0xc3;
+pub const JP_NZ_A16: u8 = 0xc2;
+pub const JP_Z_A16: u8 = 0xca;
 pub const LD_NN_A: u8 = 0xea;
 pub const LD_SP_HL: u8 = 0xf9;
 pub const LD_SP_NN: u8 = 0x31;
