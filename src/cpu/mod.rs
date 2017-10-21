@@ -453,16 +453,18 @@ impl Cpu {
         Ok(())
     }
 
-    // **Description:**
-    //
-    //  Add n to current address and jump to it.
-    //
-    // **Use with:**
-    //
-    //  n = one byte signed immediate value
+    /// **Description:**
+    ///
+    ///  Add n to current address and jump to it.
+    ///
+    /// **Use with:**
+    ///
+    ///  n = one byte signed immediate value
     fn jr_r8(&mut self) -> Result<()> {
         let n = self.read_byte() as u16;
         self.pc += n;
+
+        println!("JR\t{:2x}", n);
         Ok(())
     }
 
