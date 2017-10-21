@@ -226,6 +226,13 @@ impl Cpu {
 
             opcodes::LD_A16_A => self.ld_a16_a(),
             opcodes::LD_A_D8 => self.ld_a_d8(),
+            opcodes::LD_A_A => self.ld_a_a(),
+            opcodes::LD_A_B => self.ld_a_b(),
+            opcodes::LD_A_C => self.ld_a_c(),
+            opcodes::LD_A_D => self.ld_a_d(),
+            opcodes::LD_A_E => self.ld_a_e(),
+            opcodes::LD_A_H => self.ld_a_h(),
+            opcodes::LD_A_L => self.ld_a_l(),
             opcodes::LD_HL_D16 => self.ld_hl_d16(),
             opcodes::LD_SP_HL => self.ld_sp_hl(),
             opcodes::LD_SP_NN => self.ld_sp_nn(),
@@ -307,6 +314,76 @@ impl Cpu {
         self.mem[addr] = self.a;
 
         println!("LD\t{:04x},A", addr);
+        Ok(())
+    }
+
+    /// **Description**
+    ///
+    /// Put value of A into A.
+    fn ld_a_a(&mut self) -> Result<()> {
+        self.a = self.a;
+
+        println!("LD\tA,A");
+        Ok(())
+    }
+
+    /// **Description**
+    ///
+    /// Put value of B into A.
+    fn ld_a_b(&mut self) -> Result<()> {
+        self.a = self.b;
+
+        println!("LD\tA,B");
+        Ok(())
+    }
+
+    /// **Description**
+    ///
+    /// Put value of C into A.
+    fn ld_a_c(&mut self) -> Result<()> {
+        self.a = self.c;
+
+        println!("LD\tA,C");
+        Ok(())
+    }
+
+    /// **Description**
+    ///
+    /// Put value of D into A.
+    fn ld_a_d(&mut self) -> Result<()> {
+        self.a = self.d;
+
+        println!("LD\tA,D");
+        Ok(())
+    }
+
+    /// **Description**
+    ///
+    /// Put value of E into A.
+    fn ld_a_e(&mut self) -> Result<()> {
+        self.a = self.e;
+
+        println!("LD\tA,E");
+        Ok(())
+    }
+
+    /// **Description**
+    ///
+    /// Put value of H into A.
+    fn ld_a_h(&mut self) -> Result<()> {
+        self.a = self.h;
+
+        println!("LD\tA,H");
+        Ok(())
+    }
+
+    /// **Description**
+    ///
+    /// Put value of L into A.
+    fn ld_a_l(&mut self) -> Result<()> {
+        self.a = self.l;
+
+        println!("LD\tA,L");
         Ok(())
     }
 
@@ -591,6 +668,76 @@ mod tests {
 
         cpu.tick().unwrap();
         assert_eq!(cpu.mem[0x3401], 0x72);
+    }
+
+    #[test]
+    fn test_ld_a_a() {
+        let mut cpu = Cpu::new();
+        cpu.a = 0x72;
+        cpu.mem[0] = opcodes::LD_A_A;
+
+        cpu.tick().unwrap();
+        assert_eq!(0x72, cpu.a);
+    }
+
+    #[test]
+    fn test_ld_a_b() {
+        let mut cpu = Cpu::new();
+        cpu.b = 0x72;
+        cpu.mem[0] = opcodes::LD_A_B;
+
+        cpu.tick().unwrap();
+        assert_eq!(0x72, cpu.a);
+    }
+
+    #[test]
+    fn test_ld_a_c() {
+        let mut cpu = Cpu::new();
+        cpu.c = 0x72;
+        cpu.mem[0] = opcodes::LD_A_C;
+
+        cpu.tick().unwrap();
+        assert_eq!(0x72, cpu.a);
+    }
+
+    #[test]
+    fn test_ld_a_d() {
+        let mut cpu = Cpu::new();
+        cpu.d = 0x72;
+        cpu.mem[0] = opcodes::LD_A_D;
+
+        cpu.tick().unwrap();
+        assert_eq!(0x72, cpu.a);
+    }
+
+    #[test]
+    fn test_ld_a_e() {
+        let mut cpu = Cpu::new();
+        cpu.e = 0x72;
+        cpu.mem[0] = opcodes::LD_A_E;
+
+        cpu.tick().unwrap();
+        assert_eq!(0x72, cpu.a);
+    }
+
+    #[test]
+    fn test_ld_a_h() {
+        let mut cpu = Cpu::new();
+        cpu.h = 0x72;
+        cpu.mem[0] = opcodes::LD_A_H;
+
+        cpu.tick().unwrap();
+        assert_eq!(0x72, cpu.a);
+    }
+
+    #[test]
+    fn test_ld_a_l() {
+        let mut cpu = Cpu::new();
+        cpu.l = 0x72;
+        cpu.mem[0] = opcodes::LD_A_L;
+
+        cpu.tick().unwrap();
+        assert_eq!(0x72, cpu.a);
     }
 
     #[test]
