@@ -224,7 +224,7 @@ impl Cpu {
 
         self.a = n;
 
-        println!("LD\tA,{}", n);
+        println!("LD\tA,{:02x}", n);
         Ok(())
     }
 
