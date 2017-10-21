@@ -21,3 +21,4 @@ pub const LD_HL_D16: u8 = 0x21;
 pub const LD_SP_HL: u8 = 0xf9;
 pub const LD_SP_NN: u8 = 0x31;
 pub const NOP: u8 = 0x00;
+pub const RET: u8 = 0xc9;

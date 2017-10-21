@@ -141,6 +141,20 @@ impl Cpu {
         self.push_stack(&[b1, b2]);
     }
 
+    pub fn pop_stack(&mut self, n: usize) -> &[u8] {
+        let bottom = (self.sp as usize) + 1;
+        let top = bottom + n - 1;
+
+        self.sp = top as u16;
+
+        self.get_mem_range(bottom, top)
+    }
+
+    pub fn pop_stack_u16(&mut self) -> u16 {
+        let bytes = self.pop_stack(2);
+        u8_to_u16(bytes[0], bytes[1])
+    }
+
     //
     // Manage registers
     //
@@ -240,6 +254,8 @@ impl Cpu {
             opcodes::LDH_A8_A => self.ldh_a8_a(),
 
             opcodes::NOP => self.nop(),
+
+            opcodes::RET => self.ret(),
             s => Err(Error::new(
                 ErrorKind::UnknownInstruction,
                 format!(
@@ -535,6 +551,15 @@ impl Cpu {
         println!("LDH\t{:02x},A", n);
         Ok(())
     }
+
+    ///**Description:**
+    /// Pop two bytes from stack & jump to that address.
+    fn ret(&mut self) -> Result<()> {
+        self.pc = self.pop_stack_u16();
+
+        println!("RET");
+        Ok(())
+    }
 }
 
 #[cfg(test)]
@@ -654,6 +679,37 @@ mod tests {
         assert_eq!(0xee, cpu.mem[0xfffe]);
         assert_eq!(0xff, cpu.mem[0xfffd]);
         assert_eq!(0xfffc, cpu.sp);
+    }
+
+    #[test]
+    fn test_pop_stack() {
+        let mut cpu = Cpu::new();
+        cpu.sp = 0xfffb;
+
+        cpu.mem[0xfffe] = 0xcc;
+        cpu.mem[0xfffd] = 0xee;
+        cpu.mem[0xfffc] = 0xff;
+
+        {
+            let result = cpu.pop_stack(3);
+            assert_eq!([0xff, 0xee, 0xcc], result);
+        }
+
+        assert_eq!(0xfffe, cpu.sp);
+    }
+
+    #[test]
+    fn test_pop_stack_u16() {
+        let mut cpu = Cpu::new();
+        cpu.sp = 0xfffc;
+
+        cpu.mem[0xfffe] = 0xcc;
+        cpu.mem[0xfffd] = 0xee;
+
+        let result = cpu.pop_stack_u16();
+
+        assert_eq!(0xeecc, result);
+        assert_eq!(0xfffe, cpu.sp);
     }
 
     //
@@ -887,6 +943,21 @@ mod tests {
         assert_eq!(0x3524, cpu.pc);
         assert_eq!(0x16, cpu.mem[0xfffe]);
         assert_eq!(0xff, cpu.mem[0xfffd]);
+    }
+
+    #[test]
+    fn test_ret() {
+        let mut cpu = Cpu::new();
+
+        cpu.mem[0x0] = opcodes::RET;
+        cpu.mem[0xfffe] = 0x24;
+        cpu.mem[0xfffd] = 0x35;
+        cpu.sp = 0xfffc;
+
+        cpu.tick().unwrap();
+
+        assert_eq!(0xfffe, cpu.sp);
+        assert_eq!(0x3524, cpu.pc);
     }
 
 }
