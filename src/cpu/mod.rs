@@ -369,14 +369,14 @@ impl Cpu {
         result
     }
 
-    fn consume_two_bytes_le(&mut self) -> u16 {
+    fn consume_16_imm(&mut self) -> u16 {
         let fst_byte = self.consume_byte();
         let snd_byte = self.consume_byte();
 
         u8_to_u16(fst_byte, snd_byte)
     }
 
-    fn consume_two_bytes_be(&mut self) -> u16 {
+    fn consume_16_addr(&mut self) -> u16 {
         let snd_byte = self.consume_byte();
         let fst_byte = self.consume_byte();
 
@@ -395,7 +395,7 @@ impl Cpu {
     ///
     /// a16 = two byte immediate value. (LS byte first)
     fn call_a16(&mut self) -> Result<()> {
-        let addr = self.consume_two_bytes_be();
+        let addr = self.consume_16_addr();
 
         // copy pc because self needs to be borrowed mutably
         // when pushing to the stack
@@ -415,7 +415,7 @@ impl Cpu {
     ///
     /// nn = two byte immediate value. (LS byte first)
     fn ld_a16_a(&mut self) -> Result<()> {
-        let addr = self.consume_two_bytes_be() as usize;
+        let addr = self.consume_16_addr() as usize;
         self.mem[addr] = self.a;
 
         Ok(())
@@ -506,7 +506,7 @@ impl Cpu {
     ///
     /// d16 = two byte immediate value.
     fn ld_hl_d16(&mut self) -> Result<()> {
-        let n = self.consume_two_bytes_le();
+        let n = self.consume_16_imm();
         self.set_hl(n);
 
         Ok(())
@@ -516,7 +516,7 @@ impl Cpu {
     ///
     /// Put d16 into Stack Pointer (SP).
     fn ld_sp_d16(&mut self) -> Result<()> {
-        let addr = self.consume_two_bytes_le();
+        let addr = self.consume_16_imm();
         self.sp = addr;
 
         Ok(())
@@ -529,7 +529,7 @@ impl Cpu {
     /// nn = two byte immediate value. (LS byte first.)
     ///
     fn jp_a16(&mut self) -> Result<()> {
-        let addr = self.consume_two_bytes_be();
+        let addr = self.consume_16_addr();
         self.pc = addr;
 
         Ok(())
@@ -599,7 +599,7 @@ impl Cpu {
     where
         F: Fn(&Cpu) -> bool,
     {
-        let addr = self.consume_two_bytes_be();
+        let addr = self.consume_16_addr();
 
         if condition(&self) {
             self.pc = addr;
