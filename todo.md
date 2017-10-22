@@ -24,7 +24,7 @@
     - [ ] LDD (HL),A
     - [ ] LD A,(HLI)
     - [ ] LD A,(HL+)
-    - [ ] LD A,(HL)
+    - [X] LD A,(HL)
     - [ ] LD (HLI),A
     - [ ] LD (HL+),A
     - [ ] LDI (HL),A

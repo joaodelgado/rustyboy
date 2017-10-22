@@ -258,6 +258,7 @@ impl Cpu {
             opcodes::LD_A_E => println!("LD\tA,E"),
             opcodes::LD_A_H => println!("LD\tA,H"),
             opcodes::LD_A_L => println!("LD\tA,L"),
+            opcodes::LD_A_HL => println!("LD\tA,(HL)"),
             opcodes::LD_A_D8 => println!("LD\tA,{}", read_8_imm()),
             opcodes::LD_HL_D16 => println!("LD\tHL,{}", read_16_imm()),
             opcodes::LD_SP_D16 => println!("LD\tSP,{}", read_16_imm()),
@@ -315,6 +316,7 @@ impl Cpu {
             opcodes::JP_NZ_A16 => self.jp_cc_a16(|cpu| !cpu.status_is_set(StatusRegBit::Zero)),
 
             opcodes::LD_A16_A => self.ld_a16_a(),
+
             opcodes::LD_A_D8 => self.ld_a(|cpu| cpu.consume_byte()),
             opcodes::LD_A_A => self.ld_a(|cpu| cpu.a),
             opcodes::LD_A_B => self.ld_a(|cpu| cpu.b),
@@ -323,6 +325,7 @@ impl Cpu {
             opcodes::LD_A_E => self.ld_a(|cpu| cpu.e),
             opcodes::LD_A_H => self.ld_a(|cpu| cpu.h),
             opcodes::LD_A_L => self.ld_a(|cpu| cpu.l),
+            opcodes::LD_A_HL => self.ld_a_hl(),
             opcodes::LD_HL_D16 => self.ld_hl_d16(),
             opcodes::LD_SP_HL => self.ld_sp_hl(),
             opcodes::LD_SP_D16 => self.ld_sp_d16(),
@@ -427,6 +430,14 @@ impl Cpu {
         F: Fn(&mut Cpu) -> u8,
     {
         self.a = f(self);
+    }
+
+    /// **Description**
+    ///
+    /// Put value at address stored in HL into A.
+    fn ld_a_hl(&mut self) {
+        let value = self.mem[self.get_hl() as usize];
+        self.a = value;
     }
 
     /// **Description**
@@ -815,6 +826,18 @@ mod tests {
 
         cpu.tick().unwrap();
         assert_eq!(0x72, cpu.a);
+    }
+
+    #[test]
+    fn test_ld_a_hl() {
+        let mut cpu = Cpu::new();
+        let addr = 0xb00b;
+        cpu.mem[0] = opcodes::LD_A_HL;
+        cpu.mem[addr as usize] = 5;
+        cpu.set_hl(addr as u16);
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.a, cpu.mem[addr as usize]);
     }
 
     #[test]
