@@ -315,14 +315,14 @@ impl Cpu {
             opcodes::JP_NZ_A16 => self.jp_cc_a16(|cpu| !cpu.status_is_set(StatusRegBit::Zero)),
 
             opcodes::LD_A16_A => self.ld_a16_a(),
-            opcodes::LD_A_D8 => self.ld_a_d8(),
-            opcodes::LD_A_A => self.ld_a_a(),
-            opcodes::LD_A_B => self.ld_a_b(),
-            opcodes::LD_A_C => self.ld_a_c(),
-            opcodes::LD_A_D => self.ld_a_d(),
-            opcodes::LD_A_E => self.ld_a_e(),
-            opcodes::LD_A_H => self.ld_a_h(),
-            opcodes::LD_A_L => self.ld_a_l(),
+            opcodes::LD_A_D8 => self.ld_a(|cpu| cpu.consume_byte()),
+            opcodes::LD_A_A => self.ld_a(|cpu| cpu.a),
+            opcodes::LD_A_B => self.ld_a(|cpu| cpu.b),
+            opcodes::LD_A_C => self.ld_a(|cpu| cpu.c),
+            opcodes::LD_A_D => self.ld_a(|cpu| cpu.d),
+            opcodes::LD_A_E => self.ld_a(|cpu| cpu.e),
+            opcodes::LD_A_H => self.ld_a(|cpu| cpu.h),
+            opcodes::LD_A_L => self.ld_a(|cpu| cpu.l),
             opcodes::LD_HL_D16 => self.ld_hl_d16(),
             opcodes::LD_SP_HL => self.ld_sp_hl(),
             opcodes::LD_SP_D16 => self.ld_sp_d16(),
@@ -421,63 +421,12 @@ impl Cpu {
 
     /// **Description**
     ///
-    /// Put value of A into A.
-    fn ld_a_a(&mut self) {
-        self.a = self.a;
-    }
-
-    /// **Description**
-    ///
-    /// Put value of B into A.
-    fn ld_a_b(&mut self) {
-        self.a = self.b;
-    }
-
-    /// **Description**
-    ///
-    /// Put value of C into A.
-    fn ld_a_c(&mut self) {
-        self.a = self.c;
-    }
-
-    /// **Description**
-    ///
-    /// Put value of D into A.
-    fn ld_a_d(&mut self) {
-        self.a = self.d;
-    }
-
-    /// **Description**
-    ///
-    /// Put value of E into A.
-    fn ld_a_e(&mut self) {
-        self.a = self.e;
-    }
-
-    /// **Description**
-    ///
-    /// Put value of H into A.
-    fn ld_a_h(&mut self) {
-        self.a = self.h;
-    }
-
-    /// **Description**
-    ///
-    /// Put value of L into A.
-    fn ld_a_l(&mut self) {
-        self.a = self.l;
-    }
-
-    /// **Description**
-    ///
-    /// Put value d8 into A.
-    ///
-    /// **Use with**:
-    ///
-    /// d8 = one byte immediate value.
-    fn ld_a_d8(&mut self) {
-        let n = self.consume_byte();
-        self.a = n;
+    /// Put a value into A.
+    fn ld_a<F>(&mut self, f: F)
+    where
+        F: Fn(&mut Cpu) -> u8,
+    {
+        self.a = f(self);
     }
 
     /// **Description**
