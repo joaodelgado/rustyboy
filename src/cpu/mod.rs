@@ -219,6 +219,16 @@ impl Cpu {
         }
     }
 
+    // Set the defined status flag
+    fn status_reset(&mut self, bit_enum: StatusRegBit) {
+        match bit_enum {
+            StatusRegBit::Zero => self.status = 0,
+            StatusRegBit::Sub => self.status = 0,
+            StatusRegBit::HalfCarry => self.status = 0,
+            StatusRegBit::Carry => self.status = 0,
+        }
+    }
+
     fn print_curr(&self) {
         self.print_instr(self.pc)
     }
@@ -292,6 +302,15 @@ impl Cpu {
 
             opcodes::DI => println!("DI"),
             opcodes::NOP => println!("NOP"),
+            opcodes::OR_A_A => println!("OR\tA,A"),
+            opcodes::OR_A_B => println!("OR\tA,B"),
+            opcodes::OR_A_C => println!("OR\tA,C"),
+            opcodes::OR_A_D => println!("OR\tA,D"),
+            opcodes::OR_A_E => println!("OR\tA,E"),
+            opcodes::OR_A_H => println!("OR\tA,H"),
+            opcodes::OR_A_L => println!("OR\tA,L"),
+            opcodes::OR_A_HL => println!("OR\tA,HL"),
+            opcodes::OR_A_D8 => println!("OR\tA,{}", read_8_imm()),
 
             n => println!("Unknown instruction {:02x}@{:04x}", n, addr),
         }
@@ -353,6 +372,19 @@ impl Cpu {
             opcodes::INC_DE => self.inc_r16(Cpu::get_de, Cpu::set_de),
             opcodes::INC_HL => self.inc_r16(Cpu::get_hl, Cpu::set_hl),
             opcodes::INC_SP => self.inc_r16(|cpu| cpu.sp, |cpu, n| cpu.sp = n),
+
+            opcodes::OR_A_A => self.or_a(|cpu| cpu.a),
+            opcodes::OR_A_B => self.or_a(|cpu| cpu.a),
+            opcodes::OR_A_C => self.or_a(|cpu| cpu.a),
+            opcodes::OR_A_D => self.or_a(|cpu| cpu.a),
+            opcodes::OR_A_E => self.or_a(|cpu| cpu.a),
+            opcodes::OR_A_H => self.or_a(|cpu| cpu.a),
+            opcodes::OR_A_L => self.or_a(|cpu| cpu.a),
+            opcodes::OR_A_HL => {
+                let addr = self.get_hl() as usize;
+                self.or_a(|cpu| cpu.mem[addr])
+            }
+            opcodes::OR_A_D8 => self.or_a_d8(),
 
             opcodes::NOP => self.nop(),
             s => {
@@ -599,6 +631,43 @@ impl Cpu {
     {
         let curr_value = getter(self);
         setter(self, curr_value + 1);
+    }
+
+    ///**Description:**
+    ///  Logical OR n with register A, result in A.
+    ///
+    ///**Use with:**
+    ///  n = A,B,C,D,E,H,L,(HL),#
+    ///
+    ///**Flags affected:**
+    ///  Z - Set if result is zero.
+    ///  N - Reset.
+    ///  H - Reset.
+    ///  C - Reset.
+    fn or_a<F>(&mut self, f: F)
+    where
+        F: Fn(&mut Cpu) -> u8,
+    {
+        self.status_reset(StatusRegBit::Zero);
+        self.status_reset(StatusRegBit::Carry);
+        self.status_reset(StatusRegBit::HalfCarry);
+        self.status_reset(StatusRegBit::Sub);
+
+        if (self.a | f(self)) == 0 {
+            self.status_set(StatusRegBit::Zero);
+        }
+    }
+
+    fn or_a_d8(&mut self) {
+        self.status_reset(StatusRegBit::Zero);
+        self.status_reset(StatusRegBit::Carry);
+        self.status_reset(StatusRegBit::HalfCarry);
+        self.status_reset(StatusRegBit::Sub);
+
+        let value = self.consume_byte();
+        if (self.a | value) == 0 {
+            self.status_set(StatusRegBit::Zero);
+        }
     }
 }
 
@@ -1131,5 +1200,167 @@ mod tests {
 
         cpu.tick().unwrap();
         assert_eq!(cpu.sp, 1);
+    }
+
+    #[test]
+    fn test_or_a_a() {
+        let mut cpu = Cpu::new();
+        cpu.a = 0b10000000;
+        cpu.mem[0] = opcodes::OR_A_A;
+
+        cpu.tick().unwrap();
+        assert!(!cpu.status_is_set(StatusRegBit::Zero));
+
+        cpu.a = 0b00000000;
+        cpu.mem[1] = opcodes::OR_A_A;
+
+        cpu.tick().unwrap();
+        assert!(cpu.status_is_set(StatusRegBit::Zero));
+    }
+
+    #[test]
+    fn test_or_a_b() {
+        let mut cpu = Cpu::new();
+        cpu.a = 0b10000000;
+        cpu.b = 0b10000000;
+        cpu.mem[0] = opcodes::OR_A_B;
+
+        cpu.tick().unwrap();
+        assert!(!cpu.status_is_set(StatusRegBit::Zero));
+
+        cpu.a = 0b00000000;
+        cpu.c = 0b00000000;
+        cpu.mem[1] = opcodes::OR_A_B;
+
+        cpu.tick().unwrap();
+        assert!(cpu.status_is_set(StatusRegBit::Zero));
+    }
+
+    #[test]
+    fn test_or_a_c() {
+        let mut cpu = Cpu::new();
+        cpu.a = 0b10000011;
+        cpu.b = 0b01000000;
+        cpu.mem[0] = opcodes::OR_A_C;
+
+        cpu.tick().unwrap();
+        assert!(!cpu.status_is_set(StatusRegBit::Zero));
+
+        cpu.a = 0b00000000;
+        cpu.c = 0b00000000;
+        cpu.mem[1] = opcodes::OR_A_C;
+
+        cpu.tick().unwrap();
+        assert!(cpu.status_is_set(StatusRegBit::Zero));
+    }
+
+    #[test]
+    fn test_or_a_d() {
+        let mut cpu = Cpu::new();
+        cpu.a = 0xff;
+        cpu.b = 0b10000000;
+        cpu.mem[0] = opcodes::OR_A_D;
+
+        cpu.tick().unwrap();
+        assert!(!cpu.status_is_set(StatusRegBit::Zero));
+
+        cpu.a = 0b00000000;
+        cpu.d = 0b00000000;
+        cpu.mem[1] = opcodes::OR_A_D;
+
+        cpu.tick().unwrap();
+        assert!(cpu.status_is_set(StatusRegBit::Zero));
+    }
+
+    #[test]
+    fn test_or_a_e() {
+        let mut cpu = Cpu::new();
+        cpu.a = 0xff;
+        cpu.e = 0b10000000;
+        cpu.mem[0] = opcodes::OR_A_E;
+
+        cpu.tick().unwrap();
+        assert!(!cpu.status_is_set(StatusRegBit::Zero));
+
+        cpu.a = 0b00000000;
+        cpu.e = 0b00000000;
+        cpu.mem[1] = opcodes::OR_A_E;
+
+        cpu.tick().unwrap();
+        assert!(cpu.status_is_set(StatusRegBit::Zero));
+    }
+
+    #[test]
+    fn test_or_a_h() {
+        let mut cpu = Cpu::new();
+        cpu.a = 10;
+        cpu.h = 0b10000000;
+        cpu.mem[0] = opcodes::OR_A_H;
+
+        cpu.tick().unwrap();
+        assert!(!cpu.status_is_set(StatusRegBit::Zero));
+
+        cpu.a = 0b00000000;
+        cpu.h = 0b00000000;
+        cpu.mem[1] = opcodes::OR_A_H;
+
+        cpu.tick().unwrap();
+        assert!(cpu.status_is_set(StatusRegBit::Zero));
+    }
+
+    #[test]
+    fn test_or_a_l() {
+        let mut cpu = Cpu::new();
+        cpu.a = 0xf;
+        cpu.b = 0b10000000;
+        cpu.mem[0] = opcodes::OR_A_L;
+
+        cpu.tick().unwrap();
+        assert!(!cpu.status_is_set(StatusRegBit::Zero));
+
+        cpu.a = 0b00000000;
+        cpu.d = 0b00000000;
+        cpu.mem[1] = opcodes::OR_A_L;
+
+        cpu.tick().unwrap();
+        assert!(cpu.status_is_set(StatusRegBit::Zero));
+    }
+
+    #[test]
+    fn test_or_a_hl() {
+        let mut cpu = Cpu::new();
+        cpu.a = 0xff;
+        cpu.set_hl(0xffe1);
+        cpu.mem[0] = opcodes::OR_A_HL;
+        cpu.mem[0xffe1] = 0b11000000;
+
+        cpu.tick().unwrap();
+        assert!(!cpu.status_is_set(StatusRegBit::Zero));
+
+        cpu.a = 0b00000000;
+        cpu.set_hl(0xffe1);
+        cpu.mem[1] = opcodes::OR_A_HL;
+        cpu.mem[0xffe1] = 0;
+
+        cpu.tick().unwrap();
+        assert!(cpu.status_is_set(StatusRegBit::Zero));
+    }
+
+    #[test]
+    fn test_or_a_d8() {
+        let mut cpu = Cpu::new();
+        cpu.a = 0xff;
+        cpu.mem[0] = opcodes::OR_A_D8;
+        cpu.mem[1] = 0xf1;
+
+        cpu.tick().unwrap();
+        assert!(!cpu.status_is_set(StatusRegBit::Zero));
+
+        cpu.a = 0b00000000;
+        cpu.mem[2] = opcodes::OR_A_D8;
+        cpu.mem[3] = 0;
+
+        cpu.tick().unwrap();
+        assert!(cpu.status_is_set(StatusRegBit::Zero));
     }
 }
