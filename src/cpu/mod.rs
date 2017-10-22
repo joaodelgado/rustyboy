@@ -674,13 +674,12 @@ impl Cpu {
         G: Fn(&Cpu) -> u8,
         S: Fn(&mut Cpu, u8),
     {
-        // TODO flags
-        let curr_value = getter(self);
-        let new_value = curr_value.wrapping_add(1);
+        let old_value = getter(self);
+        let new_value = old_value.wrapping_add(1);
 
-        if new_value == 0 {
-            self.set_flag(Flag::Zero)
-        }
+        self.set_flag_to(Flag::Zero, new_value == 0);
+        self.set_flag_to(Flag::HalfCarry, old_value & 0xf == 0xf);
+        self.reset_flag(Flag::Sub);
 
         setter(self, new_value);
     }
@@ -694,8 +693,14 @@ impl Cpu {
     where
         G: Fn(&Cpu) -> u16,
     {
-        // TODO flags
         let addr = getter(self) as usize;
+        let old_value = self.mem[addr];
+        let new_value = old_value.wrapping_add(1);
+
+        self.set_flag_to(Flag::Zero, new_value == 0);
+        self.set_flag_to(Flag::HalfCarry, old_value & 0xf == 0xf);
+        self.reset_flag(Flag::Sub);
+
         self.mem[addr] = self.mem[addr].wrapping_add(1);
     }
 

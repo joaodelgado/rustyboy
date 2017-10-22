@@ -97,14 +97,14 @@ fn test_jr_cc_r8() {
 
     // check carry flag not set
     cpu.mem[cpu.pc as usize] = opcodes::JR_NC_R8;
-    cpu.mem[(cpu.pc+1) as usize] = 20;
+    cpu.mem[(cpu.pc + 1) as usize] = 20;
 
     cpu.tick().unwrap();
     assert_eq!(cpu.pc, 76);
 
     // check carry flag set
     cpu.mem[cpu.pc as usize] = opcodes::JR_C_R8;
-    cpu.mem[(cpu.pc+1) as usize] = 0b11101101; // -19
+    cpu.mem[(cpu.pc + 1) as usize] = 0b11101101; // -19
 
     cpu.set_flag(Flag::Carry);
     cpu.tick().unwrap();

@@ -21,6 +21,42 @@ where
     cpu.tick().unwrap();
     assert_eq!(reg_getter(cpu), 0x00);
 
+    // Test Zero flag
+    cpu.mem[cpu.pc as usize] = opcode;
+    cpu.reset_flag(Flag::Zero);
+    reg_setter(cpu, 0x01);
+
+    cpu.tick().unwrap();
+    assert!(!cpu.flag(Flag::Zero)); // Should be reset if the result is non 0
+
+    cpu.mem[cpu.pc as usize] = opcode;
+    cpu.set_flag(Flag::Zero);
+    reg_setter(cpu, 0xff);
+
+    cpu.tick().unwrap();
+    assert!(cpu.flag(Flag::Zero)); // Should be set if the result is 0
+
+    // Test Sub flag
+    cpu.mem[cpu.pc as usize] = opcode;
+    cpu.set_flag(Flag::Sub);
+
+    cpu.tick().unwrap();
+    assert!(!cpu.flag(Flag::Sub)); // Should always be reset
+
+    // Test HalfCarry flag
+    cpu.mem[cpu.pc as usize] = opcode;
+    cpu.set_flag(Flag::HalfCarry);
+    reg_setter(cpu, 0b0000_0001);
+
+    cpu.tick().unwrap();
+    assert!(!cpu.flag(Flag::HalfCarry)); // Should be reset if there's no carry on bit 3
+
+    cpu.mem[cpu.pc as usize] = opcode;
+    cpu.reset_flag(Flag::HalfCarry);
+    reg_setter(cpu, 0b0000_1111);
+
+    cpu.tick().unwrap();
+    assert!(cpu.flag(Flag::HalfCarry)); // Should be set if there's carry on bit 3
 }
 
 #[test]
@@ -76,6 +112,47 @@ fn test_inc_ahl() {
 
     cpu.tick().unwrap();
     assert_eq!(cpu.mem[0xfee2], 0x00);
+
+    // Test Zero flag
+    cpu.mem[cpu.pc as usize] = opcodes::INC_AHL;
+    cpu.reset_flag(Flag::Zero);
+    cpu.set_hl(0xfee2);
+    cpu.mem[0xfee2] = 0x01;
+
+    cpu.tick().unwrap();
+    assert!(!cpu.flag(Flag::Zero)); // Should be reset if the result is non 0
+
+    cpu.mem[cpu.pc as usize] = opcodes::INC_AHL;
+    cpu.set_flag(Flag::Zero);
+    cpu.set_hl(0xfee2);
+    cpu.mem[0xfee2] = 0xff;
+
+    cpu.tick().unwrap();
+    assert!(cpu.flag(Flag::Zero)); // Should be set if the result is 0
+
+    // Test Sub flag
+    cpu.mem[cpu.pc as usize] = opcodes::INC_AHL;
+    cpu.set_flag(Flag::Sub);
+
+    cpu.tick().unwrap();
+    assert!(!cpu.flag(Flag::Sub)); // Should always be reset
+
+    // Test HalfCarry flag
+    cpu.mem[cpu.pc as usize] = opcodes::INC_AHL;
+    cpu.set_flag(Flag::HalfCarry);
+    cpu.set_hl(0xfee2);
+    cpu.mem[0xfee2] = 0b0000_0001;
+
+    cpu.tick().unwrap();
+    assert!(!cpu.flag(Flag::HalfCarry)); // Should be reset if there's no carry on bit 3
+
+    cpu.mem[cpu.pc as usize] = opcodes::INC_AHL;
+    cpu.reset_flag(Flag::HalfCarry);
+    cpu.set_hl(0xfee2);
+    cpu.mem[0xfee2] = 0b0000_1111;
+
+    cpu.tick().unwrap();
+    assert!(cpu.flag(Flag::HalfCarry)); // Should be set if there's carry on bit 3
 }
 
 fn _test_inc_reg16<G, S>(opcode: u8, reg_getter: G, reg_setter: S)
