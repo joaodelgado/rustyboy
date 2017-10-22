@@ -12,17 +12,17 @@ fn test_status_reg() {
     let mut cpu = Cpu::new();
     cpu.init();
 
-    cpu.status_set(StatusRegBit::Zero);
-    assert_eq!(cpu.status_is_set(StatusRegBit::Zero), true);
+    cpu.set_flag(Flag::Zero);
+    assert_eq!(cpu.flag(Flag::Zero), true);
 
-    cpu.status_set(StatusRegBit::Sub);
-    assert_eq!(cpu.status_is_set(StatusRegBit::Sub), true);
+    cpu.set_flag(Flag::Sub);
+    assert_eq!(cpu.flag(Flag::Sub), true);
 
-    cpu.status_set(StatusRegBit::HalfCarry);
-    assert_eq!(cpu.status_is_set(StatusRegBit::HalfCarry), true);
+    cpu.set_flag(Flag::HalfCarry);
+    assert_eq!(cpu.flag(Flag::HalfCarry), true);
 
-    cpu.status_set(StatusRegBit::Carry);
-    assert_eq!(cpu.status_is_set(StatusRegBit::Carry), true);
+    cpu.set_flag(Flag::Carry);
+    assert_eq!(cpu.flag(Flag::Carry), true);
 }
 
 #[test]

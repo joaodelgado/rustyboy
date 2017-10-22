@@ -50,7 +50,7 @@ fn test_jp_cc_a16() {
     cpu.mem[2] = 0x01;
     cpu.pc = 0;
 
-    cpu.status_set(StatusRegBit::Zero);
+    cpu.set_flag(Flag::Zero);
     cpu.tick().unwrap();
 
     assert_eq!(cpu.pc, 0x100);
@@ -70,7 +70,7 @@ fn test_jp_cc_a16() {
     cpu.mem[2] = 0x01;
     cpu.pc = 0;
 
-    cpu.status_set(StatusRegBit::Carry);
+    cpu.set_flag(Flag::Carry);
     cpu.tick().unwrap();
     assert_eq!(cpu.pc, 0x100);
 }

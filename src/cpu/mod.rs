@@ -71,7 +71,7 @@ impl fmt::Display for Cpu {
     }
 }
 
-pub enum StatusRegBit {
+pub enum Flag {
     Zero,
     Sub,
     HalfCarry,
@@ -200,33 +200,37 @@ impl Cpu {
         self.l = l;
     }
 
-    // Check if a certain flag is set
-    fn status_is_set(&self, bit_enum: StatusRegBit) -> bool {
+    //
+    // Flags
+    //
+
+    /// Check if a certain flag is set
+    fn flag(&self, bit_enum: Flag) -> bool {
         match bit_enum {
-            StatusRegBit::Zero => (self.status & 0b10000000) == 0b10000000,
-            StatusRegBit::Sub => (self.status & 0b01000000) == 0b01000000,
-            StatusRegBit::HalfCarry => (self.status & 0b00100000) == 0b00100000,
-            StatusRegBit::Carry => (self.status & 0b00010000) == 0b00010000,
+            Flag::Zero => (self.status & 0b10000000) == 0b10000000,
+            Flag::Sub => (self.status & 0b01000000) == 0b01000000,
+            Flag::HalfCarry => (self.status & 0b00100000) == 0b00100000,
+            Flag::Carry => (self.status & 0b00010000) == 0b00010000,
         }
     }
 
-    // Set the defined status flag
-    fn status_set(&mut self, bit_enum: StatusRegBit) {
+    /// Set the defined status flag
+    fn set_flag(&mut self, bit_enum: Flag) {
         match bit_enum {
-            StatusRegBit::Zero => self.status |= 0b10000000,
-            StatusRegBit::Sub => self.status |= 0b01000000,
-            StatusRegBit::HalfCarry => self.status |= 0b00100000,
-            StatusRegBit::Carry => self.status |= 0b00010000,
+            Flag::Zero => self.status |= 0b10000000,
+            Flag::Sub => self.status |= 0b01000000,
+            Flag::HalfCarry => self.status |= 0b00100000,
+            Flag::Carry => self.status |= 0b00010000,
         }
     }
 
-    // Set the defined status flag
-    fn status_reset(&mut self, bit_enum: StatusRegBit) {
+    /// Reset the defined status flag
+    fn reset_flag(&mut self, bit_enum: Flag) {
         match bit_enum {
-            StatusRegBit::Zero => self.status = 0,
-            StatusRegBit::Sub => self.status = 0,
-            StatusRegBit::HalfCarry => self.status = 0,
-            StatusRegBit::Carry => self.status = 0,
+            Flag::Zero => self.status = 0,
+            Flag::Sub => self.status = 0,
+            Flag::HalfCarry => self.status = 0,
+            Flag::Carry => self.status = 0,
         }
     }
 
@@ -346,10 +350,10 @@ impl Cpu {
             opcodes::JP_A16 => self.jp_a16(),
             opcodes::JP_HL => self.jp_hl(),
             opcodes::JR_R8 => self.jr_r8(),
-            opcodes::JP_C_A16 => self.jp_cc_a16(|cpu| cpu.status_is_set(StatusRegBit::Carry)),
-            opcodes::JP_NC_A16 => self.jp_cc_a16(|cpu| !cpu.status_is_set(StatusRegBit::Carry)),
-            opcodes::JP_Z_A16 => self.jp_cc_a16(|cpu| cpu.status_is_set(StatusRegBit::Zero)),
-            opcodes::JP_NZ_A16 => self.jp_cc_a16(|cpu| !cpu.status_is_set(StatusRegBit::Zero)),
+            opcodes::JP_C_A16 => self.jp_cc_a16(|cpu| cpu.flag(Flag::Carry)),
+            opcodes::JP_NC_A16 => self.jp_cc_a16(|cpu| !cpu.flag(Flag::Carry)),
+            opcodes::JP_Z_A16 => self.jp_cc_a16(|cpu| cpu.flag(Flag::Zero)),
+            opcodes::JP_NZ_A16 => self.jp_cc_a16(|cpu| !cpu.flag(Flag::Zero)),
 
             opcodes::LD_BC_A => self.ld_addr_a(|cpu| cpu.get_bc()),
             opcodes::LD_DE_A => self.ld_addr_a(|cpu| cpu.get_de()),
@@ -656,7 +660,13 @@ impl Cpu {
     {
         // TODO flags
         let curr_value = getter(self);
-        setter(self, curr_value.wrapping_add(1));
+        let new_value = curr_value.wrapping_add(1);
+
+        if new_value == 0 {
+            self.set_flag(Flag::Zero)
+        }
+
+        setter(self, new_value);
     }
 
     ///**Description:**
@@ -702,25 +712,25 @@ impl Cpu {
     where
         F: Fn(&mut Cpu) -> u8,
     {
-        self.status_reset(StatusRegBit::Zero);
-        self.status_reset(StatusRegBit::Carry);
-        self.status_reset(StatusRegBit::HalfCarry);
-        self.status_reset(StatusRegBit::Sub);
+        self.reset_flag(Flag::Zero);
+        self.reset_flag(Flag::Carry);
+        self.reset_flag(Flag::HalfCarry);
+        self.reset_flag(Flag::Sub);
 
         if (self.a | f(self)) == 0 {
-            self.status_set(StatusRegBit::Zero);
+            self.set_flag(Flag::Zero);
         }
     }
 
     fn or_a_d8(&mut self) {
-        self.status_reset(StatusRegBit::Zero);
-        self.status_reset(StatusRegBit::Carry);
-        self.status_reset(StatusRegBit::HalfCarry);
-        self.status_reset(StatusRegBit::Sub);
+        self.reset_flag(Flag::Zero);
+        self.reset_flag(Flag::Carry);
+        self.reset_flag(Flag::HalfCarry);
+        self.reset_flag(Flag::Sub);
 
         let value = self.consume_byte();
         if (self.a | value) == 0 {
-            self.status_set(StatusRegBit::Zero);
+            self.set_flag(Flag::Zero);
         }
     }
 }
