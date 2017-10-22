@@ -1,130 +1,61 @@
 #![cfg(test)]
 use super::*;
 
-#[test]
-fn test_inc_a() {
-    let mut cpu = Cpu::new();
+fn _test_inc_reg<G, S>(opcode: u8, reg_getter: G, reg_setter: S)
+where
+    G: Fn(&Cpu) -> u8,
+    S: Fn(&mut Cpu, u8),
+{
+    let cpu = &mut Cpu::new();
 
-    cpu.a = 0x01;
-    cpu.mem[0] = opcodes::INC_A;
+    reg_setter(cpu, 0x01);
+    cpu.mem[0] = opcode;
 
     cpu.tick().unwrap();
-    assert_eq!(cpu.a, 0x02);
+    assert_eq!(reg_getter(cpu), 0x02);
 
     // Test wrapping
-    cpu.mem[cpu.pc as usize] = opcodes::INC_A;
-    cpu.a = 0xff;
+    cpu.mem[cpu.pc as usize] = opcode;
+    reg_setter(cpu, 0xff);
 
     cpu.tick().unwrap();
-    assert_eq!(cpu.a, 0x00);
+    assert_eq!(reg_getter(cpu), 0x00);
+
+}
+
+#[test]
+fn test_inc_a() {
+    _test_inc_reg(opcodes::INC_A, |cpu| cpu.a, |cpu, n| cpu.a = n);
 }
 
 #[test]
 fn test_inc_b() {
-    let mut cpu = Cpu::new();
-
-    cpu.b = 0x01;
-    cpu.mem[0] = opcodes::INC_B;
-
-    cpu.tick().unwrap();
-    assert_eq!(cpu.b, 0x02);
-
-    // Test wrapping
-    cpu.mem[cpu.pc as usize] = opcodes::INC_B;
-    cpu.b = 0xff;
-
-    cpu.tick().unwrap();
-    assert_eq!(cpu.b, 0x00);
+    _test_inc_reg(opcodes::INC_B, |cpu| cpu.b, |cpu, n| cpu.b = n);
 }
 
 #[test]
 fn test_inc_c() {
-    let mut cpu = Cpu::new();
-
-    cpu.c = 0x01;
-    cpu.mem[0] = opcodes::INC_C;
-
-    cpu.tick().unwrap();
-    assert_eq!(cpu.c, 0x02);
-
-    // Test wrapping
-    cpu.mem[cpu.pc as usize] = opcodes::INC_C;
-    cpu.c = 0xff;
-
-    cpu.tick().unwrap();
-    assert_eq!(cpu.c, 0x00);
+    _test_inc_reg(opcodes::INC_C, |cpu| cpu.c, |cpu, n| cpu.c = n);
 }
 
 #[test]
 fn test_inc_d() {
-    let mut cpu = Cpu::new();
-
-    cpu.d = 0x01;
-    cpu.mem[0] = opcodes::INC_D;
-
-    cpu.tick().unwrap();
-    assert_eq!(cpu.d, 0x02);
-
-    // Test wrapping
-    cpu.mem[cpu.pc as usize] = opcodes::INC_D;
-    cpu.d = 0xff;
-
-    cpu.tick().unwrap();
-    assert_eq!(cpu.d, 0x00);
+    _test_inc_reg(opcodes::INC_D, |cpu| cpu.d, |cpu, n| cpu.d = n);
 }
 
 #[test]
 fn test_inc_e() {
-    let mut cpu = Cpu::new();
-
-    cpu.e = 0x01;
-    cpu.mem[0] = opcodes::INC_E;
-
-    cpu.tick().unwrap();
-    assert_eq!(cpu.e, 0x02);
-
-    // Test wrapping
-    cpu.mem[cpu.pc as usize] = opcodes::INC_E;
-    cpu.e = 0xff;
-
-    cpu.tick().unwrap();
-    assert_eq!(cpu.e, 0x00);
+    _test_inc_reg(opcodes::INC_E, |cpu| cpu.e, |cpu, n| cpu.e = n);
 }
 
 #[test]
 fn test_inc_h() {
-    let mut cpu = Cpu::new();
-
-    cpu.h = 0x01;
-    cpu.mem[0] = opcodes::INC_H;
-
-    cpu.tick().unwrap();
-    assert_eq!(cpu.h, 0x02);
-
-    // Test wrapping
-    cpu.mem[cpu.pc as usize] = opcodes::INC_H;
-    cpu.h = 0xff;
-
-    cpu.tick().unwrap();
-    assert_eq!(cpu.h, 0x00);
+    _test_inc_reg(opcodes::INC_H, |cpu| cpu.h, |cpu, n| cpu.h = n);
 }
 
 #[test]
 fn test_inc_l() {
-    let mut cpu = Cpu::new();
-
-    cpu.h = 0x01;
-    cpu.mem[0] = opcodes::INC_H;
-
-    cpu.tick().unwrap();
-    assert_eq!(cpu.h, 0x02);
-
-    // Test wrapping
-    cpu.mem[cpu.pc as usize] = opcodes::INC_H;
-    cpu.h = 0xff;
-
-    cpu.tick().unwrap();
-    assert_eq!(cpu.h, 0x00);
+    _test_inc_reg(opcodes::INC_L, |cpu| cpu.l, |cpu, n| cpu.l = n);
 }
 
 #[test]
@@ -147,56 +78,39 @@ fn test_inc_ahl() {
     assert_eq!(cpu.mem[0xfee2], 0x00);
 }
 
-#[test]
-fn test_inc_bc() {
-    let mut cpu = Cpu::new();
-    cpu.set_bc(0xfff9);
+fn _test_inc_reg16<G, S>(opcode: u8, reg_getter: G, reg_setter: S)
+where
+    G: Fn(&Cpu) -> u16,
+    S: Fn(&mut Cpu, u16),
+{
+    let cpu = &mut Cpu::new();
 
-    cpu.mem[0] = opcodes::INC_BC;
+    reg_setter(cpu, 0xfff9);
+    cpu.mem[0] = opcode;
 
     cpu.tick().unwrap();
-    assert_eq!(cpu.get_bc(), 0xfffa);
+    assert_eq!(reg_getter(cpu), 0xfffa);
 
     // Test wrapping
-    cpu.mem[cpu.pc as usize] = opcodes::INC_BC;
-    cpu.set_bc(0xffff);
+    cpu.mem[cpu.pc as usize] = opcode;
+    reg_setter(cpu, 0xffff);
 
     cpu.tick().unwrap();
-    assert_eq!(cpu.get_bc(), 0x0000);
+    assert_eq!(reg_getter(cpu), 0x0000);
+
+}
+
+#[test]
+fn test_inc_bc() {
+    _test_inc_reg16(opcodes::INC_BC, Cpu::get_bc, Cpu::set_bc);
 }
 
 #[test]
 fn test_inc_de() {
-    let mut cpu = Cpu::new();
-    cpu.set_de(0xfff9);
-
-    cpu.mem[0] = opcodes::INC_DE;
-
-    cpu.tick().unwrap();
-    assert_eq!(cpu.get_de(), 0xfffa);
-
-    // Test wrapping
-    cpu.mem[cpu.pc as usize] = opcodes::INC_DE;
-    cpu.set_de(0xffff);
-
-    cpu.tick().unwrap();
-    assert_eq!(cpu.get_de(), 0x0000);
+    _test_inc_reg16(opcodes::INC_DE, Cpu::get_de, Cpu::set_de);
 }
 
 #[test]
 fn test_inc_hl() {
-    let mut cpu = Cpu::new();
-    cpu.set_hl(0xfff9);
-
-    cpu.mem[0] = opcodes::INC_HL;
-
-    cpu.tick().unwrap();
-    assert_eq!(cpu.get_hl(), 0xfffa);
-
-    // Test wrapping
-    cpu.mem[cpu.pc as usize] = opcodes::INC_HL;
-    cpu.set_hl(0xffff);
-
-    cpu.tick().unwrap();
-    assert_eq!(cpu.get_hl(), 0x0000);
+    _test_inc_reg16(opcodes::INC_HL, Cpu::get_hl, Cpu::set_hl);
 }
