@@ -13,7 +13,7 @@
   - Implement instructions
     - [X] 0x00 NOP
     - [X] 0x01 LD	BC,d16
-    - [ ] 0x02 LD	(BC),A
+    - [X] 0x02 LD	(BC),A
     - [X] 0x03 INC	BC
     - [ ] 0x04 INC	B
     - [ ] 0x05 DEC	B
@@ -29,7 +29,7 @@
     - [ ] 0x0f RRCA
     - [ ] 0x10 STOP	0
     - [X] 0x11 LD	DE,d16
-    - [ ] 0x12 LD	(DE),A
+    - [X] 0x12 LD	(DE),A
     - [X] 0x13 INC	DE
     - [ ] 0x14 INC	D
     - [ ] 0x15 DEC	D
@@ -130,7 +130,7 @@
     - [ ] 0x74 LD	(HL),H
     - [ ] 0x75 LD	(HL),L
     - [ ] 0x76 HALT
-    - [ ] 0x77 LD	(HL),A
+    - [X] 0x77 LD	(HL),A
     - [X] 0x78 LD	A,B
     - [X] 0x79 LD	A,C
     - [X] 0x7a LD	A,D
