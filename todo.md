@@ -15,7 +15,7 @@
     - [X] 0x01 LD	BC,d16
     - [X] 0x02 LD	(BC),A
     - [X] 0x03 INC	BC
-    - [ ] 0x04 INC	B
+    - [X] 0x04 INC	B
     - [ ] 0x05 DEC	B
     - [ ] 0x06 LD	B,d8
     - [ ] 0x07 RLCA
@@ -23,7 +23,7 @@
     - [ ] 0x09 ADD	HL,BC
     - [ ] 0x0a LD	A,(BC)
     - [ ] 0x0b DEC	BC
-    - [ ] 0x0c INC	C
+    - [X] 0x0c INC	C
     - [ ] 0x0d DEC	C
     - [ ] 0x0e LD	C,d8
     - [ ] 0x0f RRCA
@@ -31,7 +31,7 @@
     - [X] 0x11 LD	DE,d16
     - [X] 0x12 LD	(DE),A
     - [X] 0x13 INC	DE
-    - [ ] 0x14 INC	D
+    - [X] 0x14 INC	D
     - [ ] 0x15 DEC	D
     - [ ] 0x16 LD	D,d8
     - [ ] 0x17 RLA
@@ -39,7 +39,7 @@
     - [ ] 0x19 ADD	HL,DE
     - [ ] 0x1a LD	A,(DE)
     - [ ] 0x1b DEC	DE
-    - [ ] 0x1c INC	E
+    - [X] 0x1c INC	E
     - [ ] 0x1d DEC	E
     - [ ] 0x1e LD	E,d8
     - [ ] 0x1f RRA
@@ -47,7 +47,7 @@
     - [X] 0x21 LD	HL,d16
     - [ ] 0x22 LD	(HL+),A
     - [X] 0x23 INC	HL
-    - [ ] 0x24 INC	H
+    - [X] 0x24 INC	H
     - [ ] 0x25 DEC	H
     - [ ] 0x26 LD	H,d8
     - [ ] 0x27 DAA
@@ -55,7 +55,7 @@
     - [ ] 0x29 ADD	HL,HL
     - [X] 0x2a LD	A,(HL+)
     - [ ] 0x2b DEC	HL
-    - [ ] 0x2c INC	L
+    - [X] 0x2c INC	L
     - [ ] 0x2d DEC	L
     - [ ] 0x2e LD	L,d8
     - [ ] 0x2f CPL
@@ -71,7 +71,7 @@
     - [ ] 0x39 ADD	HL,SP
     - [ ] 0x3a LD	A,(HL-)
     - [ ] 0x3b DEC	SP
-    - [ ] 0x3c INC	A
+    - [X] 0x3c INC	A
     - [ ] 0x3d DEC	A
     - [X] 0x3e LD	A,d8
     - [ ] 0x3f CCF

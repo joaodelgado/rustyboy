@@ -255,6 +255,14 @@ impl Cpu {
         match opcode {
             opcodes::CALL_A16 => println!("CALL\t{}", read_16_addr()),
 
+            opcodes::INC_A => println!("INC\tA"),
+            opcodes::INC_B => println!("INC\tB"),
+            opcodes::INC_C => println!("INC\tC"),
+            opcodes::INC_D => println!("INC\tD"),
+            opcodes::INC_E => println!("INC\tE"),
+            opcodes::INC_H => println!("INC\tH"),
+            opcodes::INC_L => println!("INC\tL"),
+
             opcodes::INC_BC => println!("INC\tBC"),
             opcodes::INC_DE => println!("INC\tDE"),
             opcodes::INC_HL => println!("INC\tHL"),
@@ -374,6 +382,14 @@ impl Cpu {
             opcodes::POP_A16_BC => self.pop_r16(Cpu::set_bc),
             opcodes::POP_A16_DE => self.pop_r16(Cpu::set_de),
             opcodes::POP_A16_HL => self.pop_r16(Cpu::set_hl),
+
+            opcodes::INC_A => self.inc_r8(|cpu| cpu.a, |cpu, n| cpu.a = n),
+            opcodes::INC_B => self.inc_r8(|cpu| cpu.b, |cpu, n| cpu.b = n),
+            opcodes::INC_C => self.inc_r8(|cpu| cpu.c, |cpu, n| cpu.c = n),
+            opcodes::INC_D => self.inc_r8(|cpu| cpu.d, |cpu, n| cpu.d = n),
+            opcodes::INC_E => self.inc_r8(|cpu| cpu.e, |cpu, n| cpu.e = n),
+            opcodes::INC_H => self.inc_r8(|cpu| cpu.h, |cpu, n| cpu.h = n),
+            opcodes::INC_L => self.inc_r8(|cpu| cpu.l, |cpu, n| cpu.l = n),
 
             opcodes::INC_BC => self.inc_r16(Cpu::get_bc, Cpu::set_bc),
             opcodes::INC_DE => self.inc_r16(Cpu::get_de, Cpu::set_de),
@@ -623,6 +639,21 @@ impl Cpu {
     {
         let value = self.pop_stack_u16();
         setter(self, value);
+    }
+
+    ///**Description:**
+    /// Increment register n.
+    ///
+    ///**Use with:**
+    /// n = A,B,C,D,E,H,L
+    fn inc_r8<G, S>(&mut self, getter: G, setter: S)
+    where
+        G: Fn(&Cpu) -> u8,
+        S: Fn(&mut Cpu, u8),
+    {
+        // TODO flags
+        let curr_value = getter(self);
+        setter(self, curr_value + 1);
     }
 
     ///**Description:**
@@ -1213,6 +1244,48 @@ mod tests {
 
         cpu.tick().unwrap();
         assert_eq!(cpu.get_hl(), 0xfee2);
+    }
+
+    #[test]
+    fn test_inc_r8() {
+        let mut cpu = Cpu::new();
+
+        cpu.a = 0x01;
+        cpu.b = 0x02;
+        cpu.c = 0x03;
+        cpu.d = 0x04;
+        cpu.e = 0x05;
+        cpu.h = 0x06;
+        cpu.l = 0x07;
+
+        cpu.mem[0] = opcodes::INC_A;
+        cpu.mem[1] = opcodes::INC_B;
+        cpu.mem[2] = opcodes::INC_C;
+        cpu.mem[3] = opcodes::INC_D;
+        cpu.mem[4] = opcodes::INC_E;
+        cpu.mem[5] = opcodes::INC_H;
+        cpu.mem[6] = opcodes::INC_L;
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.a, 0x02);
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.b, 0x03);
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.c, 0x04);
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.d, 0x05);
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.e, 0x06);
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.h, 0x07);
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.l, 0x08);
     }
 
     #[test]
