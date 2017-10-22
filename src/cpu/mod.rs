@@ -260,7 +260,11 @@ impl Cpu {
             opcodes::INC_HL => println!("INC\tHL"),
             opcodes::INC_SP => println!("INC\tSP"),
 
+            opcodes::LD_BC_A => println!("LD\t(BC),A"),
+            opcodes::LD_DE_A => println!("LD\t(DE),A"),
+            opcodes::LD_HL_A => println!("LD\t(HL),A"),
             opcodes::LD_A16_A => println!("LD\t{},A", read_16_addr()),
+
             opcodes::LD_A_A => println!("LD\tA,A"),
             opcodes::LD_A_B => println!("LD\tA,B"),
             opcodes::LD_A_C => println!("LD\tA,C"),
@@ -337,7 +341,10 @@ impl Cpu {
             opcodes::JP_Z_A16 => self.jp_cc_a16(|cpu| cpu.status_is_set(StatusRegBit::Zero)),
             opcodes::JP_NZ_A16 => self.jp_cc_a16(|cpu| !cpu.status_is_set(StatusRegBit::Zero)),
 
-            opcodes::LD_A16_A => self.ld_a16_a(),
+            opcodes::LD_BC_A => self.ld_addr_a(|cpu| cpu.get_bc()),
+            opcodes::LD_DE_A => self.ld_addr_a(|cpu| cpu.get_de()),
+            opcodes::LD_HL_A => self.ld_addr_a(|cpu| cpu.get_hl()),
+            opcodes::LD_A16_A => self.ld_addr_a(|cpu| cpu.consume_16_addr()),
 
             opcodes::LD_A_D8 => self.ld_a(|cpu| cpu.consume_byte()),
             opcodes::LD_A_A => self.ld_a(|cpu| cpu.a),
@@ -455,8 +462,11 @@ impl Cpu {
     /// **Use with**:
     ///
     /// nn = two byte immediate value. (LS byte first)
-    fn ld_a16_a(&mut self) {
-        let addr = self.consume_16_addr() as usize;
+    fn ld_addr_a<F>(&mut self, f: F)
+    where
+        F: Fn(&mut Cpu) -> u16,
+    {
+        let addr = f(self) as usize;
         self.mem[addr] = self.a;
     }
 
@@ -824,6 +834,39 @@ mod tests {
     //
     // Instructions
     //
+
+    #[test]
+    fn test_ld_bc_a() {
+        let mut cpu = Cpu::new();
+        cpu.mem[0] = opcodes::LD_BC_A;
+        cpu.a = 0x72;
+        cpu.set_bc(0x3401);
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.mem[0x3401], 0x72);
+    }
+
+    #[test]
+    fn test_ld_de_a() {
+        let mut cpu = Cpu::new();
+        cpu.mem[0] = opcodes::LD_DE_A;
+        cpu.a = 0x72;
+        cpu.set_de(0x3401);
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.mem[0x3401], 0x72);
+    }
+
+    #[test]
+    fn test_ld_hl_a() {
+        let mut cpu = Cpu::new();
+        cpu.mem[0] = opcodes::LD_HL_A;
+        cpu.a = 0x72;
+        cpu.set_hl(0x3401);
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.mem[0x3401], 0x72);
+    }
 
     #[test]
     fn test_ld_a16_a() {
