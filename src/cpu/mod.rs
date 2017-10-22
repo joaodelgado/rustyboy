@@ -78,6 +78,18 @@ pub enum Flag {
     Carry,
 }
 
+impl Flag {
+    #[cfg_attr(rustfmt, rustfmt_skip)]
+    fn mask(&self) -> u8 {
+        match *self {
+            Flag::Zero =>      0b10000000,
+            Flag::Sub =>       0b01000000,
+            Flag::HalfCarry => 0b00100000,
+            Flag::Carry =>     0b00010000,
+        }
+    }
+}
+
 impl Cpu {
     pub fn new() -> Cpu {
         Cpu {
@@ -205,33 +217,27 @@ impl Cpu {
     //
 
     /// Check if a certain flag is set
-    fn flag(&self, bit_enum: Flag) -> bool {
-        match bit_enum {
-            Flag::Zero => (self.status & 0b10000000) == 0b10000000,
-            Flag::Sub => (self.status & 0b01000000) == 0b01000000,
-            Flag::HalfCarry => (self.status & 0b00100000) == 0b00100000,
-            Flag::Carry => (self.status & 0b00010000) == 0b00010000,
+    fn flag(&self, flag: Flag) -> bool {
+        (self.status & flag.mask()) > 0
+    }
+
+    /// Either set or reset a flag based on `value`
+    fn set_flag_to(&mut self, flag: Flag, value: bool) {
+        if value {
+            self.set_flag(flag);
+        } else {
+            self.reset_flag(flag);
         }
     }
 
     /// Set the defined status flag
-    fn set_flag(&mut self, bit_enum: Flag) {
-        match bit_enum {
-            Flag::Zero => self.status |= 0b10000000,
-            Flag::Sub => self.status |= 0b01000000,
-            Flag::HalfCarry => self.status |= 0b00100000,
-            Flag::Carry => self.status |= 0b00010000,
-        }
+    fn set_flag(&mut self, flag: Flag) {
+        self.status |= flag.mask()
     }
 
     /// Reset the defined status flag
-    fn reset_flag(&mut self, bit_enum: Flag) {
-        match bit_enum {
-            Flag::Zero => self.status = 0,
-            Flag::Sub => self.status = 0,
-            Flag::HalfCarry => self.status = 0,
-            Flag::Carry => self.status = 0,
-        }
+    fn reset_flag(&mut self, flag: Flag) {
+        self.status &= !flag.mask()
     }
 
     fn print_curr(&self) {

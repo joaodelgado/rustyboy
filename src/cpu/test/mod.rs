@@ -8,21 +8,106 @@ mod stack;
 mod load;
 
 #[test]
-fn test_status_reg() {
+fn test_get_flag() {
     let mut cpu = Cpu::new();
     cpu.init();
 
+    cpu.status = 0xff;
+    assert!(cpu.flag(Flag::Zero));
+    assert!(cpu.flag(Flag::Sub));
+    assert!(cpu.flag(Flag::HalfCarry));
+    assert!(cpu.flag(Flag::Carry));
+
+    // This assumes that `Flag::mask()` is implemented correctly
+    cpu.status = Flag::Zero.mask();
+    assert!(cpu.flag(Flag::Zero));
+    cpu.status = !cpu.status;
+    assert!(!cpu.flag(Flag::Zero));
+
+    cpu.status = Flag::Sub.mask();
+    assert!(cpu.flag(Flag::Sub));
+    cpu.status = !cpu.status;
+    assert!(!cpu.flag(Flag::Sub));
+
+    cpu.status = Flag::HalfCarry.mask();
+    assert!(cpu.flag(Flag::HalfCarry));
+    cpu.status = !cpu.status;
+    assert!(!cpu.flag(Flag::HalfCarry));
+
+    cpu.status = Flag::Carry.mask();
+    assert!(cpu.flag(Flag::Carry));
+    cpu.status = !cpu.status;
+    assert!(!cpu.flag(Flag::Carry));
+}
+
+#[test]
+fn test_set_flag() {
+    let mut cpu = Cpu::new();
+    cpu.init();
+
+    // This assumes that `Flag::mask()` is implemented correctly
+    cpu.status = 0x00;
     cpu.set_flag(Flag::Zero);
-    assert_eq!(cpu.flag(Flag::Zero), true);
+    assert_eq!(cpu.status, Flag::Zero.mask());
+    cpu.status = !Flag::Zero.mask();
+    cpu.set_flag_to(Flag::Zero, true);
+    assert_eq!(cpu.status, 0xff);
 
+    cpu.status = 0x00;
     cpu.set_flag(Flag::Sub);
-    assert_eq!(cpu.flag(Flag::Sub), true);
+    assert_eq!(cpu.status, Flag::Sub.mask());
+    cpu.status = !Flag::Sub.mask();
+    cpu.set_flag_to(Flag::Sub, true);
+    assert_eq!(cpu.status, 0xff);
 
+    cpu.status = 0x00;
     cpu.set_flag(Flag::HalfCarry);
-    assert_eq!(cpu.flag(Flag::HalfCarry), true);
+    assert_eq!(cpu.status, Flag::HalfCarry.mask());
+    cpu.status = !Flag::HalfCarry.mask();
+    cpu.set_flag_to(Flag::HalfCarry, true);
+    assert_eq!(cpu.status, 0xff);
 
+    cpu.status = 0x00;
     cpu.set_flag(Flag::Carry);
-    assert_eq!(cpu.flag(Flag::Carry), true);
+    assert_eq!(cpu.status, Flag::Carry.mask());
+    cpu.status = !Flag::Carry.mask();
+    cpu.set_flag_to(Flag::Carry, true);
+    assert_eq!(cpu.status, 0xff);
+}
+
+#[test]
+fn test_reset_flag() {
+    let mut cpu = Cpu::new();
+    cpu.init();
+
+    // This assumes that `Flag::mask()` is implemented correctly
+    cpu.status = 0xff;
+    cpu.reset_flag(Flag::Zero);
+    assert_eq!(cpu.status, !Flag::Zero.mask());
+    cpu.status = Flag::Zero.mask();
+    cpu.set_flag_to(Flag::Zero, false);
+    assert_eq!(cpu.status, 0x00);
+
+    cpu.status = 0xff;
+    cpu.reset_flag(Flag::Sub);
+    assert_eq!(cpu.status, !Flag::Sub.mask());
+    cpu.status = Flag::Sub.mask();
+    cpu.set_flag_to(Flag::Sub, false);
+    assert_eq!(cpu.status, 0x00);
+
+    cpu.status = 0xff;
+    cpu.reset_flag(Flag::HalfCarry);
+    assert_eq!(cpu.status, !Flag::HalfCarry.mask());
+    cpu.status = Flag::HalfCarry.mask();
+    cpu.set_flag_to(Flag::HalfCarry, false);
+    assert_eq!(cpu.status, 0x00);
+
+    cpu.status = 0xff;
+    cpu.reset_flag(Flag::Carry);
+    assert_eq!(cpu.status, !Flag::Carry.mask());
+    cpu.status = Flag::Carry.mask();
+    cpu.set_flag_to(Flag::Carry, false);
+    assert_eq!(cpu.status, 0x00);
 }
 
 #[test]
