@@ -265,6 +265,7 @@ impl Cpu {
             opcodes::LD_SP_HL => println!("LD\tSP,HL"),
 
             opcodes::LDH_A8_A => println!("LDH\ta_{},A", read_byte()),
+            opcodes::LDI_A_HL => println!("LDI\tA,(HL)"),
 
             opcodes::JP_A16 => println!("JP\t{}", read_16_addr()),
             opcodes::JP_HL => println!("JP\tHL"),
@@ -331,6 +332,7 @@ impl Cpu {
             opcodes::LD_SP_D16 => self.ld_sp_d16(),
 
             opcodes::LDH_A8_A => self.ldh_a8_a(),
+            opcodes::LDI_A_HL => self.ldi_a_hl(),
             opcodes::RET => self.ret(),
 
             opcodes::PUSH_A16_AF => self.push_a16(Cpu::get_af),
@@ -541,6 +543,19 @@ impl Cpu {
     fn ldh_a8_a(&mut self) {
         let n = self.consume_byte() as usize;
         self.mem[MEM_HW_IO_REG_OFFSET + n] = self.a;
+    }
+
+    ///**Description:**
+    ///
+    /// Put value at address HL into A. Increment HL.
+    /// Same as: LD A,(HL) - INC HL
+    ///
+    ///**Notes:**
+    ///
+    /// Implements LD A,(HLI) and LD,A(HLI+)
+    fn ldi_a_hl(&mut self) {
+        self.ld_a_hl();
+        self.inc_r16(Cpu::get_hl, Cpu::set_hl)
     }
 
     ///**Description:**
@@ -957,6 +972,20 @@ mod tests {
         cpu.tick().unwrap();
         assert_eq!(0x54, cpu.mem[MEM_HW_IO_REG_OFFSET + 0x04]);
     }
+
+    #[test]
+    fn test_ldi_a_hl() {
+        let mut cpu = Cpu::new();
+        let addr = 0xb00b;
+        cpu.mem[0] = opcodes::LDI_A_HL;
+        cpu.mem[addr as usize] = 5;
+        cpu.set_hl(addr as u16);
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.a, cpu.mem[addr as usize]);
+        assert_eq!(cpu.get_hl(), 0xb00c);
+    }
+
 
     #[test]
     fn test_ld_hl_d16() {
