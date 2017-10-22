@@ -44,6 +44,7 @@ pub const INC_D: u8 = 0x14;
 pub const INC_E: u8 = 0x1c;
 pub const INC_H: u8 = 0x24;
 pub const INC_L: u8 = 0x2c;
+pub const INC_AHL: u8 = 0x34;
 pub const INC_BC: u8 = 0x03;
 pub const INC_DE: u8 = 0x13;
 pub const INC_HL: u8 = 0x23;

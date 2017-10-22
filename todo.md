@@ -63,7 +63,7 @@
     - [X] 0x31 LD	SP,d16
     - [ ] 0x32 LD	(HL-),A
     - [X] 0x33 INC	SP
-    - [ ] 0x34 INC	(HL)
+    - [X] 0x34 INC	(HL)
     - [ ] 0x35 DEC	(HL)
     - [ ] 0x36 LD	(HL),d8
     - [ ] 0x37 SCF

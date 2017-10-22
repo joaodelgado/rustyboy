@@ -262,6 +262,7 @@ impl Cpu {
             opcodes::INC_E => println!("INC\tE"),
             opcodes::INC_H => println!("INC\tH"),
             opcodes::INC_L => println!("INC\tL"),
+            opcodes::INC_AHL => println!("INC\t(HL)"),
 
             opcodes::INC_BC => println!("INC\tBC"),
             opcodes::INC_DE => println!("INC\tDE"),
@@ -390,6 +391,7 @@ impl Cpu {
             opcodes::INC_E => self.inc_r8(|cpu| cpu.e, |cpu, n| cpu.e = n),
             opcodes::INC_H => self.inc_r8(|cpu| cpu.h, |cpu, n| cpu.h = n),
             opcodes::INC_L => self.inc_r8(|cpu| cpu.l, |cpu, n| cpu.l = n),
+            opcodes::INC_AHL => self.inc_addr(Cpu::get_hl),
 
             opcodes::INC_BC => self.inc_r16(Cpu::get_bc, Cpu::set_bc),
             opcodes::INC_DE => self.inc_r16(Cpu::get_de, Cpu::set_de),
@@ -653,7 +655,21 @@ impl Cpu {
     {
         // TODO flags
         let curr_value = getter(self);
-        setter(self, curr_value + 1);
+        setter(self, curr_value + 1); // TODO rounding add
+    }
+
+    ///**Description:**
+    /// Increment byte at address (HL).
+    ///
+    ///**Use with:**
+    /// n = A,B,C,D,E,H,L
+    fn inc_addr<G>(&mut self, getter: G)
+    where
+        G: Fn(&Cpu) -> u16,
+    {
+        // TODO flags
+        let addr = getter(self) as usize;
+        self.mem[addr] = self.mem[addr] + 1; // TODO rounding add
     }
 
     ///**Description:**
@@ -667,7 +683,7 @@ impl Cpu {
         S: Fn(&mut Cpu, u16),
     {
         let curr_value = getter(self);
-        setter(self, curr_value + 1);
+        setter(self, curr_value + 1); // TODO rounding add
     }
 
     ///**Description:**
@@ -1286,6 +1302,19 @@ mod tests {
 
         cpu.tick().unwrap();
         assert_eq!(cpu.l, 0x08);
+    }
+
+    #[test]
+    fn test_inc_addr() {
+        let mut cpu = Cpu::new();
+
+        cpu.set_hl(0x2435);
+        cpu.mem[0x2435] = 0x34;
+
+        cpu.mem[0] = opcodes::INC_AHL;
+
+        cpu.tick().unwrap();
+        assert_eq!(cpu.mem[0x2435], 0x35);
     }
 
     #[test]
