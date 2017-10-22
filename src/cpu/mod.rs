@@ -260,7 +260,9 @@ impl Cpu {
             opcodes::LD_A_L => println!("LD\tA,L"),
             opcodes::LD_A_HL => println!("LD\tA,(HL)"),
             opcodes::LD_A_D8 => println!("LD\tA,{}", read_8_imm()),
+            opcodes::LD_BC_D16 => println!("LD\tBC,{}", read_16_imm()),
             opcodes::LD_HL_D16 => println!("LD\tHL,{}", read_16_imm()),
+            opcodes::LD_DE_D16 => println!("LD\tDE,{}", read_16_imm()),
             opcodes::LD_SP_D16 => println!("LD\tSP,{}", read_16_imm()),
             opcodes::LD_SP_HL => println!("LD\tSP,HL"),
 
@@ -327,9 +329,11 @@ impl Cpu {
             opcodes::LD_A_H => self.ld_a(|cpu| cpu.h),
             opcodes::LD_A_L => self.ld_a(|cpu| cpu.l),
             opcodes::LD_A_HL => self.ld_a_hl(),
-            opcodes::LD_HL_D16 => self.ld_hl_d16(),
+            opcodes::LD_HL_D16 => self.ld_r16_d16(Cpu::set_hl),
             opcodes::LD_SP_HL => self.ld_sp_hl(),
-            opcodes::LD_SP_D16 => self.ld_sp_d16(),
+            opcodes::LD_DE_D16 => self.ld_r16_d16(Cpu::set_de),
+            opcodes::LD_BC_D16 => self.ld_r16_d16(Cpu::set_bc),
+            opcodes::LD_SP_D16 => self.ld_r16_d16(|cpu, n| cpu.sp = n),
 
             opcodes::LDH_A8_A => self.ldh_a8_a(),
             opcodes::LDI_A_HL => self.ldi_a_hl(),
@@ -444,22 +448,13 @@ impl Cpu {
 
     /// **Description**
     ///
-    /// Put value d16 into HL.
-    ///
-    /// **Use with**:
-    ///
-    /// d16 = two byte immediate value.
-    fn ld_hl_d16(&mut self) {
-        let n = self.consume_16_imm();
-        self.set_hl(n);
-    }
-
-    /// **Description**
-    ///
-    /// Put d16 into Stack Pointer (SP).
-    fn ld_sp_d16(&mut self) {
-        let addr = self.consume_16_imm();
-        self.sp = addr;
+    /// Put d16 into register r16.
+    fn ld_r16_d16<F>(&mut self, setter: F)
+    where
+        F: Fn(&mut Cpu, u16),
+    {
+        let value = self.consume_16_imm();
+        setter(self, value);
     }
 
     /// **Description:**
@@ -988,7 +983,7 @@ mod tests {
 
 
     #[test]
-    fn test_ld_hl_d16() {
+    fn test_ld_r16_d16() {
         let mut cpu = Cpu::new();
         cpu.mem[0] = opcodes::LD_HL_D16;
         cpu.mem[1] = 0x24;
@@ -996,6 +991,30 @@ mod tests {
 
         cpu.tick().unwrap();
         assert_eq!(0x2435, cpu.get_hl());
+
+        cpu.pc = 0;
+        cpu.mem[0] = opcodes::LD_BC_D16;
+        cpu.mem[1] = 0x24;
+        cpu.mem[2] = 0x35;
+
+        cpu.tick().unwrap();
+        assert_eq!(0x2435, cpu.get_bc());
+
+        cpu.pc = 0;
+        cpu.mem[0] = opcodes::LD_DE_D16;
+        cpu.mem[1] = 0x24;
+        cpu.mem[2] = 0x35;
+
+        cpu.tick().unwrap();
+        assert_eq!(0x2435, cpu.get_de());
+
+        cpu.pc = 0;
+        cpu.mem[0] = opcodes::LD_SP_D16;
+        cpu.mem[1] = 0x24;
+        cpu.mem[2] = 0x35;
+
+        cpu.tick().unwrap();
+        assert_eq!(0x2435, cpu.sp);
     }
 
     #[test]

@@ -30,7 +30,7 @@
     - [X] LDI (HL),A
     - [ ] LDH (n),A
     - [ ] LDH A, (n)
-    - [ ] LD n,nn
+    - [X] LD n,nn
     - [X] LD SP,HL
     - [ ] LD HL, SP+n
     - [ ] LDHL SP,n
