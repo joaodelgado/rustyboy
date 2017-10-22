@@ -457,11 +457,7 @@ impl Cpu {
 
     /// **Description**
     ///
-    /// Put value A into nn.
-    ///
-    /// **Use with**:
-    ///
-    /// nn = two byte immediate value. (LS byte first)
+    /// Put value A into memory address nn.
     fn ld_addr_a<F>(&mut self, f: F)
     where
         F: Fn(&mut Cpu) -> u16,
