@@ -245,10 +245,10 @@ impl Cpu {
         match opcode {
             opcodes::CALL_A16 => println!("CALL\t{}", read_16_addr()),
 
-            opcodes::INC_A16_BC => println!("INC\tBC"),
-            opcodes::INC_A16_DE => println!("INC\tDE"),
-            opcodes::INC_A16_HL => println!("INC\tHL"),
-            opcodes::INC_A16_SP => println!("INC\tSP"),
+            opcodes::INC_BC => println!("INC\tBC"),
+            opcodes::INC_DE => println!("INC\tDE"),
+            opcodes::INC_HL => println!("INC\tHL"),
+            opcodes::INC_SP => println!("INC\tSP"),
 
             opcodes::LD_A16_A => println!("LD\t{},A", read_16_addr()),
             opcodes::LD_A_A => println!("LD\tA,A"),
@@ -345,10 +345,10 @@ impl Cpu {
             opcodes::POP_A16_DE => self.pop_r16(Cpu::set_de),
             opcodes::POP_A16_HL => self.pop_r16(Cpu::set_hl),
 
-            opcodes::INC_A16_BC => self.inc_r16(Cpu::get_bc, Cpu::set_bc),
-            opcodes::INC_A16_DE => self.inc_r16(Cpu::get_de, Cpu::set_de),
-            opcodes::INC_A16_HL => self.inc_r16(Cpu::get_hl, Cpu::set_hl),
-            opcodes::INC_A16_SP => self.inc_r16(|cpu| cpu.sp, |cpu, n| cpu.sp = n),
+            opcodes::INC_BC => self.inc_r16(Cpu::get_bc, Cpu::set_bc),
+            opcodes::INC_DE => self.inc_r16(Cpu::get_de, Cpu::set_de),
+            opcodes::INC_HL => self.inc_r16(Cpu::get_hl, Cpu::set_hl),
+            opcodes::INC_SP => self.inc_r16(|cpu| cpu.sp, |cpu, n| cpu.sp = n),
 
             opcodes::NOP => self.nop(),
             s => {
@@ -555,7 +555,7 @@ impl Cpu {
     /// Implements LD A,(HLI) and LD,A(HLI+)
     fn ldi_a_hl(&mut self) {
         self.ld_a_hl();
-        self.inc_r16(Cpu::get_hl, Cpu::set_hl)
+        self.inc_r16(Cpu::get_hl, Cpu::set_hl);
     }
 
     ///**Description:**
@@ -1089,17 +1089,17 @@ mod tests {
     }
 
     #[test]
-    fn test_inc_a16() {
+    fn test_inc_r16() {
         let mut cpu = Cpu::new();
         cpu.set_bc(0xfff9);
         cpu.set_de(0x1234);
         cpu.set_hl(0xfee2);
         cpu.sp = 0;
 
-        cpu.mem[0] = opcodes::INC_A16_BC;
-        cpu.mem[1] = opcodes::INC_A16_DE;
-        cpu.mem[2] = opcodes::INC_A16_HL;
-        cpu.mem[3] = opcodes::INC_A16_SP;
+        cpu.mem[0] = opcodes::INC_BC;
+        cpu.mem[1] = opcodes::INC_DE;
+        cpu.mem[2] = opcodes::INC_HL;
+        cpu.mem[3] = opcodes::INC_SP;
 
         cpu.tick().unwrap();
         assert_eq!(cpu.get_bc(), 0xfffa);
