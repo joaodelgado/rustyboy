@@ -305,6 +305,10 @@ impl Cpu {
             opcodes::JP_C_A16 => println!("JP\tC,{}", read_16_addr()),
 
             opcodes::JR_R8 => println!("JR\t{}", read_8_rel()),
+            opcodes::JR_NZ_R8 => println!("JR\tNZ,{}", read_8_rel()),
+            opcodes::JR_Z_R8 => println!("JR\tZ,{}", read_8_rel()),
+            opcodes::JR_NC_R8 => println!("JR\tNC,{}", read_8_rel()),
+            opcodes::JR_C_R8 => println!("JR\tC,{}", read_8_rel()),
 
             opcodes::PUSH_A16_AF => println!("PUSH\tAF"),
             opcodes::PUSH_A16_BC => println!("PUSH\tBC"),
@@ -350,10 +354,16 @@ impl Cpu {
             opcodes::JP_A16 => self.jp_a16(),
             opcodes::JP_HL => self.jp_hl(),
             opcodes::JR_R8 => self.jr_r8(),
+
             opcodes::JP_C_A16 => self.jp_cc_a16(|cpu| cpu.flag(Flag::Carry)),
             opcodes::JP_NC_A16 => self.jp_cc_a16(|cpu| !cpu.flag(Flag::Carry)),
             opcodes::JP_Z_A16 => self.jp_cc_a16(|cpu| cpu.flag(Flag::Zero)),
             opcodes::JP_NZ_A16 => self.jp_cc_a16(|cpu| !cpu.flag(Flag::Zero)),
+
+            opcodes::JR_NZ_R8 => self.jr_cc_r8(|cpu| !cpu.flag(Flag::Zero)),
+            opcodes::JR_Z_R8 => self.jr_cc_r8(|cpu| cpu.flag(Flag::Zero)),
+            opcodes::JR_NC_R8 => self.jr_cc_r8(|cpu| !cpu.flag(Flag::Carry)),
+            opcodes::JR_C_R8 => self.jr_cc_r8(|cpu| cpu.flag(Flag::Carry)),
 
             opcodes::LD_BC_A => self.ld_addr_a(|cpu| cpu.get_bc()),
             opcodes::LD_DE_A => self.ld_addr_a(|cpu| cpu.get_de()),
@@ -731,6 +741,27 @@ impl Cpu {
         let value = self.consume_byte();
         if (self.a | value) == 0 {
             self.set_flag(Flag::Zero);
+        }
+    }
+
+    ///**Description:**
+    /// If following condition is true then add n to current
+    /// address and jump to it:
+    ///
+    ///**Use with:**
+    /// n = one byte signed immediate value
+    /// cc = NZ, Jump if Z flag is reset
+    /// cc = Z, Jump if Z flag is set
+    /// cc = NC, Jump if C flag is reset
+    /// cc = C, Jump if C flag is set
+    fn jr_cc_r8<F>(&mut self, condition: F)
+    where
+        F: Fn(&Cpu) -> bool,
+    {
+        if condition(&self) {
+            let offset = self.consume_byte() as i8;
+            let pc = self.pc as i16;
+            self.pc = pc.wrapping_add(offset as i16) as u16;
         }
     }
 }

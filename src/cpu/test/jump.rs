@@ -74,3 +74,39 @@ fn test_jp_cc_a16() {
     cpu.tick().unwrap();
     assert_eq!(cpu.pc, 0x100);
 }
+
+#[test]
+fn test_jr_cc_r8() {
+    let mut cpu = Cpu::new();
+
+    // check zero flag not set
+    cpu.mem[0] = opcodes::JR_NZ_R8;
+    cpu.mem[1] = 100;
+
+    cpu.tick().unwrap();
+    assert_eq!(cpu.pc, 102);
+
+    // check zero flag set
+    cpu.mem[102] = opcodes::JR_Z_R8;
+    cpu.mem[103] = 0b11001110; // -50
+
+    cpu.set_flag(Flag::Zero);
+    cpu.tick().unwrap();
+
+    assert_eq!(cpu.pc, 54);
+
+    // check carry flag not set
+    cpu.mem[cpu.pc as usize] = opcodes::JR_NC_R8;
+    cpu.mem[(cpu.pc+1) as usize] = 20;
+
+    cpu.tick().unwrap();
+    assert_eq!(cpu.pc, 76);
+
+    // check carry flag set
+    cpu.mem[cpu.pc as usize] = opcodes::JR_C_R8;
+    cpu.mem[(cpu.pc+1) as usize] = 0b11101101; // -19
+
+    cpu.set_flag(Flag::Carry);
+    cpu.tick().unwrap();
+    assert_eq!(cpu.pc, 59);
+}

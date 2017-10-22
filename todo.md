@@ -43,7 +43,7 @@
     - [ ] 0x1d DEC	E
     - [ ] 0x1e LD	E,d8
     - [ ] 0x1f RRA
-    - [ ] 0x20 JR	NZ,r8
+    - [X] 0x20 JR	NZ,r8
     - [X] 0x21 LD	HL,d16
     - [ ] 0x22 LD	(HL+),A
     - [X] 0x23 INC	HL
@@ -51,7 +51,7 @@
     - [ ] 0x25 DEC	H
     - [ ] 0x26 LD	H,d8
     - [ ] 0x27 DAA
-    - [ ] 0x28 JR	Z,r8
+    - [X] 0x28 JR	Z,r8
     - [ ] 0x29 ADD	HL,HL
     - [X] 0x2a LD	A,(HL+)
     - [ ] 0x2b DEC	HL
@@ -59,7 +59,7 @@
     - [ ] 0x2d DEC	L
     - [ ] 0x2e LD	L,d8
     - [ ] 0x2f CPL
-    - [ ] 0x30 JR	NC,r8
+    - [X] 0x30 JR	NC,r8
     - [X] 0x31 LD	SP,d16
     - [ ] 0x32 LD	(HL-),A
     - [X] 0x33 INC	SP
@@ -67,7 +67,7 @@
     - [ ] 0x35 DEC	(HL)
     - [ ] 0x36 LD	(HL),d8
     - [ ] 0x37 SCF
-    - [ ] 0x38 JR	C,r8
+    - [X] 0x38 JR	C,r8
     - [ ] 0x39 ADD	HL,SP
     - [ ] 0x3a LD	A,(HL-)
     - [ ] 0x3b DEC	SP

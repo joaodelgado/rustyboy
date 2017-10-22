@@ -58,3 +58,7 @@ pub const OR_A_H: u8 = 0xb4;
 pub const OR_A_L: u8 = 0xb5;
 pub const OR_A_HL: u8 = 0xb6;
 pub const OR_A_D8: u8 = 0xf6;
+pub const JR_NZ_R8: u8 = 0x20;
+pub const JR_Z_R8: u8 = 0x28;
+pub const JR_NC_R8: u8 = 0x30;
+pub const JR_C_R8: u8 = 0x38;
