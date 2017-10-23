@@ -212,3 +212,48 @@ fn test_ld_r16_d16() {
     cpu.tick().unwrap();
     assert_eq!(0x2435, cpu.sp);
 }
+
+#[test]
+fn test_ld_r8_d8() {
+    let mut cpu = Cpu::new();
+    cpu.mem[0] = opcodes::LD_B_D8;
+    cpu.mem[1] = 0x24;
+
+    cpu.tick().unwrap();
+    assert_eq!(0x24, cpu.b);
+
+    cpu.pc = 0;
+    cpu.mem[0] = opcodes::LD_C_D8;
+    cpu.mem[1] = 0x35;
+
+    cpu.tick().unwrap();
+    assert_eq!(0x35, cpu.c);
+
+    cpu.pc = 0;
+    cpu.mem[0] = opcodes::LD_D_D8;
+    cpu.mem[1] = 0x35;
+
+    cpu.tick().unwrap();
+    assert_eq!(0x35, cpu.d);
+
+    cpu.pc = 0;
+    cpu.mem[0] = opcodes::LD_E_D8;
+    cpu.mem[1] = 0x35;
+
+    cpu.tick().unwrap();
+    assert_eq!(0x35, cpu.e);
+
+    cpu.pc = 0;
+    cpu.mem[0] = opcodes::LD_H_D8;
+    cpu.mem[1] = 0x35;
+
+    cpu.tick().unwrap();
+    assert_eq!(0x35, cpu.h);
+
+    cpu.pc = 0;
+    cpu.mem[0] = opcodes::LD_L_D8;
+    cpu.mem[1] = 0x35;
+
+    cpu.tick().unwrap();
+    assert_eq!(0x35, cpu.l);
+}

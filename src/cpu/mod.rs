@@ -326,6 +326,13 @@ impl Cpu {
             opcodes::POP_A16_DE => println!("POP\tDE"),
             opcodes::POP_A16_HL => println!("POP\tHL"),
 
+            opcodes::LD_B_D8 => println!("LD\tB,{}", read_8_imm()),
+            opcodes::LD_C_D8 => println!("LD\tB,{}", read_8_imm()),
+            opcodes::LD_D_D8 => println!("LD\tB,{}", read_8_imm()),
+            opcodes::LD_E_D8 => println!("LD\tB,{}", read_8_imm()),
+            opcodes::LD_H_D8 => println!("LD\tB,{}", read_8_imm()),
+            opcodes::LD_L_D8 => println!("LD\tB,{}", read_8_imm()),
+
             opcodes::RET => println!("RET"),
 
             opcodes::DI => println!("DI"),
@@ -431,6 +438,12 @@ impl Cpu {
                 self.or_a(|cpu| cpu.mem[addr])
             }
             opcodes::OR_A_D8 => self.or_a_d8(),
+            opcodes::LD_B_D8 => self.ld_r8_d8(|cpu,n| cpu.b = n),
+            opcodes::LD_C_D8 => self.ld_r8_d8(|cpu,n| cpu.c = n),
+            opcodes::LD_D_D8 => self.ld_r8_d8(|cpu,n| cpu.d = n),
+            opcodes::LD_E_D8 => self.ld_r8_d8(|cpu,n| cpu.e = n),
+            opcodes::LD_H_D8 => self.ld_r8_d8(|cpu,n| cpu.h = n),
+            opcodes::LD_L_D8 => self.ld_r8_d8(|cpu,n| cpu.l = n),
 
             opcodes::NOP => self.nop(),
             s => {
@@ -774,5 +787,13 @@ impl Cpu {
             let pc = self.pc as i16;
             self.pc = pc.wrapping_add(offset as i16) as u16;
         }
+    }
+
+    fn ld_r8_d8<F>(&mut self, setter: F)
+    where
+        F: Fn(&mut Cpu, u8)
+    {
+        let value = self.consume_byte();
+        setter(self, value);
     }
 }
