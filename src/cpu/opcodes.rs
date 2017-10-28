@@ -21,6 +21,7 @@ pub const LD_A_E: u8 = 0x7b;
 pub const LD_A_H: u8 = 0x7c;
 pub const LD_A_L: u8 = 0x7d;
 pub const LD_A_HL: u8 = 0x7e;
+pub const LD_A_A16: u8 = 0xfa;
 pub const LD_B_B: u8 = 0x40;
 pub const LD_B_C: u8 = 0x41;
 pub const LD_B_D: u8 = 0x42;

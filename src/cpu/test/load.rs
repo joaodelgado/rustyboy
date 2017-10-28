@@ -330,3 +330,16 @@ fn test_ld_r8_d8() {
     cpu.tick().unwrap();
     assert_eq!(0x35, cpu.l);
 }
+
+#[test]
+fn test_ld_r8_a16() {
+    let mut cpu = Cpu::new();
+
+    cpu.mem[0] = opcodes::LD_A_A16;
+    cpu.mem[1] = 0x34;
+    cpu.mem[2] = 0x12;
+    cpu.mem[0x1234] = 15;
+
+    cpu.tick().unwrap();
+    assert_eq!(cpu.a, 15);
+}

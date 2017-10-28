@@ -252,7 +252,7 @@
     - [ ] 0xf7 RST	30H
     - [ ] 0xf8 LD	HL,SP+r8
     - [X] 0xf9 LD	SP,HL
-    - [ ] 0xfa LD	A,(a16)
+    - [X] 0xfa LD	A,(a16)
     - [ ] 0xfb EI
     - [ ] 0xfe CP	d8
     - [ ] 0xff RST	38H

@@ -293,6 +293,7 @@ impl Cpu {
             opcodes::LD_A_H => println!("LD\tA,H"),
             opcodes::LD_A_L => println!("LD\tA,L"),
             opcodes::LD_A_HL => println!("LD\tA,(HL)"),
+            opcodes::LD_A_A16 => println!("LD\tA,{}", read_16_addr()),
             opcodes::LD_B_B => println!("LD\tB,B"),
             opcodes::LD_B_C => println!("LD\tB,C"),
             opcodes::LD_B_D => println!("LD\tB,D"),
@@ -409,6 +410,7 @@ impl Cpu {
             opcodes::LD_A_H => self.ld_r8_r8(|cpu| cpu.h, |cpu, n| cpu.a = n),
             opcodes::LD_A_L => self.ld_r8_r8(|cpu| cpu.l, |cpu, n| cpu.a = n),
             opcodes::LD_A_HL => self.ld_r8_hl(|cpu, n| cpu.a = n),
+            opcodes::LD_A_A16 => self.ld_r8_a16(|cpu, n| cpu.a = n),
 
             opcodes::LD_B_B => self.ld_r8_r8(|cpu| cpu.b, |cpu, n| cpu.b = n),
             opcodes::LD_B_C => self.ld_r8_r8(|cpu| cpu.c, |cpu, n| cpu.b = n),
@@ -592,6 +594,22 @@ impl Cpu {
     {
         let r2 = self.mem[self.get_hl() as usize] as u8;
         setter(self, r2);
+    }
+
+    /// **Description**
+    ///
+    /// Put value at (nn) address into r1.
+    ///
+    ///**Use with:**
+    /// r1 = A,B,C,D,E,H,L
+    /// r2 = (nn)
+    fn ld_r8_a16<F>(&mut self, f: F)
+    where
+        F: Fn(&mut Cpu, u8),
+    {
+        let addr = self.consume_16_addr();
+        let r2 = self.mem[addr as usize] as u8;
+        f(self, r2);
     }
 
     /// **Description**
