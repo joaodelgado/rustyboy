@@ -789,6 +789,12 @@ impl Cpu {
         }
     }
 
+    ///**Description:**
+    ///  Put value n into nn.
+    ///
+    /// **Use with:**
+    ///  n = B,C,D,E,H,L,BC,DE,HL,SP
+    ///  nn = 8 bit immediate value
     fn ld_r8_d8<F>(&mut self, setter: F)
     where
         F: Fn(&mut Cpu, u8)
