@@ -129,6 +129,79 @@ fn test_ld_a_hl() {
 }
 
 #[test]
+fn test_ld_b_b() {
+    let mut cpu = Cpu::new();
+    cpu.b = 0x72;
+    cpu.mem[0] = opcodes::LD_B_B;
+
+    cpu.tick().unwrap();
+    assert_eq!(0x72, cpu.b);
+}
+
+
+#[test]
+fn test_ld_b_c() {
+    let mut cpu = Cpu::new();
+    cpu.c = 0x72;
+    cpu.mem[0] = opcodes::LD_B_C;
+
+    cpu.tick().unwrap();
+    assert_eq!(0x72, cpu.b);
+}
+
+#[test]
+fn test_ld_b_d() {
+    let mut cpu = Cpu::new();
+    cpu.d = 0x72;
+    cpu.mem[0] = opcodes::LD_B_D;
+
+    cpu.tick().unwrap();
+    assert_eq!(0x72, cpu.b);
+}
+
+#[test]
+fn test_ld_b_e() {
+    let mut cpu = Cpu::new();
+    cpu.e = 0x72;
+    cpu.mem[0] = opcodes::LD_B_E;
+
+    cpu.tick().unwrap();
+    assert_eq!(0x72, cpu.b);
+}
+
+#[test]
+fn test_ld_b_h() {
+    let mut cpu = Cpu::new();
+    cpu.h = 0x72;
+    cpu.mem[0] = opcodes::LD_B_H;
+
+    cpu.tick().unwrap();
+    assert_eq!(0x72, cpu.b);
+}
+
+#[test]
+fn test_ld_b_l() {
+    let mut cpu = Cpu::new();
+    cpu.l = 0x72;
+    cpu.mem[0] = opcodes::LD_B_L;
+
+    cpu.tick().unwrap();
+    assert_eq!(0x72, cpu.b);
+}
+
+#[test]
+fn test_ld_b_hl() {
+    let mut cpu = Cpu::new();
+    let addr = 0xb00b;
+    cpu.mem[0] = opcodes::LD_B_HL;
+    cpu.mem[addr as usize] = 5;
+    cpu.set_hl(addr as u16);
+
+    cpu.tick().unwrap();
+    assert_eq!(cpu.b, cpu.mem[addr as usize]);
+}
+
+#[test]
 fn test_ld_sp_nn() {
     let mut cpu = Cpu::new();
     cpu.mem[0] = 0x31;

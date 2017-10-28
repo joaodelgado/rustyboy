@@ -293,6 +293,13 @@ impl Cpu {
             opcodes::LD_A_H => println!("LD\tA,H"),
             opcodes::LD_A_L => println!("LD\tA,L"),
             opcodes::LD_A_HL => println!("LD\tA,(HL)"),
+            opcodes::LD_B_B => println!("LD\tB,B"),
+            opcodes::LD_B_C => println!("LD\tB,C"),
+            opcodes::LD_B_D => println!("LD\tB,D"),
+            opcodes::LD_B_E => println!("LD\tB,E"),
+            opcodes::LD_B_H => println!("LD\tB,H"),
+            opcodes::LD_B_L => println!("LD\tB,L"),
+            opcodes::LD_B_HL => println!("LD\tB,(HL)"),
             opcodes::LD_A_D8 => println!("LD\tA,{}", read_8_imm()),
             opcodes::LD_BC_D16 => println!("LD\tBC,{}", read_16_imm()),
             opcodes::LD_HL_D16 => println!("LD\tHL,{}", read_16_imm()),
@@ -384,14 +391,23 @@ impl Cpu {
             opcodes::LD_A16_A => self.ld_addr_a(|cpu| cpu.consume_16_addr()),
 
             opcodes::LD_A_D8 => self.ld_a(|cpu| cpu.consume_byte()),
-            opcodes::LD_A_A => self.ld_a(|cpu| cpu.a),
-            opcodes::LD_A_B => self.ld_a(|cpu| cpu.b),
-            opcodes::LD_A_C => self.ld_a(|cpu| cpu.c),
-            opcodes::LD_A_D => self.ld_a(|cpu| cpu.d),
-            opcodes::LD_A_E => self.ld_a(|cpu| cpu.e),
-            opcodes::LD_A_H => self.ld_a(|cpu| cpu.h),
-            opcodes::LD_A_L => self.ld_a(|cpu| cpu.l),
-            opcodes::LD_A_HL => self.ld_a_hl(),
+            opcodes::LD_A_A => self.ld_r8_r8(|cpu| cpu.a, |cpu, n| cpu.a = n),
+            opcodes::LD_A_B => self.ld_r8_r8(|cpu| cpu.b, |cpu, n|cpu.a = n),
+            opcodes::LD_A_C => self.ld_r8_r8(|cpu| cpu.c, |cpu, n| cpu.a = n),
+            opcodes::LD_A_D => self.ld_r8_r8(|cpu| cpu.d, |cpu, n| cpu.a = n),
+            opcodes::LD_A_E => self.ld_r8_r8(|cpu| cpu.e, |cpu, n| cpu.a = n),
+            opcodes::LD_A_H => self.ld_r8_r8(|cpu| cpu.h, |cpu, n| cpu.a = n),
+            opcodes::LD_A_L => self.ld_r8_r8(|cpu| cpu.l, |cpu, n| cpu.a = n),
+            opcodes::LD_A_HL => self.ld_r8_hl(|cpu, n| cpu.a = n),
+
+            opcodes::LD_B_B => self.ld_r8_r8(|cpu| cpu.b, |cpu, n| cpu.b = n),
+            opcodes::LD_B_C => self.ld_r8_r8(|cpu| cpu.c, |cpu, n| cpu.b = n),
+            opcodes::LD_B_D => self.ld_r8_r8(|cpu| cpu.d, |cpu, n| cpu.b = n),
+            opcodes::LD_B_E => self.ld_r8_r8(|cpu| cpu.e, |cpu, n| cpu.b = n),
+            opcodes::LD_B_H => self.ld_r8_r8(|cpu| cpu.h, |cpu, n| cpu.b = n),
+            opcodes::LD_B_L => self.ld_r8_r8(|cpu| cpu.l, |cpu, n| cpu.b = n),
+            opcodes::LD_B_HL => self.ld_r8_hl(|cpu, n| cpu.b = n),
+
             opcodes::LD_HL_D16 => self.ld_r16_d16(Cpu::set_hl),
             opcodes::LD_SP_HL => self.ld_sp_hl(),
             opcodes::LD_DE_D16 => self.ld_r16_d16(Cpu::set_de),
@@ -530,10 +546,32 @@ impl Cpu {
 
     /// **Description**
     ///
-    /// Put value at address stored in HL into A.
-    fn ld_a_hl(&mut self) {
-        let value = self.mem[self.get_hl() as usize];
-        self.a = value;
+    /// Put value r2 into r1.
+    ///
+    ///**Use with:**
+    /// r1,r2 = A,B,C,D,E,H,L,
+    fn ld_r8_r8<G, F>(&mut self, getter: G, setter: F)
+    where
+        G: Fn(&mut Cpu) -> u8,
+        F: Fn(&mut Cpu, u8),
+    {
+        let r1 = getter(self);
+        setter(self, r1);
+    }
+
+    /// **Description**
+    ///
+    /// Put value at (HL) into r1.
+    ///
+    ///**Use with:**
+    /// r1 = A,B,C,D,E,H,L
+    /// r2 = (HL)
+    fn ld_r8_hl<F>(&mut self, setter: F)
+    where
+        F: Fn(&mut Cpu, u8),
+    {
+        let r2 = self.mem[self.get_hl() as usize] as u8;
+        setter(self, r2);
     }
 
     /// **Description**
@@ -639,7 +677,7 @@ impl Cpu {
     ///
     /// Implements LD A,(HLI) and LD,A(HLI+)
     fn ldi_a_hl(&mut self) {
-        self.ld_a_hl();
+        self.ld_r8_hl(|cpu, n| cpu.a = n);
         self.inc_r16(Cpu::get_hl, Cpu::set_hl);
     }
 
@@ -793,8 +831,8 @@ impl Cpu {
     ///  Put value n into nn.
     ///
     /// **Use with:**
-    ///  n = B,C,D,E,H,L,BC,DE,HL,SP
-    ///  nn = 8 bit immediate value
+    ///  nn = B,C,D,E,H,L,BC,DE,HL,SP
+    ///  n = 8 bit immediate value
     fn ld_r8_d8<F>(&mut self, setter: F)
     where
         F: Fn(&mut Cpu, u8)
