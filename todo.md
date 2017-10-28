@@ -75,13 +75,13 @@
     - [ ] 0x3d DEC	A
     - [X] 0x3e LD	A,d8
     - [ ] 0x3f CCF
-    - [ ] 0x40 LD	B,B
-    - [ ] 0x41 LD	B,C
-    - [ ] 0x42 LD	B,D
-    - [ ] 0x43 LD	B,E
-    - [ ] 0x44 LD	B,H
-    - [ ] 0x45 LD	B,L
-    - [ ] 0x46 LD	B,(HL)
+    - [X] 0x40 LD	B,B
+    - [X] 0x41 LD	B,C
+    - [X] 0x42 LD	B,D
+    - [X] 0x43 LD	B,E
+    - [X] 0x44 LD	B,H
+    - [X] 0x45 LD	B,L
+    - [X] 0x46 LD	B,(HL)
     - [ ] 0x47 LD	B,A
     - [ ] 0x48 LD	C,B
     - [ ] 0x49 LD	C,C
