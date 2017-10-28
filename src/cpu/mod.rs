@@ -402,7 +402,7 @@ impl Cpu {
 
             opcodes::LD_A_D8 => self.ld_a(|cpu| cpu.consume_byte()),
             opcodes::LD_A_A => self.ld_r8_r8(|cpu| cpu.a, |cpu, n| cpu.a = n),
-            opcodes::LD_A_B => self.ld_r8_r8(|cpu| cpu.b, |cpu, n|cpu.a = n),
+            opcodes::LD_A_B => self.ld_r8_r8(|cpu| cpu.b, |cpu, n| cpu.a = n),
             opcodes::LD_A_C => self.ld_r8_r8(|cpu| cpu.c, |cpu, n| cpu.a = n),
             opcodes::LD_A_D => self.ld_r8_r8(|cpu| cpu.d, |cpu, n| cpu.a = n),
             opcodes::LD_A_E => self.ld_r8_r8(|cpu| cpu.e, |cpu, n| cpu.a = n),
@@ -464,12 +464,12 @@ impl Cpu {
                 self.or_a(|cpu| cpu.mem[addr])
             }
             opcodes::OR_A_D8 => self.or_a_d8(),
-            opcodes::LD_B_D8 => self.ld_r8_d8(|cpu,n| cpu.b = n),
-            opcodes::LD_C_D8 => self.ld_r8_d8(|cpu,n| cpu.c = n),
-            opcodes::LD_D_D8 => self.ld_r8_d8(|cpu,n| cpu.d = n),
-            opcodes::LD_E_D8 => self.ld_r8_d8(|cpu,n| cpu.e = n),
-            opcodes::LD_H_D8 => self.ld_r8_d8(|cpu,n| cpu.h = n),
-            opcodes::LD_L_D8 => self.ld_r8_d8(|cpu,n| cpu.l = n),
+            opcodes::LD_B_D8 => self.ld_r8_d8(|cpu, n| cpu.b = n),
+            opcodes::LD_C_D8 => self.ld_r8_d8(|cpu, n| cpu.c = n),
+            opcodes::LD_D_D8 => self.ld_r8_d8(|cpu, n| cpu.d = n),
+            opcodes::LD_E_D8 => self.ld_r8_d8(|cpu, n| cpu.e = n),
+            opcodes::LD_H_D8 => self.ld_r8_d8(|cpu, n| cpu.h = n),
+            opcodes::LD_L_D8 => self.ld_r8_d8(|cpu, n| cpu.l = n),
 
             opcodes::CP_A => self.cp_d8(|cpu| cpu.a),
             opcodes::CP_B => self.cp_d8(|cpu| cpu.b),
@@ -855,7 +855,7 @@ impl Cpu {
     ///  n = 8 bit immediate value
     fn ld_r8_d8<F>(&mut self, setter: F)
     where
-        F: Fn(&mut Cpu, u8)
+        F: Fn(&mut Cpu, u8),
     {
         let value = self.consume_byte();
         setter(self, value);
@@ -902,8 +902,7 @@ impl Cpu {
     ///  H - Set if no borrow from bit 4.
     ///  C - Set for no borrow. (Set if A < n.)
     /// TODO: implement this with the SUB instruction instead
-    fn cp_hl(&mut self)
-    {
+    fn cp_hl(&mut self) {
         let n = self.mem[self.get_hl() as usize];
         let a = self.a;
 
