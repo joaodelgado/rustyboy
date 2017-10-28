@@ -129,6 +129,30 @@ fn test_ld_a_hl() {
 }
 
 #[test]
+fn test_ld_a_bc() {
+    let mut cpu = Cpu::new();
+    let addr = 0xb00b;
+    cpu.mem[0] = opcodes::LD_A_BC;
+    cpu.mem[addr as usize] = 5;
+    cpu.set_bc(addr as u16);
+
+    cpu.tick().unwrap();
+    assert_eq!(cpu.a, cpu.mem[addr as usize]);
+}
+
+#[test]
+fn test_ld_a_de() {
+    let mut cpu = Cpu::new();
+    let addr = 0xb00b;
+    cpu.mem[0] = opcodes::LD_A_DE;
+    cpu.mem[addr as usize] = 5;
+    cpu.set_de(addr as u16);
+
+    cpu.tick().unwrap();
+    assert_eq!(cpu.a, cpu.mem[addr as usize]);
+}
+
+#[test]
 fn test_ld_b_b() {
     let mut cpu = Cpu::new();
     cpu.b = 0x72;

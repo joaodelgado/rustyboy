@@ -21,7 +21,7 @@
     - [ ] 0x07 RLCA
     - [ ] 0x08 LD	(a16),SP
     - [ ] 0x09 ADD	HL,BC
-    - [ ] 0x0a LD	A,(BC)
+    - [X] 0x0a LD	A,(BC)
     - [ ] 0x0b DEC	BC
     - [X] 0x0c INC	C
     - [ ] 0x0d DEC	C
@@ -37,7 +37,7 @@
     - [ ] 0x17 RLA
     - [X] 0x18 JR	r8
     - [ ] 0x19 ADD	HL,DE
-    - [ ] 0x1a LD	A,(DE)
+    - [X] 0x1a LD	A,(DE)
     - [ ] 0x1b DEC	DE
     - [X] 0x1c INC	E
     - [ ] 0x1d DEC	E

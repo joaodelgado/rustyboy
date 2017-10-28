@@ -409,7 +409,9 @@ impl Cpu {
             opcodes::LD_A_E => self.ld_r8_r8(|cpu| cpu.e, |cpu, n| cpu.a = n),
             opcodes::LD_A_H => self.ld_r8_r8(|cpu| cpu.h, |cpu, n| cpu.a = n),
             opcodes::LD_A_L => self.ld_r8_r8(|cpu| cpu.l, |cpu, n| cpu.a = n),
-            opcodes::LD_A_HL => self.ld_r8_hl(|cpu, n| cpu.a = n),
+            opcodes::LD_A_BC => self.ld_r8_r16(Cpu::get_bc, |cpu, n| cpu.a = n),
+            opcodes::LD_A_DE => self.ld_r8_r16(Cpu::get_de, |cpu, n| cpu.a = n),
+            opcodes::LD_A_HL => self.ld_r8_r16(Cpu::get_hl, |cpu, n| cpu.a = n),
             opcodes::LD_A_A16 => self.ld_r8_a16(|cpu, n| cpu.a = n),
 
             opcodes::LD_B_B => self.ld_r8_r8(|cpu| cpu.b, |cpu, n| cpu.b = n),
@@ -418,7 +420,7 @@ impl Cpu {
             opcodes::LD_B_E => self.ld_r8_r8(|cpu| cpu.e, |cpu, n| cpu.b = n),
             opcodes::LD_B_H => self.ld_r8_r8(|cpu| cpu.h, |cpu, n| cpu.b = n),
             opcodes::LD_B_L => self.ld_r8_r8(|cpu| cpu.l, |cpu, n| cpu.b = n),
-            opcodes::LD_B_HL => self.ld_r8_hl(|cpu, n| cpu.b = n),
+            opcodes::LD_B_HL => self.ld_r8_r16(Cpu::get_hl, |cpu, n| cpu.b = n),
 
             opcodes::LD_HL_D16 => self.ld_r16_d16(Cpu::set_hl),
             opcodes::LD_SP_HL => self.ld_sp_hl(),
@@ -588,11 +590,12 @@ impl Cpu {
     ///**Use with:**
     /// r1 = A,B,C,D,E,H,L
     /// r2 = (HL)
-    fn ld_r8_hl<F>(&mut self, setter: F)
+    fn ld_r8_r16<G, F>(&mut self, getter: G, setter: F)
     where
+        G: Fn(&Cpu) -> u16,
         F: Fn(&mut Cpu, u8),
     {
-        let r2 = self.mem[self.get_hl() as usize] as u8;
+        let r2 = self.mem[getter(self) as usize] as u8;
         setter(self, r2);
     }
 
@@ -715,7 +718,7 @@ impl Cpu {
     ///
     /// Implements LD A,(HLI) and LD,A(HLI+)
     fn ldi_a_hl(&mut self) {
-        self.ld_r8_hl(|cpu, n| cpu.a = n);
+        self.ld_r8_r16(Cpu::get_hl, |cpu, n| cpu.a = n);
         self.inc_r16(Cpu::get_hl, Cpu::set_hl);
     }
 
