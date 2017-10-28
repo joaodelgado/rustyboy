@@ -354,6 +354,16 @@ impl Cpu {
             opcodes::OR_A_HL => println!("OR\tA,HL"),
             opcodes::OR_A_D8 => println!("OR\tA,{}", read_8_imm()),
 
+            opcodes::CP_A => println!("CP\tA,A"),
+            opcodes::CP_B => println!("CP\tA,B"),
+            opcodes::CP_C => println!("CP\tA,C"),
+            opcodes::CP_D => println!("CP\tA,D"),
+            opcodes::CP_E => println!("CP\tA,E"),
+            opcodes::CP_H => println!("CP\tA,H"),
+            opcodes::CP_L => println!("CP\tA,L"),
+            opcodes::CP_HL => println!("CP\tA,{}", read_16_addr()),
+            opcodes::CP_D8 => println!("CP\tA,{}", read_8_imm()),
+
             n => println!("Unknown instruction {:02x}@{:04x}", n, addr),
         }
     }
@@ -460,6 +470,16 @@ impl Cpu {
             opcodes::LD_E_D8 => self.ld_r8_d8(|cpu,n| cpu.e = n),
             opcodes::LD_H_D8 => self.ld_r8_d8(|cpu,n| cpu.h = n),
             opcodes::LD_L_D8 => self.ld_r8_d8(|cpu,n| cpu.l = n),
+
+            opcodes::CP_A => self.cp_d8(|cpu| cpu.a),
+            opcodes::CP_B => self.cp_d8(|cpu| cpu.b),
+            opcodes::CP_C => self.cp_d8(|cpu| cpu.c),
+            opcodes::CP_D => self.cp_d8(|cpu| cpu.d),
+            opcodes::CP_E => self.cp_d8(|cpu| cpu.e),
+            opcodes::CP_H => self.cp_d8(|cpu| cpu.h),
+            opcodes::CP_L => self.cp_d8(|cpu| cpu.l),
+            opcodes::CP_HL => self.cp_hl(),
+            opcodes::CP_D8 => self.cp_d8(Cpu::consume_byte),
 
             opcodes::NOP => self.nop(),
             s => {
@@ -839,5 +859,57 @@ impl Cpu {
     {
         let value = self.consume_byte();
         setter(self, value);
+    }
+
+    ///**Description:**
+    ///  Compare A with n. This is basically an A - n
+    ///  subtraction instruction but the results are thrown
+    ///  away.
+    ///
+    ///**Use with:**
+    ///  n = A,B,C,D,E,H,L,#
+    ///
+    ///**Flags affected:**
+    ///  Z - Set if result is zero. (Set if A = n.)
+    ///  N - Set.
+    ///  H - Set if no borrow from bit 4.
+    ///  C - Set for no borrow. (Set if A < n.)
+    /// TODO: implement this with the SUB instruction instead
+    fn cp_d8<F>(&mut self, f: F)
+    where
+        F: Fn(&mut Cpu) -> u8,
+    {
+        let n = f(self);
+        let a = self.a;
+
+        self.set_flag_to(Flag::Zero, a == n);
+        self.set_flag_to(Flag::Carry, a < n);
+        self.set_flag_to(Flag::HalfCarry, (a & 0xF) < (n & 0xF));
+        self.set_flag(Flag::Sub);
+    }
+
+    ///**Description:**
+    ///  Compare A with address at (HL), n. This is basically an A - n
+    ///  subtraction instruction but the results are thrown
+    ///  away.
+    ///
+    ///**Use with:**
+    ///  n = (HL)
+    ///
+    ///**Flags affected:**
+    ///  Z - Set if result is zero. (Set if A = n.)
+    ///  N - Set.
+    ///  H - Set if no borrow from bit 4.
+    ///  C - Set for no borrow. (Set if A < n.)
+    /// TODO: implement this with the SUB instruction instead
+    fn cp_hl(&mut self)
+    {
+        let n = self.mem[self.get_hl() as usize];
+        let a = self.a;
+
+        self.set_flag_to(Flag::Zero, a == n);
+        self.set_flag_to(Flag::Carry, a < n);
+        self.set_flag_to(Flag::HalfCarry, (a & 0xF) < (n & 0xF));
+        self.set_flag(Flag::Sub);
     }
 }

@@ -162,3 +162,46 @@ fn test_or_a_d8() {
     cpu.tick().unwrap();
     assert!(cpu.flag(Flag::Zero));
 }
+
+
+#[test]
+fn test_cp_d8() {
+    let mut cpu = Cpu::new();
+    cpu.a = 4;
+    cpu.mem[0] = opcodes::CP_A;
+
+    cpu.tick().unwrap();
+    assert!(cpu.flag(Flag::Zero));
+
+    cpu.b = 10;
+    cpu.mem[cpu.pc as usize] = opcodes::CP_B;
+
+    cpu.tick().unwrap();
+    assert!(cpu.flag(Flag::Carry));
+
+    cpu.a = 0b00000011;
+    cpu.c = 0b00010011;
+
+    cpu.tick().unwrap();
+    assert!(cpu.flag(Flag::HalfCarry));
+
+    cpu.a = 0x12;
+    cpu.mem[cpu.pc as usize] = opcodes::CP_D8;
+    cpu.mem[(cpu.pc + 1) as usize] = 0x12;
+
+    cpu.tick().unwrap();
+    assert!(cpu.flag(Flag::Zero));
+}
+
+#[test]
+fn test_cp_hl() {
+    let mut cpu = Cpu::new();
+    let addr = 0x1234;
+    cpu.set_hl(addr);
+    cpu.mem[0] = opcodes::CP_HL;
+    cpu.a = 5;
+    cpu.mem[addr as usize] = 5;
+
+    cpu.tick().unwrap();
+    assert!(cpu.flag(Flag::Zero));
+}

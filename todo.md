@@ -195,14 +195,14 @@
     - [X] 0xb5 OR	L
     - [X] 0xb6 OR	(HL)
     - [X] 0xb7 OR	A
-    - [ ] 0xb8 CP	B
-    - [ ] 0xb9 CP	C
-    - [ ] 0xba CP	D
-    - [ ] 0xbb CP	E
-    - [ ] 0xbc CP	H
-    - [ ] 0xbd CP	L
-    - [ ] 0xbe CP	(HL)
-    - [ ] 0xbf CP	A
+    - [X] 0xb8 CP	B
+    - [X] 0xb9 CP	C
+    - [X] 0xba CP	D
+    - [X] 0xbb CP	E
+    - [X] 0xbc CP	H
+    - [X] 0xbd CP	L
+    - [X] 0xbe CP	(HL)
+    - [X] 0xbf CP	#
     - [ ] 0xc0 RET	NZ
     - [X] 0xc1 POP	BC
     - [X] 0xc2 JP	NZ,a16
