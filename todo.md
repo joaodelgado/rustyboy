@@ -171,14 +171,14 @@
     - [ ] 0x9d SBC	A,L
     - [ ] 0x9e SBC	A,(HL)
     - [ ] 0x9f SBC	A,A
-    - [ ] 0xa0 AND	B
-    - [ ] 0xa1 AND	C
-    - [ ] 0xa2 AND	D
-    - [ ] 0xa3 AND	E
-    - [ ] 0xa4 AND	H
-    - [ ] 0xa5 AND	L
-    - [ ] 0xa6 AND	(HL)
-    - [ ] 0xa7 AND	A
+    - [X] 0xa0 AND	B
+    - [X] 0xa1 AND	C
+    - [X] 0xa2 AND	D
+    - [X] 0xa3 AND	E
+    - [X] 0xa4 AND	H
+    - [X] 0xa5 AND	L
+    - [X] 0xa6 AND	(HL)
+    - [X] 0xa7 AND	A
     - [ ] 0xa8 XOR	B
     - [ ] 0xa9 XOR	C
     - [ ] 0xaa XOR	D
@@ -236,7 +236,7 @@
     - [X] 0xe1 POP	HL
     - [ ] 0xe2 LD	(C),A
     - [X] 0xe5 PUSH	HL
-    - [ ] 0xe6 AND	d8
+    - [X] 0xe6 AND	d8
     - [ ] 0xe7 RST	20H
     - [ ] 0xe8 ADD	SP,r8
     - [X] 0xe9 JP	(HL)

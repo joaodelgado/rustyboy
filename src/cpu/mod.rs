@@ -368,6 +368,17 @@ impl Cpu {
 
             opcodes::DI => println!("DI"),
             opcodes::NOP => println!("NOP"),
+
+            opcodes::AND_A_A => println!("AND\tA,A"),
+            opcodes::AND_A_B => println!("AND\tA,B"),
+            opcodes::AND_A_C => println!("AND\tA,C"),
+            opcodes::AND_A_D => println!("AND\tA,D"),
+            opcodes::AND_A_E => println!("AND\tA,E"),
+            opcodes::AND_A_H => println!("AND\tA,H"),
+            opcodes::AND_A_L => println!("AND\tA,L"),
+            opcodes::AND_A_HL => println!("AND\tA,HL"),
+            opcodes::AND_A_D8 => println!("AND\tA,{}", read_8_imm()),
+
             opcodes::OR_A_A => println!("OR\tA,A"),
             opcodes::OR_A_B => println!("OR\tA,B"),
             opcodes::OR_A_C => println!("OR\tA,C"),
@@ -503,6 +514,19 @@ impl Cpu {
             opcodes::INC_HL => self.inc_r16(Cpu::get_hl, Cpu::set_hl),
             opcodes::INC_SP => self.inc_r16(|cpu| cpu.sp, |cpu, n| cpu.sp = n),
 
+            opcodes::AND_A_A => self.and_a(|cpu| cpu.a),
+            opcodes::AND_A_B => self.and_a(|cpu| cpu.b),
+            opcodes::AND_A_C => self.and_a(|cpu| cpu.c),
+            opcodes::AND_A_D => self.and_a(|cpu| cpu.d),
+            opcodes::AND_A_E => self.and_a(|cpu| cpu.e),
+            opcodes::AND_A_H => self.and_a(|cpu| cpu.h),
+            opcodes::AND_A_L => self.and_a(|cpu| cpu.l),
+            opcodes::AND_A_HL => {
+                let addr = self.get_hl() as usize;
+                self.and_a(|cpu| cpu.mem[addr])
+            }
+            opcodes::AND_A_D8 => self.and_a(|cpu| cpu.consume_byte()),
+
             opcodes::OR_A_A => self.or_a(|cpu| cpu.a),
             opcodes::OR_A_B => self.or_a(|cpu| cpu.b),
             opcodes::OR_A_C => self.or_a(|cpu| cpu.c),
@@ -514,7 +538,8 @@ impl Cpu {
                 let addr = self.get_hl() as usize;
                 self.or_a(|cpu| cpu.mem[addr])
             }
-            opcodes::OR_A_D8 => self.or_a_d8(),
+            opcodes::OR_A_D8 => self.or_a(|cpu| cpu.consume_byte()),
+
             opcodes::LD_B_D8 => self.ld_r8_d8(|cpu, n| cpu.b = n),
             opcodes::LD_C_D8 => self.ld_r8_d8(|cpu, n| cpu.c = n),
             opcodes::LD_D_D8 => self.ld_r8_d8(|cpu, n| cpu.d = n),
@@ -858,6 +883,31 @@ impl Cpu {
     }
 
     ///**Description:**
+    ///  Logical AND n with register A, result in A.
+    ///
+    ///**Use with:**
+    ///  n = A,B,C,D,E,H,L,(HL),#
+    ///
+    ///**Flags affected:**
+    ///  Z - Set if result is zero.
+    ///  N - Reset.
+    ///  H - Reset.
+    ///  C - Reset.
+    fn and_a<F>(&mut self, f: F)
+    where
+        F: Fn(&mut Cpu) -> u8,
+    {
+
+        let result = self.a & f(self);
+        self.a = result;
+
+        self.set_flag_to(Flag::Zero, result == 0);
+        self.reset_flag(Flag::Carry);
+        self.reset_flag(Flag::HalfCarry);
+        self.reset_flag(Flag::Sub);
+    }
+
+    ///**Description:**
     ///  Logical OR n with register A, result in A.
     ///
     ///**Use with:**
@@ -874,17 +924,6 @@ impl Cpu {
     {
 
         let result = self.a | f(self);
-        self.a = result;
-
-        self.set_flag_to(Flag::Zero, result == 0);
-        self.reset_flag(Flag::Carry);
-        self.reset_flag(Flag::HalfCarry);
-        self.reset_flag(Flag::Sub);
-    }
-
-    fn or_a_d8(&mut self) {
-        let value = self.consume_byte();
-        let result = self.a | value;
         self.a = result;
 
         self.set_flag_to(Flag::Zero, result == 0);
