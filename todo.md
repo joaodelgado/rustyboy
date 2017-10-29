@@ -99,13 +99,13 @@
     - [X] 0x55 LD	D,L
     - [X] 0x56 LD	D,(HL)
     - [ ] 0x57 LD	D,A
-    - [ ] 0x58 LD	E,B
-    - [ ] 0x59 LD	E,C
-    - [ ] 0x5a LD	E,D
-    - [ ] 0x5b LD	E,E
-    - [ ] 0x5c LD	E,H
-    - [ ] 0x5d LD	E,L
-    - [ ] 0x5e LD	E,(HL)
+    - [X] 0x58 LD	E,B
+    - [X] 0x59 LD	E,C
+    - [X] 0x5a LD	E,D
+    - [X] 0x5b LD	E,E
+    - [X] 0x5c LD	E,H
+    - [X] 0x5d LD	E,L
+    - [X] 0x5e LD	E,(HL)
     - [ ] 0x5f LD	E,A
     - [ ] 0x60 LD	H,B
     - [ ] 0x61 LD	H,C
