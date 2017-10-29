@@ -58,6 +58,20 @@ where
     assert_eq!(value, r1(cpu));
 }
 
+fn _test_ld_reg_addr<G, F>(getter: G, setter: F, value: u8, addr: u16, opcode: u8)
+where
+    G: Fn(&Cpu) -> u8,
+    F: Fn(&mut Cpu, u16),
+{
+    let cpu = &mut Cpu::new();
+    cpu.mem[0] = opcode;
+    cpu.mem[addr as usize] = value;
+    setter(cpu, addr);
+
+    cpu.tick().unwrap();
+    assert_eq!(getter(cpu), cpu.mem[addr as usize]);
+}
+
 #[test]
 fn test_ld_a_a() {
     _test_ld_reg_reg(|cpu| cpu.a, |cpu, n| cpu.a = n, 0x72, opcodes::LD_A_A);
@@ -95,38 +109,17 @@ fn test_ld_a_l() {
 
 #[test]
 fn test_ld_a_hl() {
-    let mut cpu = Cpu::new();
-    let addr = 0xb00b;
-    cpu.mem[0] = opcodes::LD_A_HL;
-    cpu.mem[addr as usize] = 5;
-    cpu.set_hl(addr as u16);
-
-    cpu.tick().unwrap();
-    assert_eq!(cpu.a, cpu.mem[addr as usize]);
+    _test_ld_reg_addr(|cpu| cpu.a, Cpu::set_hl, 5, 0xb00b, opcodes::LD_A_HL);
 }
 
 #[test]
 fn test_ld_a_bc() {
-    let mut cpu = Cpu::new();
-    let addr = 0xb00b;
-    cpu.mem[0] = opcodes::LD_A_BC;
-    cpu.mem[addr as usize] = 5;
-    cpu.set_bc(addr as u16);
-
-    cpu.tick().unwrap();
-    assert_eq!(cpu.a, cpu.mem[addr as usize]);
+    _test_ld_reg_addr(|cpu| cpu.a, Cpu::set_bc, 5, 0xb00b, opcodes::LD_A_BC);
 }
 
 #[test]
 fn test_ld_a_de() {
-    let mut cpu = Cpu::new();
-    let addr = 0xb00b;
-    cpu.mem[0] = opcodes::LD_A_DE;
-    cpu.mem[addr as usize] = 5;
-    cpu.set_de(addr as u16);
-
-    cpu.tick().unwrap();
-    assert_eq!(cpu.a, cpu.mem[addr as usize]);
+    _test_ld_reg_addr(|cpu| cpu.a, Cpu::set_de, 5, 0xb00b, opcodes::LD_A_DE);
 }
 
 #[test]
@@ -162,14 +155,9 @@ fn test_ld_b_l() {
 
 #[test]
 fn test_ld_b_hl() {
-    let mut cpu = Cpu::new();
-    let addr = 0xb00b;
-    cpu.mem[0] = opcodes::LD_B_HL;
-    cpu.mem[addr as usize] = 5;
-    cpu.set_hl(addr as u16);
+    _test_ld_reg_addr(|cpu| cpu.b, Cpu::set_hl, 5, 0xb00b, opcodes::LD_B_HL);
+}
 
-    cpu.tick().unwrap();
-    assert_eq!(cpu.b, cpu.mem[addr as usize]);
 }
 
 #[test]
