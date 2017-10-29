@@ -207,7 +207,7 @@
     - [X] 0xc1 POP	BC
     - [X] 0xc2 JP	NZ,a16
     - [X] 0xc3 JP	a16
-    - [ ] 0xc4 CALL	NZ,a16
+    - [X] 0xc4 CALL	NZ,a16
     - [X] 0xc5 PUSH	BC
     - [ ] 0xc6 ADD	A,d8
     - [ ] 0xc7 RST	00H
@@ -215,21 +215,21 @@
     - [X] 0xc9 RET
     - [X] 0xca JP	Z,a16
     - [ ] 0xcb PREFIX	CB
-    - [ ] 0xcc CALL	Z,a16
+    - [X] 0xcc CALL	Z,a16
     - [X] 0xcd CALL	a16
     - [ ] 0xce ADC	A,d8
     - [ ] 0xcf RST	08H
     - [ ] 0xd0 RET	NC
     - [X] 0xd1 POP	DE
     - [X] 0xd2 JP	NC,a16
-    - [ ] 0xd4 CALL	NC,a16
+    - [X] 0xd4 CALL	NC,a16
     - [X] 0xd5 PUSH	DE
     - [ ] 0xd6 SUB	d8
     - [ ] 0xd7 RST	10H
     - [ ] 0xd8 RET	C
     - [ ] 0xd9 RETI
     - [X] 0xda JP	C,a16
-    - [ ] 0xdc CALL	C,a16
+    - [X] 0xdc CALL	C,a16
     - [ ] 0xde SBC	A,d8
     - [ ] 0xdf RST	18H
     - [X] 0xe0 LDH	(a8),A

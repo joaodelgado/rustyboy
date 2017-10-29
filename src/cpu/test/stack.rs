@@ -19,6 +19,48 @@ fn test_call_a16() {
     assert_eq!(0xff, cpu.mem[0xfffd]);
 }
 
+fn _test_call_cc_a16<F>(flag_setter: F, opcode: u8)
+where
+    F: Fn(&mut Cpu),
+{
+    let cpu = &mut Cpu::new();
+    cpu.pc = 0xff13;
+    cpu.sp = 0xfffe;
+    flag_setter(cpu);
+
+    cpu.mem[0xff13] = opcode;
+    cpu.mem[0xff14] = 0x24;
+    cpu.mem[0xff15] = 0x35;
+
+    cpu.tick().unwrap();
+
+    assert_eq!(0xfffc, cpu.sp);
+    assert_eq!(0x3524, cpu.pc);
+    assert_eq!(0x16, cpu.mem[0xfffe]);
+    assert_eq!(0xff, cpu.mem[0xfffd]);
+
+}
+
+#[test]
+fn test_call_z_a16() {
+    _test_call_cc_a16(|cpu| cpu.set_flag(Flag::Zero), opcodes::CALL_Z_A16);
+}
+
+#[test]
+fn test_call_c_a16() {
+    _test_call_cc_a16(|cpu| cpu.set_flag(Flag::Carry), opcodes::CALL_C_A16);
+}
+
+#[test]
+fn test_call_nz_a16() {
+    test_call_a16();
+}
+
+#[test]
+fn test_call_nc_a16() {
+    test_call_a16();
+}
+
 #[test]
 fn test_ret() {
     let mut cpu = Cpu::new();

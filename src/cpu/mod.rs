@@ -265,6 +265,10 @@ impl Cpu {
         let opcode = self.mem[addr];
         match opcode {
             opcodes::CALL_A16 => println!("CALL\t{}", read_16_addr()),
+            opcodes::CALL_NZ_A16 => println!("CALL\tNZ,{}", read_16_addr()),
+            opcodes::CALL_Z_A16 => println!("CALL\tZ,{}", read_16_addr()),
+            opcodes::CALL_NC_A16 => println!("CALL\tNC,{}", read_16_addr()),
+            opcodes::CALL_C_A16 => println!("CALL\tC,{}", read_16_addr()),
 
             opcodes::INC_A => println!("INC\tA"),
             opcodes::INC_B => println!("INC\tB"),
@@ -433,6 +437,10 @@ impl Cpu {
         let opcode = self.consume_byte();
         match opcode {
             opcodes::CALL_A16 => self.call_a16(),
+            opcodes::CALL_NZ_A16 => self.call_cc_a16(|cpu| !cpu.flag(Flag::Zero)),
+            opcodes::CALL_Z_A16 => self.call_cc_a16(|cpu| cpu.flag(Flag::Zero)),
+            opcodes::CALL_NC_A16 => self.call_cc_a16(|cpu| !cpu.flag(Flag::Carry)),
+            opcodes::CALL_C_A16 => self.call_cc_a16(|cpu| cpu.flag(Flag::Carry)),
 
             opcodes::DI => self.di(),
 
@@ -660,6 +668,25 @@ impl Cpu {
         self.push_stack_u16(pc);
 
         self.pc = addr;
+    }
+
+    ///**Description:**
+    ///  Call address n if following condition is true:
+    ///
+    ///  cc = NZ, Call if Z flag is reset.
+    ///  cc = Z, Call if Z flag is set.
+    ///  cc = NC, Call if C flag is reset.
+    ///  cc = C, Call if C flag is set.
+    ///
+    ///**Use with:**
+    ///  nn = two byte immediate value. (LS byte first.)
+    fn call_cc_a16<F>(&mut self, condition: F)
+    where
+        F: Fn(&Cpu) -> bool,
+    {
+        if condition(self) {
+            self.call_a16();
+        }
     }
 
     /// **Description**
