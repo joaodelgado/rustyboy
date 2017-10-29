@@ -303,6 +303,42 @@ fn test_ld_h_hl() {
 }
 
 #[test]
+fn test_ld_l_b() {
+    _test_ld_reg_reg(|cpu| cpu.l, |cpu, n| cpu.b = n, 0x72, opcodes::LD_L_B);
+}
+
+
+#[test]
+fn test_ld_l_c() {
+    _test_ld_reg_reg(|cpu| cpu.l, |cpu, n| cpu.c = n, 0x72, opcodes::LD_L_C);
+}
+
+#[test]
+fn test_ld_l_d() {
+    _test_ld_reg_reg(|cpu| cpu.l, |cpu, n| cpu.d = n, 0x72, opcodes::LD_L_D);
+}
+
+#[test]
+fn test_ld_l_e() {
+    _test_ld_reg_reg(|cpu| cpu.l, |cpu, n| cpu.e = n, 0x72, opcodes::LD_L_E);
+}
+
+#[test]
+fn test_ld_l_h() {
+    _test_ld_reg_reg(|cpu| cpu.l, |cpu, n| cpu.h = n, 0x72, opcodes::LD_L_H);
+}
+
+#[test]
+fn test_ld_l_l() {
+    _test_ld_reg_reg(|cpu| cpu.l, |cpu, n| cpu.l = n, 0x72, opcodes::LD_L_L);
+}
+
+#[test]
+fn test_ld_l_hl() {
+    _test_ld_reg_addr(|cpu| cpu.l, Cpu::set_hl, 5, 0xb00b, opcodes::LD_L_HL);
+}
+
+#[test]
 fn test_ld_sp_nn() {
     let mut cpu = Cpu::new();
     cpu.mem[0] = 0x31;
