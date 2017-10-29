@@ -107,28 +107,28 @@
     - [X] 0x5d LD	E,L
     - [X] 0x5e LD	E,(HL)
     - [ ] 0x5f LD	E,A
-    - [ ] 0x60 LD	H,B
-    - [ ] 0x61 LD	H,C
-    - [ ] 0x62 LD	H,D
-    - [ ] 0x63 LD	H,E
-    - [ ] 0x64 LD	H,H
-    - [ ] 0x65 LD	H,L
-    - [ ] 0x66 LD	H,(HL)
+    - [X] 0x60 LD	H,B
+    - [X] 0x61 LD	H,C
+    - [X] 0x62 LD	H,D
+    - [X] 0x63 LD	H,E
+    - [X] 0x64 LD	H,H
+    - [X] 0x65 LD	H,L
+    - [X] 0x66 LD	H,(HL)
     - [ ] 0x67 LD	H,A
-    - [ ] 0x68 LD	L,B
-    - [ ] 0x69 LD	L,C
-    - [ ] 0x6a LD	L,D
-    - [ ] 0x6b LD	L,E
-    - [ ] 0x6c LD	L,H
-    - [ ] 0x6d LD	L,L
-    - [ ] 0x6e LD	L,(HL)
+    - [X] 0x68 LD	L,B
+    - [X] 0x69 LD	L,C
+    - [X] 0x6a LD	L,D
+    - [X] 0x6b LD	L,E
+    - [X] 0x6c LD	L,H
+    - [X] 0x6d LD	L,L
+    - [X] 0x6e LD	L,(HL)
     - [ ] 0x6f LD	L,A
-    - [ ] 0x70 LD	(HL),B
-    - [ ] 0x71 LD	(HL),C
-    - [ ] 0x72 LD	(HL),D
-    - [ ] 0x73 LD	(HL),E
-    - [ ] 0x74 LD	(HL),H
-    - [ ] 0x75 LD	(HL),L
+    - [X] 0x70 LD	(HL),B
+    - [X] 0x71 LD	(HL),C
+    - [X] 0x72 LD	(HL),D
+    - [X] 0x73 LD	(HL),E
+    - [X] 0x74 LD	(HL),H
+    - [X] 0x75 LD	(HL),L
     - [ ] 0x76 HALT
     - [X] 0x77 LD	(HL),A
     - [X] 0x78 LD	A,B
