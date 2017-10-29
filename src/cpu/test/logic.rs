@@ -215,7 +215,7 @@ fn test_and_a_d8() {
 }
 
 #[test]
-fn test_cp_d8() {
+fn test_cp_a() {
     let mut cpu = Cpu::new();
     cpu.a = 4;
     cpu.mem[0] = opcodes::CP_A;

@@ -590,15 +590,15 @@ impl Cpu {
             opcodes::LD_H_D8 => self.ld_r8_d8(|cpu, n| cpu.h = n),
             opcodes::LD_L_D8 => self.ld_r8_d8(|cpu, n| cpu.l = n),
 
-            opcodes::CP_A => self.cp_d8(|cpu| cpu.a),
-            opcodes::CP_B => self.cp_d8(|cpu| cpu.b),
-            opcodes::CP_C => self.cp_d8(|cpu| cpu.c),
-            opcodes::CP_D => self.cp_d8(|cpu| cpu.d),
-            opcodes::CP_E => self.cp_d8(|cpu| cpu.e),
-            opcodes::CP_H => self.cp_d8(|cpu| cpu.h),
-            opcodes::CP_L => self.cp_d8(|cpu| cpu.l),
+            opcodes::CP_A => self.cp_a(|cpu| cpu.a),
+            opcodes::CP_B => self.cp_a(|cpu| cpu.b),
+            opcodes::CP_C => self.cp_a(|cpu| cpu.c),
+            opcodes::CP_D => self.cp_a(|cpu| cpu.d),
+            opcodes::CP_E => self.cp_a(|cpu| cpu.e),
+            opcodes::CP_H => self.cp_a(|cpu| cpu.h),
+            opcodes::CP_L => self.cp_a(|cpu| cpu.l),
             opcodes::CP_HL => self.cp_hl(),
-            opcodes::CP_D8 => self.cp_d8(Cpu::consume_byte),
+            opcodes::CP_D8 => self.cp_a(Cpu::consume_byte),
 
             opcodes::NOP => self.nop(),
             s => {
@@ -1024,7 +1024,7 @@ impl Cpu {
     ///  H - Set if no borrow from bit 4.
     ///  C - Set for no borrow. (Set if A < n.)
     /// TODO: implement this with the SUB instruction instead
-    fn cp_d8<F>(&mut self, f: F)
+    fn cp_a<F>(&mut self, f: F)
     where
         F: Fn(&mut Cpu) -> u8,
     {
