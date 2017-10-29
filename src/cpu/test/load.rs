@@ -158,6 +158,40 @@ fn test_ld_b_hl() {
     _test_ld_reg_addr(|cpu| cpu.b, Cpu::set_hl, 5, 0xb00b, opcodes::LD_B_HL);
 }
 
+#[test]
+fn test_ld_c_b() {
+    _test_ld_reg_reg(|cpu| cpu.c, |cpu, n| cpu.b = n, 0x72, opcodes::LD_C_B);
+}
+
+
+#[test]
+fn test_ld_c_c() {
+    _test_ld_reg_reg(|cpu| cpu.c, |cpu, n| cpu.c = n, 0x72, opcodes::LD_C_C);
+}
+
+#[test]
+fn test_ld_c_d() {
+    _test_ld_reg_reg(|cpu| cpu.c, |cpu, n| cpu.d = n, 0x72, opcodes::LD_C_D);
+}
+
+#[test]
+fn test_ld_c_e() {
+    _test_ld_reg_reg(|cpu| cpu.c, |cpu, n| cpu.e = n, 0x72, opcodes::LD_C_E);
+}
+
+#[test]
+fn test_ld_c_h() {
+    _test_ld_reg_reg(|cpu| cpu.c, |cpu, n| cpu.h = n, 0x72, opcodes::LD_C_H);
+}
+
+#[test]
+fn test_ld_c_l() {
+    _test_ld_reg_reg(|cpu| cpu.c, |cpu, n| cpu.l = n, 0x72, opcodes::LD_C_L);
+}
+
+#[test]
+fn test_ld_c_hl() {
+    _test_ld_reg_addr(|cpu| cpu.c, Cpu::set_hl, 5, 0xb00b, opcodes::LD_C_HL);
 }
 
 #[test]

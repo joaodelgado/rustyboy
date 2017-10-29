@@ -422,6 +422,14 @@ impl Cpu {
             opcodes::LD_B_L => self.ld_r8_r8(|cpu| cpu.l, |cpu, n| cpu.b = n),
             opcodes::LD_B_HL => self.ld_r8_r16(Cpu::get_hl, |cpu, n| cpu.b = n),
 
+            opcodes::LD_C_B => self.ld_r8_r8(|cpu| cpu.b, |cpu, n| cpu.c = n),
+            opcodes::LD_C_C => self.ld_r8_r8(|cpu| cpu.c, |cpu, n| cpu.c = n),
+            opcodes::LD_C_D => self.ld_r8_r8(|cpu| cpu.d, |cpu, n| cpu.c = n),
+            opcodes::LD_C_E => self.ld_r8_r8(|cpu| cpu.e, |cpu, n| cpu.c = n),
+            opcodes::LD_C_H => self.ld_r8_r8(|cpu| cpu.h, |cpu, n| cpu.c = n),
+            opcodes::LD_C_L => self.ld_r8_r8(|cpu| cpu.l, |cpu, n| cpu.c = n),
+            opcodes::LD_C_HL => self.ld_r8_r16(Cpu::get_hl, |cpu, n| cpu.c = n),
+
             opcodes::LD_HL_D16 => self.ld_r16_d16(Cpu::set_hl),
             opcodes::LD_SP_HL => self.ld_sp_hl(),
             opcodes::LD_DE_D16 => self.ld_r16_d16(Cpu::set_de),
