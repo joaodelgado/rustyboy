@@ -338,6 +338,12 @@ impl Cpu {
             opcodes::LD_L_H => println!("LD\tL,H"),
             opcodes::LD_L_L => println!("LD\tL,L"),
             opcodes::LD_L_HL => println!("LD\tL,(HL)"),
+            opcodes::LD_HL_B => println!("LD\t(HL),B,"),
+            opcodes::LD_HL_C => println!("LD\t(HL),C"),
+            opcodes::LD_HL_D => println!("LD\t(HL),D"),
+            opcodes::LD_HL_E => println!("LD\t(HL),E"),
+            opcodes::LD_HL_H => println!("LD\t(HL),H"),
+            opcodes::LD_HL_L => println!("LD\t(HL),L"),
             opcodes::LD_A_D8 => println!("LD\tA,{}", read_8_imm()),
             opcodes::LD_BC_D16 => println!("LD\tBC,{}", read_16_imm()),
             opcodes::LD_HL_D16 => println!("LD\tHL,{}", read_16_imm()),
@@ -444,9 +450,9 @@ impl Cpu {
             opcodes::JR_NC_R8 => self.jr_cc_r8(|cpu| !cpu.flag(Flag::Carry)),
             opcodes::JR_C_R8 => self.jr_cc_r8(|cpu| cpu.flag(Flag::Carry)),
 
-            opcodes::LD_BC_A => self.ld_addr_a(|cpu| cpu.get_bc()),
-            opcodes::LD_DE_A => self.ld_addr_a(|cpu| cpu.get_de()),
-            opcodes::LD_HL_A => self.ld_addr_a(|cpu| cpu.get_hl()),
+            opcodes::LD_BC_A => self.ld_addr_r8(Cpu::get_bc, |cpu| cpu.a),
+            opcodes::LD_HL_A => self.ld_addr_r8(Cpu::get_hl, |cpu| cpu.a),
+            opcodes::LD_DE_A => self.ld_addr_r8(Cpu::get_de, |cpu| cpu.a),
             opcodes::LD_A16_A => self.ld_addr_a(|cpu| cpu.consume_16_addr()),
 
             opcodes::LD_A_D8 => self.ld_a(|cpu| cpu.consume_byte()),
@@ -509,6 +515,13 @@ impl Cpu {
             opcodes::LD_L_H => self.ld_r8_r8(|cpu| cpu.h, |cpu, n| cpu.l = n),
             opcodes::LD_L_L => self.ld_r8_r8(|cpu| cpu.l, |cpu, n| cpu.l = n),
             opcodes::LD_L_HL => self.ld_r8_r16(Cpu::get_hl, |cpu, n| cpu.l = n),
+
+            opcodes::LD_HL_B => self.ld_addr_r8(Cpu::get_hl, |cpu| cpu.b),
+            opcodes::LD_HL_C => self.ld_addr_r8(Cpu::get_hl, |cpu| cpu.c),
+            opcodes::LD_HL_D => self.ld_addr_r8(Cpu::get_hl, |cpu| cpu.d),
+            opcodes::LD_HL_E => self.ld_addr_r8(Cpu::get_hl, |cpu| cpu.e),
+            opcodes::LD_HL_H => self.ld_addr_r8(Cpu::get_hl, |cpu| cpu.h),
+            opcodes::LD_HL_L => self.ld_addr_r8(Cpu::get_hl, |cpu| cpu.l),
 
             opcodes::LD_HL_D16 => self.ld_r16_d16(Cpu::set_hl),
             opcodes::LD_SP_HL => self.ld_sp_hl(),
@@ -1046,5 +1059,17 @@ impl Cpu {
         self.set_flag_to(Flag::Carry, a < n);
         self.set_flag_to(Flag::HalfCarry, (a & 0xF) < (n & 0xF));
         self.set_flag(Flag::Sub);
+    }
+
+    /// **Description**
+    ///
+    /// Put value at register r2 into memory address stored in r1.
+    fn ld_addr_r8<G, F>(&mut self, r1: G, r2: F)
+    where
+        F: Fn(&Cpu) -> u8,
+        G: Fn(&Cpu) -> u16,
+    {
+        let addr = r1(self) as usize;
+        self.mem[addr] = r2(self);
     }
 }
