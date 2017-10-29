@@ -504,12 +504,12 @@ impl Cpu {
             opcodes::INC_SP => self.inc_r16(|cpu| cpu.sp, |cpu, n| cpu.sp = n),
 
             opcodes::OR_A_A => self.or_a(|cpu| cpu.a),
-            opcodes::OR_A_B => self.or_a(|cpu| cpu.a),
-            opcodes::OR_A_C => self.or_a(|cpu| cpu.a),
-            opcodes::OR_A_D => self.or_a(|cpu| cpu.a),
-            opcodes::OR_A_E => self.or_a(|cpu| cpu.a),
-            opcodes::OR_A_H => self.or_a(|cpu| cpu.a),
-            opcodes::OR_A_L => self.or_a(|cpu| cpu.a),
+            opcodes::OR_A_B => self.or_a(|cpu| cpu.b),
+            opcodes::OR_A_C => self.or_a(|cpu| cpu.c),
+            opcodes::OR_A_D => self.or_a(|cpu| cpu.d),
+            opcodes::OR_A_E => self.or_a(|cpu| cpu.e),
+            opcodes::OR_A_H => self.or_a(|cpu| cpu.h),
+            opcodes::OR_A_L => self.or_a(|cpu| cpu.l),
             opcodes::OR_A_HL => {
                 let addr = self.get_hl() as usize;
                 self.or_a(|cpu| cpu.mem[addr])
@@ -872,26 +872,25 @@ impl Cpu {
     where
         F: Fn(&mut Cpu) -> u8,
     {
-        self.reset_flag(Flag::Zero);
+
+        let result = self.a | f(self);
+        self.a = result;
+
+        self.set_flag_to(Flag::Zero, result == 0);
         self.reset_flag(Flag::Carry);
         self.reset_flag(Flag::HalfCarry);
         self.reset_flag(Flag::Sub);
-
-        if (self.a | f(self)) == 0 {
-            self.set_flag(Flag::Zero);
-        }
     }
 
     fn or_a_d8(&mut self) {
-        self.reset_flag(Flag::Zero);
+        let value = self.consume_byte();
+        let result = self.a | value;
+        self.a = result;
+
+        self.set_flag_to(Flag::Zero, result == 0);
         self.reset_flag(Flag::Carry);
         self.reset_flag(Flag::HalfCarry);
         self.reset_flag(Flag::Sub);
-
-        let value = self.consume_byte();
-        if (self.a | value) == 0 {
-            self.set_flag(Flag::Zero);
-        }
     }
 
     ///**Description:**
