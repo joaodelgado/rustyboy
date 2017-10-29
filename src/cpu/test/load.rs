@@ -46,74 +46,51 @@ fn test_ld_a16_a() {
     assert_eq!(cpu.mem[0x3401], 0x72);
 }
 
+fn _test_ld_reg_reg<G, F>(r1: G, r2: F, value: u8, opcode: u8)
+where
+    G: Fn(&Cpu) -> u8,
+    F: Fn(&mut Cpu, u8),
+{
+    let cpu = &mut Cpu::new();
+    r2(cpu, value);
+    cpu.mem[0] = opcode;
+    cpu.tick().unwrap();
+    assert_eq!(value, r1(cpu));
+}
+
 #[test]
 fn test_ld_a_a() {
-    let mut cpu = Cpu::new();
-    cpu.a = 0x72;
-    cpu.mem[0] = opcodes::LD_A_A;
-
-    cpu.tick().unwrap();
-    assert_eq!(0x72, cpu.a);
+    _test_ld_reg_reg(|cpu| cpu.a, |cpu, n| cpu.a = n, 0x72, opcodes::LD_A_A);
 }
 
 #[test]
 fn test_ld_a_b() {
-    let mut cpu = Cpu::new();
-    cpu.b = 0x72;
-    cpu.mem[0] = opcodes::LD_A_B;
-
-    cpu.tick().unwrap();
-    assert_eq!(0x72, cpu.a);
+    _test_ld_reg_reg(|cpu| cpu.a, |cpu, n| cpu.b = n, 0x72, opcodes::LD_A_B);
 }
 
 #[test]
 fn test_ld_a_c() {
-    let mut cpu = Cpu::new();
-    cpu.c = 0x72;
-    cpu.mem[0] = opcodes::LD_A_C;
-
-    cpu.tick().unwrap();
-    assert_eq!(0x72, cpu.a);
+    _test_ld_reg_reg(|cpu| cpu.a, |cpu, n| cpu.c = n, 0x72, opcodes::LD_A_C);
 }
 
 #[test]
 fn test_ld_a_d() {
-    let mut cpu = Cpu::new();
-    cpu.d = 0x72;
-    cpu.mem[0] = opcodes::LD_A_D;
-
-    cpu.tick().unwrap();
-    assert_eq!(0x72, cpu.a);
+    _test_ld_reg_reg(|cpu| cpu.a, |cpu, n| cpu.d = n, 0x72, opcodes::LD_A_D);
 }
 
 #[test]
 fn test_ld_a_e() {
-    let mut cpu = Cpu::new();
-    cpu.e = 0x72;
-    cpu.mem[0] = opcodes::LD_A_E;
-
-    cpu.tick().unwrap();
-    assert_eq!(0x72, cpu.a);
+    _test_ld_reg_reg(|cpu| cpu.a, |cpu, n| cpu.e = n, 0x72, opcodes::LD_A_E);
 }
 
 #[test]
 fn test_ld_a_h() {
-    let mut cpu = Cpu::new();
-    cpu.h = 0x72;
-    cpu.mem[0] = opcodes::LD_A_H;
-
-    cpu.tick().unwrap();
-    assert_eq!(0x72, cpu.a);
+    _test_ld_reg_reg(|cpu| cpu.a, |cpu, n| cpu.h = n, 0x72, opcodes::LD_A_H);
 }
 
 #[test]
 fn test_ld_a_l() {
-    let mut cpu = Cpu::new();
-    cpu.l = 0x72;
-    cpu.mem[0] = opcodes::LD_A_L;
-
-    cpu.tick().unwrap();
-    assert_eq!(0x72, cpu.a);
+    _test_ld_reg_reg(|cpu| cpu.a, |cpu, n| cpu.l = n, 0x72, opcodes::LD_A_L);
 }
 
 #[test]
@@ -154,63 +131,33 @@ fn test_ld_a_de() {
 
 #[test]
 fn test_ld_b_b() {
-    let mut cpu = Cpu::new();
-    cpu.b = 0x72;
-    cpu.mem[0] = opcodes::LD_B_B;
-
-    cpu.tick().unwrap();
-    assert_eq!(0x72, cpu.b);
+    _test_ld_reg_reg(|cpu| cpu.b, |cpu, n| cpu.b = n, 0x72, opcodes::LD_B_B);
 }
 
 
 #[test]
 fn test_ld_b_c() {
-    let mut cpu = Cpu::new();
-    cpu.c = 0x72;
-    cpu.mem[0] = opcodes::LD_B_C;
-
-    cpu.tick().unwrap();
-    assert_eq!(0x72, cpu.b);
+    _test_ld_reg_reg(|cpu| cpu.b, |cpu, n| cpu.c = n, 0x72, opcodes::LD_B_C);
 }
 
 #[test]
 fn test_ld_b_d() {
-    let mut cpu = Cpu::new();
-    cpu.d = 0x72;
-    cpu.mem[0] = opcodes::LD_B_D;
-
-    cpu.tick().unwrap();
-    assert_eq!(0x72, cpu.b);
+    _test_ld_reg_reg(|cpu| cpu.b, |cpu, n| cpu.d = n, 0x72, opcodes::LD_B_D);
 }
 
 #[test]
 fn test_ld_b_e() {
-    let mut cpu = Cpu::new();
-    cpu.e = 0x72;
-    cpu.mem[0] = opcodes::LD_B_E;
-
-    cpu.tick().unwrap();
-    assert_eq!(0x72, cpu.b);
+    _test_ld_reg_reg(|cpu| cpu.b, |cpu, n| cpu.e = n, 0x72, opcodes::LD_B_E);
 }
 
 #[test]
 fn test_ld_b_h() {
-    let mut cpu = Cpu::new();
-    cpu.h = 0x72;
-    cpu.mem[0] = opcodes::LD_B_H;
-
-    cpu.tick().unwrap();
-    assert_eq!(0x72, cpu.b);
+    _test_ld_reg_reg(|cpu| cpu.b, |cpu, n| cpu.h = n, 0x72, opcodes::LD_B_H);
 }
 
 #[test]
 fn test_ld_b_l() {
-    let mut cpu = Cpu::new();
-    cpu.l = 0x72;
-    cpu.mem[0] = opcodes::LD_B_L;
-
-    cpu.tick().unwrap();
-    assert_eq!(0x72, cpu.b);
+    _test_ld_reg_reg(|cpu| cpu.b, |cpu, n| cpu.l = n, 0x72, opcodes::LD_B_L);
 }
 
 #[test]
