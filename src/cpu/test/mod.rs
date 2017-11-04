@@ -1,7 +1,7 @@
 #![cfg(test)]
 use super::*;
 
-mod inc;
+mod alu;
 mod jump;
 mod logic;
 mod stack;

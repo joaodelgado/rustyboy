@@ -1,6 +1,10 @@
 #![cfg(test)]
 use super::*;
 
+//
+// INC
+//
+
 fn _test_inc_reg<G, S>(opcode: u8, reg_getter: G, reg_setter: S)
 where
     G: Fn(&Cpu) -> u8,
