@@ -201,7 +201,7 @@ fn test_inc_hl() {
 // ADD
 //
 
-fn _test_add_a_reg<S>(opcode: u8, r: S)
+fn _test_add_a<S>(opcode: u8, r: S)
 where
     S: Fn(&mut Cpu, u8),
 {
@@ -287,42 +287,42 @@ where
 
 #[test]
 fn test_add_a() {
-    _test_add_a_reg(opcodes::ADD_A_A, |cpu, n| cpu.a = n);
+    _test_add_a(opcodes::ADD_A_A, |cpu, n| cpu.a = n);
 }
 
 #[test]
 fn test_add_b() {
-    _test_add_a_reg(opcodes::ADD_A_B, |cpu, n| cpu.b = n);
+    _test_add_a(opcodes::ADD_A_B, |cpu, n| cpu.b = n);
 }
 
 #[test]
 fn test_add_c() {
-    _test_add_a_reg(opcodes::ADD_A_C, |cpu, n| cpu.c = n);
+    _test_add_a(opcodes::ADD_A_C, |cpu, n| cpu.c = n);
 }
 
 #[test]
 fn test_add_d() {
-    _test_add_a_reg(opcodes::ADD_A_D, |cpu, n| cpu.d = n);
+    _test_add_a(opcodes::ADD_A_D, |cpu, n| cpu.d = n);
 }
 
 #[test]
 fn test_add_e() {
-    _test_add_a_reg(opcodes::ADD_A_E, |cpu, n| cpu.e = n);
+    _test_add_a(opcodes::ADD_A_E, |cpu, n| cpu.e = n);
 }
 
 #[test]
 fn test_add_h() {
-    _test_add_a_reg(opcodes::ADD_A_H, |cpu, n| cpu.h = n);
+    _test_add_a(opcodes::ADD_A_H, |cpu, n| cpu.h = n);
 }
 
 #[test]
 fn test_add_l() {
-    _test_add_a_reg(opcodes::ADD_A_L, |cpu, n| cpu.l = n);
+    _test_add_a(opcodes::ADD_A_L, |cpu, n| cpu.l = n);
 }
 
 #[test]
 fn test_add_a_hl() {
-    _test_add_a_reg(opcodes::ADD_A_HL, |cpu, value| {
+    _test_add_a(opcodes::ADD_A_HL, |cpu, value| {
         cpu.set_hl(0xffe1);
         cpu.mem[0xffe1] = value
     });
@@ -330,8 +330,112 @@ fn test_add_a_hl() {
 
 #[test]
 fn test_add_a_d8() {
-    _test_add_a_reg(opcodes::ADD_A_D8, |cpu, value| {
+    _test_add_a(opcodes::ADD_A_D8, |cpu, value| {
         let i = (cpu.pc + 1) as usize;
         cpu.mem[i] = value;
     });
+}
+
+fn _test_add_hl<S>(opcode: u8, r: S)
+where
+    S: Fn(&mut Cpu, u16),
+{
+    let new_cpu = || {
+        let mut cpu = Cpu::new();
+
+        cpu.set_flag(Flag::Zero);
+        cpu.set_flag(Flag::Sub);
+        cpu.set_flag(Flag::HalfCarry);
+        cpu.set_flag(Flag::Carry);
+
+        cpu
+    };
+
+    //
+    // Test zero add
+    //
+
+    let cpu = &mut new_cpu();
+    cpu.set_hl(0x0000);
+    r(cpu, 0x0000);
+    cpu.mem[0] = opcode;
+    let result = cpu.get_hl() + 0x0000;
+    cpu.tick().unwrap();
+
+    assert_eq!(cpu.get_hl(), result);
+    assert!(cpu.flag(Flag::Zero));
+    assert!(!cpu.flag(Flag::Sub));
+    assert!(!cpu.flag(Flag::HalfCarry));
+    assert!(!cpu.flag(Flag::Carry));
+
+    //
+    // Test non carry add
+    //
+
+    let cpu = &mut new_cpu();
+    cpu.set_hl(0x0000);
+    r(cpu, 0x0001);
+    cpu.mem[0] = opcode;
+    let result = cpu.get_hl() + 0x0001;
+    cpu.tick().unwrap();
+
+    assert_eq!(cpu.get_hl(), result);
+    assert!(cpu.flag(Flag::Zero));
+    assert!(!cpu.flag(Flag::Sub));
+    assert!(!cpu.flag(Flag::HalfCarry));
+    assert!(!cpu.flag(Flag::Carry));
+
+    //
+    // Test half carry add
+    //
+
+    let cpu = &mut new_cpu();
+    cpu.set_hl(0x0fff);
+    r(cpu, 0x0fff);
+    cpu.mem[0] = opcode;
+    let result = cpu.get_hl() + 0x0fff;
+    cpu.tick().unwrap();
+
+    assert_eq!(cpu.get_hl(), result);
+    assert!(cpu.flag(Flag::Zero));
+    assert!(!cpu.flag(Flag::Sub));
+    assert!(cpu.flag(Flag::HalfCarry));
+    assert!(!cpu.flag(Flag::Carry));
+
+    //
+    // Test carry add
+    //
+
+    let cpu = &mut new_cpu();
+    cpu.set_hl(0xffff);
+    r(cpu, 0xffff);
+    cpu.mem[0] = opcode;
+    let result = cpu.get_hl().wrapping_add(0xffff);
+    cpu.tick().unwrap();
+
+    assert_eq!(cpu.get_hl(), result);
+    assert!(cpu.flag(Flag::Zero));
+    assert!(!cpu.flag(Flag::Sub));
+    assert!(cpu.flag(Flag::HalfCarry));
+    assert!(cpu.flag(Flag::Carry));
+}
+
+#[test]
+fn test_add_hl_bc() {
+    _test_add_hl(opcodes::ADD_HL_BC, |cpu, n| cpu.set_bc(n));
+}
+
+#[test]
+fn test_add_hl_de() {
+    _test_add_hl(opcodes::ADD_HL_DE, |cpu, n| cpu.set_de(n));
+}
+
+#[test]
+fn test_add_hl_hl() {
+    _test_add_hl(opcodes::ADD_HL_HL, |cpu, n| cpu.set_hl(n));
+}
+
+#[test]
+fn test_add_hl_sp() {
+    _test_add_hl(opcodes::ADD_HL_SP, |cpu, n| cpu.sp = n);
 }

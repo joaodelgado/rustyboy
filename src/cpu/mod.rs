@@ -402,6 +402,10 @@ impl Cpu {
             opcodes::ADD_A_L => println!("ADD\tA,L"),
             opcodes::ADD_A_HL => println!("ADD\tA,HL"),
             opcodes::ADD_A_D8 => println!("ADD\tA,{}", read_8_imm()),
+            opcodes::ADD_HL_BC => println!("ADD\tHL,BC"),
+            opcodes::ADD_HL_DE => println!("ADD\tHL,DE"),
+            opcodes::ADD_HL_HL => println!("ADD\tHL,HL"),
+            opcodes::ADD_HL_SP => println!("ADD\tHL,SP"),
 
             opcodes::AND_A_A => println!("AND\tA,A"),
             opcodes::AND_A_B => println!("AND\tA,B"),
@@ -587,6 +591,10 @@ impl Cpu {
                 self.add_a(|cpu| cpu.mem[addr])
             }
             opcodes::ADD_A_D8 => self.add_a(|cpu| cpu.consume_byte()),
+            opcodes::ADD_HL_BC => self.add_hl(Cpu::get_bc),
+            opcodes::ADD_HL_DE => self.add_hl(Cpu::get_de),
+            opcodes::ADD_HL_HL => self.add_hl(Cpu::get_hl),
+            opcodes::ADD_HL_SP => self.add_hl(|cpu| cpu.sp),
 
             opcodes::AND_A_A => self.and_a(|cpu| cpu.a),
             opcodes::AND_A_B => self.and_a(|cpu| cpu.b),
@@ -1000,6 +1008,35 @@ impl Cpu {
         self.set_flag_to(Flag::Carry, (old_value as u16) + (n as u16) > 0xff);
 
         self.a = result;
+    }
+
+    ///**Description:**
+    ///  Add n to HL.
+    ///
+    ///**Use with:**
+    ///  n = BC,DE,HL,SP
+    ///
+    ///**Flags affected:**
+    ///  Z - Not affected.
+    ///  N - Reset.
+    ///  H - Set if carry from bit 11.
+    ///  C - Set if carry from bit 15.
+    fn add_hl<F>(&mut self, f: F)
+    where
+        F: Fn(&Cpu) -> u16,
+    {
+        let old_value = self.get_hl();
+        let n = f(self);
+        let result = old_value.wrapping_add(n);
+
+        self.reset_flag(Flag::Sub);
+        self.set_flag_to(
+            Flag::HalfCarry,
+            (old_value & 0x0fff) + (n & 0x0fff) > 0x0fff,
+        );
+        self.set_flag_to(Flag::Carry, (old_value as u32) + (n as u32) > 0xffff);
+
+        self.set_hl(result);
     }
 
     ///**Description:**
