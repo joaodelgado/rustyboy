@@ -456,6 +456,12 @@ impl Cpu {
             opcodes::CP_HL => println!("CP\tA,{}", read_16_addr()),
             opcodes::CP_D8 => println!("CP\tA,{}", read_8_imm()),
             opcodes::ADC_A_A => println!("ADC\tA,A"),
+            opcodes::ADC_A_B => println!("ADC\tA,B"),
+            opcodes::ADC_A_C => println!("ADC\tA,C"),
+            opcodes::ADC_A_D => println!("ADC\tA,D"),
+            opcodes::ADC_A_E => println!("ADC\tA,E"),
+            opcodes::ADC_A_H => println!("ADC\tA,H"),
+            opcodes::ADC_A_L => println!("ADC\tA,L"),
 
             n => panic!("Unknown instruction {:02x}@{:04x}", n, addr),
         }
@@ -673,7 +679,16 @@ impl Cpu {
             opcodes::CP_D8 => self.cp_a(Cpu::consume_byte),
 
             opcodes::ADC_A_A => self.adc_a(|cpu| cpu.a),
-
+            opcodes::ADC_A_B => self.adc_a(|cpu| cpu.b),
+            opcodes::ADC_A_C => self.adc_a(|cpu| cpu.c),
+            opcodes::ADC_A_D => self.adc_a(|cpu| cpu.d),
+            opcodes::ADC_A_E => self.adc_a(|cpu| cpu.e),
+            opcodes::ADC_A_H => self.adc_a(|cpu| cpu.h),
+            opcodes::ADC_A_L => self.adc_a(|cpu| cpu.l),
+            opcodes::ADC_A_HL => {
+                let addr = self.get_hl() as usize;
+                self.adc_a(|cpu| cpu.mem[addr])
+            }
 
             opcodes::NOP => self.nop(),
             s => {

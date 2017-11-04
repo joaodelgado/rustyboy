@@ -728,41 +728,152 @@ fn test_add_sp_r8() {
     assert!(cpu.flag(Flag::Carry));
 }
 
-#[test]
-fn test_adc_a_a() {
-    let cpu = &mut Cpu::new();
-    cpu.mem[0] = opcodes::ADC_A_A;
-    cpu.a = 128;
+fn _test_adc_a<S>(opcode: u8, r: S, is_a: bool)
+where
+    S: Fn(&mut Cpu, u8),
+{
+    let new_cpu = || {
+        let mut cpu = Cpu::new();
 
+        cpu.set_flag(Flag::Zero);
+        cpu.set_flag(Flag::Sub);
+        cpu.set_flag(Flag::HalfCarry);
+        cpu.set_flag(Flag::Carry);
+
+        cpu
+    };
+
+    //
+    // Test zero add
+    //
+
+    let cpu = &mut new_cpu();
+    cpu.a = 0x00;
+    r(cpu, 0x00);
+    cpu.mem[0] = opcode;
+    cpu.reset_flag(Flag::Carry);
+    let carry = if cpu.flag(Flag::Carry) {1} else {0};
+    let result = cpu.a + 0x00 + carry;
     cpu.tick().unwrap();
 
+    assert_eq!(cpu.a, result);
     assert!(cpu.flag(Flag::Zero));
-    assert!(cpu.flag(Flag::Carry));
-
-    cpu.mem[cpu.pc as usize] = opcodes::ADC_A_A;
-    cpu.a = 127;
-    cpu.reset_status();
-    cpu.tick().unwrap();
-
-    assert!(!cpu.flag(Flag::Zero));
-    assert!(cpu.flag(Flag::HalfCarry));
-    assert!(!cpu.flag(Flag::Carry));
-
-    cpu.mem[cpu.pc as usize] = opcodes::ADC_A_A;
-    cpu.a = 10;
-    cpu.reset_status();
-    cpu.tick().unwrap();
-
-    assert!(!cpu.flag(Flag::Zero));
-    assert!(cpu.flag(Flag::HalfCarry));
-    assert!(!cpu.flag(Flag::Carry));
-
-    cpu.mem[cpu.pc as usize] = opcodes::ADC_A_A;
-    cpu.a = 4;
-    cpu.reset_status();
-    cpu.tick().unwrap();
-
-    assert!(!cpu.flag(Flag::Zero));
+    assert!(!cpu.flag(Flag::Sub));
     assert!(!cpu.flag(Flag::HalfCarry));
     assert!(!cpu.flag(Flag::Carry));
+
+    //
+    // Test non carry add
+    //
+
+    let cpu = &mut new_cpu();
+    cpu.a = 0x00;
+    r(cpu, 0x01);
+    cpu.mem[0] = opcode;
+    let carry = if cpu.flag(Flag::Carry) {1} else {0};
+    let result = cpu.a + 0x01 + carry;
+    cpu.tick().unwrap();
+
+    assert_eq!(cpu.a, result);
+    assert!(!cpu.flag(Flag::Zero));
+    assert!(!cpu.flag(Flag::Sub));
+    assert!(!cpu.flag(Flag::HalfCarry));
+    assert!(!cpu.flag(Flag::Carry));
+
+    //
+    // Test half carry add
+    //
+
+    let cpu = &mut new_cpu();
+    cpu.a = 0x0f;
+    r(cpu, 0x0f);
+    cpu.mem[0] = opcode;
+    let carry = if cpu.flag(Flag::Carry) {1} else {0};
+    let result = cpu.a + 0x0f + carry;
+    cpu.tick().unwrap();
+
+    assert_eq!(cpu.a, result);
+    assert!(!cpu.flag(Flag::Zero));
+    assert!(!cpu.flag(Flag::Sub));
+    assert!(cpu.flag(Flag::HalfCarry));
+    assert!(!cpu.flag(Flag::Carry));
+
+    //
+    // Test carry add
+    //
+
+    let cpu = &mut new_cpu();
+    cpu.a = 0xff;
+    r(cpu, 0xff);
+    cpu.mem[0] = opcode;
+    let carry = if cpu.flag(Flag::Carry) {1} else {0};
+    let result = cpu.a.wrapping_add(0xff).wrapping_add(carry);
+    cpu.tick().unwrap();
+
+    assert_eq!(cpu.a, result);
+    assert!(!cpu.flag(Flag::Zero));
+    assert!(!cpu.flag(Flag::Sub));
+    assert!(cpu.flag(Flag::HalfCarry));
+    assert!(cpu.flag(Flag::Carry));
+
+    if !is_a {
+        let cpu = &mut new_cpu();
+        cpu.a = 0x80;
+        r(cpu, 0x7f);
+        cpu.mem[0] = opcode;
+        let carry = if cpu.flag(Flag::Carry) {1} else {0};
+        let result = cpu.a.wrapping_add(0x7f).wrapping_add(carry);
+        cpu.tick().unwrap();
+
+        assert_eq!(cpu.a, result);
+        assert!(cpu.flag(Flag::Zero));
+        assert!(!cpu.flag(Flag::Sub));
+        assert!(cpu.flag(Flag::HalfCarry));
+        assert!(cpu.flag(Flag::Carry));
+    }
+}
+
+
+#[test]
+fn test_adc_a() {
+    _test_adc_a(opcodes::ADC_A_A, |cpu, n| cpu.a = n, true);
+}
+
+
+#[test]
+fn test_adc_a_b() {
+    _test_adc_a(opcodes::ADC_A_B, |cpu, n| cpu.b = n, false);
+}
+
+
+#[test]
+fn test_adc_a_c() {
+    _test_adc_a(opcodes::ADC_A_C, |cpu, n| cpu.c = n, false);
+}
+
+#[test]
+fn test_adc_a_d() {
+    _test_adc_a(opcodes::ADC_A_D, |cpu, n| cpu.d = n, false);
+}
+
+#[test]
+fn test_adc_a_e() {
+    _test_adc_a(opcodes::ADC_A_E, |cpu, n| cpu.e = n, false);
+}
+
+#[test]
+fn test_adc_a_h() {
+    _test_adc_a(opcodes::ADC_A_H, |cpu, n| cpu.h = n, false);
+}
+
+#[test]
+fn test_adc_a_l() {
+    _test_adc_a(opcodes::ADC_A_L, |cpu, n| cpu.l = n, false);
+}
+
+fn test_adc_a_hl() {
+    _test_adc_a(opcodes::ADC_A_HL, |cpu, value| {
+        cpu.set_hl(0xffe1);
+        cpu.mem[0xffe1] = value
+    }, false);
 }
