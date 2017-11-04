@@ -196,6 +196,200 @@ fn test_inc_hl() {
     _test_inc_reg16(opcodes::INC_HL, Cpu::get_hl, Cpu::set_hl);
 }
 
+//
+// DEC
+//
+
+fn _test_dec_reg<G, S>(opcode: u8, reg_getter: G, reg_setter: S)
+where
+    G: Fn(&Cpu) -> u8,
+    S: Fn(&mut Cpu, u8),
+{
+    let cpu = &mut Cpu::new();
+
+    reg_setter(cpu, 0x02);
+    cpu.mem[0] = opcode;
+
+    cpu.tick().unwrap();
+    assert_eq!(reg_getter(cpu), 0x01);
+
+    // Test wrapping
+    cpu.mem[cpu.pc as usize] = opcode;
+    reg_setter(cpu, 0x00);
+
+    cpu.tick().unwrap();
+    assert_eq!(reg_getter(cpu), 0xff);
+
+    // Test Zero flag
+    cpu.mem[cpu.pc as usize] = opcode;
+    cpu.reset_flag(Flag::Zero);
+    reg_setter(cpu, 0x02);
+
+    cpu.tick().unwrap();
+    assert!(!cpu.flag(Flag::Zero)); // Should be reset if the result is non 0
+
+    cpu.mem[cpu.pc as usize] = opcode;
+    cpu.set_flag(Flag::Zero);
+    reg_setter(cpu, 0x01);
+
+    cpu.tick().unwrap();
+    assert!(cpu.flag(Flag::Zero)); // Should be set if the result is 0
+
+    // Test Sub flag
+    cpu.mem[cpu.pc as usize] = opcode;
+    cpu.set_flag(Flag::Sub);
+
+    cpu.tick().unwrap();
+    assert!(cpu.flag(Flag::Sub)); // Should always be set
+
+    // Test HalfCarry flag
+    cpu.mem[cpu.pc as usize] = opcode;
+    cpu.set_flag(Flag::HalfCarry);
+    reg_setter(cpu, 0b0001_1111);
+
+    cpu.tick().unwrap();
+    assert!(!cpu.flag(Flag::HalfCarry)); // Should be reset if there's no carry on bit 3
+
+    cpu.mem[cpu.pc as usize] = opcode;
+    cpu.reset_flag(Flag::HalfCarry);
+    reg_setter(cpu, 0b0001_0000);
+
+    cpu.tick().unwrap();
+    assert!(cpu.flag(Flag::HalfCarry)); // Should be set if there's borrow on bit 3
+}
+
+#[test]
+fn test_dec_a() {
+    _test_dec_reg(opcodes::DEC_A, |cpu| cpu.a, |cpu, n| cpu.a = n);
+}
+
+#[test]
+fn test_dec_b() {
+    _test_dec_reg(opcodes::DEC_B, |cpu| cpu.b, |cpu, n| cpu.b = n);
+}
+
+#[test]
+fn test_dec_c() {
+    _test_dec_reg(opcodes::DEC_C, |cpu| cpu.c, |cpu, n| cpu.c = n);
+}
+
+#[test]
+fn test_dec_d() {
+    _test_dec_reg(opcodes::DEC_D, |cpu| cpu.d, |cpu, n| cpu.d = n);
+}
+
+#[test]
+fn test_dec_e() {
+    _test_dec_reg(opcodes::DEC_E, |cpu| cpu.e, |cpu, n| cpu.e = n);
+}
+
+#[test]
+fn test_dec_h() {
+    _test_dec_reg(opcodes::DEC_H, |cpu| cpu.h, |cpu, n| cpu.h = n);
+}
+
+#[test]
+fn test_dec_l() {
+    _test_dec_reg(opcodes::DEC_L, |cpu| cpu.l, |cpu, n| cpu.l = n);
+}
+
+#[test]
+fn test_dec_ahl() {
+    let mut cpu = Cpu::new();
+
+    cpu.set_hl(0xfee2);
+    cpu.mem[0xfee2] = 0x02;
+
+    cpu.mem[0] = opcodes::DEC_AHL;
+
+    cpu.tick().unwrap();
+    assert_eq!(cpu.mem[0xfee2], 0x01);
+
+    // Test wrapping
+    cpu.mem[cpu.pc as usize] = opcodes::DEC_AHL;
+    cpu.mem[0xfee2] = 0x00;
+
+    cpu.tick().unwrap();
+    assert_eq!(cpu.mem[0xfee2], 0xff);
+
+    // Test Zero flag
+    cpu.mem[cpu.pc as usize] = opcodes::DEC_AHL;
+    cpu.reset_flag(Flag::Zero);
+    cpu.set_hl(0xfee2);
+    cpu.mem[0xfee2] = 0x02;
+
+    cpu.tick().unwrap();
+    assert!(!cpu.flag(Flag::Zero)); // Should be reset if the result is non 0
+
+    cpu.mem[cpu.pc as usize] = opcodes::DEC_AHL;
+    cpu.set_flag(Flag::Zero);
+    cpu.set_hl(0xfee2);
+    cpu.mem[0xfee2] = 0x01;
+
+    cpu.tick().unwrap();
+    assert!(cpu.flag(Flag::Zero)); // Should be set if the result is 0
+
+    // Test Sub flag
+    cpu.mem[cpu.pc as usize] = opcodes::DEC_AHL;
+    cpu.set_flag(Flag::Sub);
+
+    cpu.tick().unwrap();
+    assert!(cpu.flag(Flag::Sub)); // Should always be reset
+
+    // Test HalfCarry flag
+    cpu.mem[cpu.pc as usize] = opcodes::DEC_AHL;
+    cpu.set_flag(Flag::HalfCarry);
+    cpu.set_hl(0xfee2);
+    cpu.mem[0xfee2] = 0b0001_1111;
+
+    cpu.tick().unwrap();
+    assert!(!cpu.flag(Flag::HalfCarry)); // Should be reset if there's no carry on bit 3
+
+    cpu.mem[cpu.pc as usize] = opcodes::DEC_AHL;
+    cpu.reset_flag(Flag::HalfCarry);
+    cpu.set_hl(0xfee2);
+    cpu.mem[0xfee2] = 0b0001_0000;
+
+    cpu.tick().unwrap();
+    assert!(cpu.flag(Flag::HalfCarry)); // Should be set if there's carry on bit 3
+}
+
+fn _test_dec_reg16<G, S>(opcode: u8, reg_getter: G, reg_setter: S)
+where
+    G: Fn(&Cpu) -> u16,
+    S: Fn(&mut Cpu, u16),
+{
+    let cpu = &mut Cpu::new();
+
+    reg_setter(cpu, 0xfff9);
+    cpu.mem[0] = opcode;
+
+    cpu.tick().unwrap();
+    assert_eq!(reg_getter(cpu), 0xfff8);
+
+    // Test wrapping
+    cpu.mem[cpu.pc as usize] = opcode;
+    reg_setter(cpu, 0x0000);
+
+    cpu.tick().unwrap();
+    assert_eq!(reg_getter(cpu), 0xffff);
+
+}
+
+#[test]
+fn test_dec_bc() {
+    _test_dec_reg16(opcodes::DEC_BC, Cpu::get_bc, Cpu::set_bc);
+}
+
+#[test]
+fn test_dec_de() {
+    _test_dec_reg16(opcodes::DEC_DE, Cpu::get_de, Cpu::set_de);
+}
+
+#[test]
+fn test_dec_hl() {
+    _test_dec_reg16(opcodes::DEC_HL, Cpu::get_hl, Cpu::set_hl);
+}
 
 //
 // ADD

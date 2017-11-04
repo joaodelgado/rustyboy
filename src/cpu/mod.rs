@@ -279,11 +279,23 @@ impl Cpu {
             opcodes::INC_H => println!("INC\tH"),
             opcodes::INC_L => println!("INC\tL"),
             opcodes::INC_AHL => println!("INC\t(HL)"),
-
             opcodes::INC_BC => println!("INC\tBC"),
             opcodes::INC_DE => println!("INC\tDE"),
             opcodes::INC_HL => println!("INC\tHL"),
             opcodes::INC_SP => println!("INC\tSP"),
+
+            opcodes::DEC_A => println!("DEC\tA"),
+            opcodes::DEC_B => println!("DEC\tB"),
+            opcodes::DEC_C => println!("DEC\tC"),
+            opcodes::DEC_D => println!("DEC\tD"),
+            opcodes::DEC_E => println!("DEC\tE"),
+            opcodes::DEC_H => println!("DEC\tH"),
+            opcodes::DEC_L => println!("DEC\tL"),
+            opcodes::DEC_AHL => println!("DEC\t(HL)"),
+            opcodes::DEC_BC => println!("DEC\tBC"),
+            opcodes::DEC_DE => println!("DEC\tDE"),
+            opcodes::DEC_HL => println!("DEC\tHL"),
+            opcodes::DEC_SP => println!("DEC\tSP"),
 
             opcodes::LD_BC_A => println!("LD\t(BC),A"),
             opcodes::LD_DE_A => println!("LD\t(DE),A"),
@@ -575,11 +587,23 @@ impl Cpu {
             opcodes::INC_H => self.inc_r8(|cpu| cpu.h, |cpu, n| cpu.h = n),
             opcodes::INC_L => self.inc_r8(|cpu| cpu.l, |cpu, n| cpu.l = n),
             opcodes::INC_AHL => self.inc_addr(Cpu::get_hl),
-
             opcodes::INC_BC => self.inc_r16(Cpu::get_bc, Cpu::set_bc),
             opcodes::INC_DE => self.inc_r16(Cpu::get_de, Cpu::set_de),
             opcodes::INC_HL => self.inc_r16(Cpu::get_hl, Cpu::set_hl),
             opcodes::INC_SP => self.inc_r16(|cpu| cpu.sp, |cpu, n| cpu.sp = n),
+
+            opcodes::DEC_A => self.dec_r8(|cpu| cpu.a, |cpu, n| cpu.a = n),
+            opcodes::DEC_B => self.dec_r8(|cpu| cpu.b, |cpu, n| cpu.b = n),
+            opcodes::DEC_C => self.dec_r8(|cpu| cpu.c, |cpu, n| cpu.c = n),
+            opcodes::DEC_D => self.dec_r8(|cpu| cpu.d, |cpu, n| cpu.d = n),
+            opcodes::DEC_E => self.dec_r8(|cpu| cpu.e, |cpu, n| cpu.e = n),
+            opcodes::DEC_H => self.dec_r8(|cpu| cpu.h, |cpu, n| cpu.h = n),
+            opcodes::DEC_L => self.dec_r8(|cpu| cpu.l, |cpu, n| cpu.l = n),
+            opcodes::DEC_AHL => self.dec_addr(Cpu::get_hl),
+            opcodes::DEC_BC => self.dec_r16(Cpu::get_bc, Cpu::set_bc),
+            opcodes::DEC_DE => self.dec_r16(Cpu::get_de, Cpu::set_de),
+            opcodes::DEC_HL => self.dec_r16(Cpu::get_hl, Cpu::set_hl),
+            opcodes::DEC_SP => self.dec_r16(|cpu| cpu.sp, |cpu, n| cpu.sp = n),
 
             opcodes::ADD_A_A => self.add_a(|cpu| cpu.a),
             opcodes::ADD_A_B => self.add_a(|cpu| cpu.b),
@@ -969,7 +993,7 @@ impl Cpu {
         self.set_flag_to(Flag::HalfCarry, old_value & 0xf == 0xf);
         self.reset_flag(Flag::Sub);
 
-        self.mem[addr] = self.mem[addr].wrapping_add(1);
+        self.mem[addr] = new_value;
     }
 
     ///**Description:**
@@ -984,6 +1008,60 @@ impl Cpu {
     {
         let curr_value = getter(self);
         setter(self, curr_value.wrapping_add(1));
+    }
+
+    ///**Description:**
+    /// Decrement register n.
+    ///
+    ///**Use with:**
+    /// n = A,B,C,D,E,H,L
+    fn dec_r8<G, S>(&mut self, getter: G, setter: S)
+    where
+        G: Fn(&Cpu) -> u8,
+        S: Fn(&mut Cpu, u8),
+    {
+        let old_value = getter(self);
+        let new_value = old_value.wrapping_sub(1);
+
+        self.set_flag_to(Flag::Zero, new_value == 0);
+        self.set_flag_to(Flag::HalfCarry, old_value & 0xf == 0);
+        self.set_flag(Flag::Sub);
+
+        setter(self, new_value);
+    }
+
+    ///**Description:**
+    /// Decrement byte at address (HL).
+    ///
+    ///**Use with:**
+    /// n = A,B,C,D,E,H,L
+    fn dec_addr<G>(&mut self, getter: G)
+    where
+        G: Fn(&Cpu) -> u16,
+    {
+        let addr = getter(self) as usize;
+        let old_value = self.mem[addr];
+        let new_value = old_value.wrapping_sub(1);
+
+        self.set_flag_to(Flag::Zero, new_value == 0);
+        self.set_flag_to(Flag::HalfCarry, old_value & 0xf == 0);
+        self.set_flag(Flag::Sub);
+
+        self.mem[addr] = new_value;
+    }
+
+    ///**Description:**
+    /// Decrement register nn.
+    ///
+    ///**Use with:**
+    /// nn = BC,DE,HL,SP
+    fn dec_r16<G, S>(&mut self, getter: G, setter: S)
+    where
+        G: Fn(&Cpu) -> u16,
+        S: Fn(&mut Cpu, u16),
+    {
+        let curr_value = getter(self);
+        setter(self, curr_value.wrapping_sub(1));
     }
 
     ///**Description:**
