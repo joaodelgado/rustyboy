@@ -433,7 +433,7 @@ impl Cpu {
             opcodes::CP_HL => println!("CP\tA,{}", read_16_addr()),
             opcodes::CP_D8 => println!("CP\tA,{}", read_8_imm()),
 
-            n => println!("Unknown instruction {:02x}@{:04x}", n, addr),
+            n => panic!("Unknown instruction {:02x}@{:04x}", n, addr),
         }
     }
 
