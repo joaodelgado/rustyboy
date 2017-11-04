@@ -249,6 +249,7 @@ impl Cpu {
         let read_byte = || format!("{:02x}", self.mem[addr + 1]);
         let read_8_rel = || format!("r_{}", read_byte());
         let read_8_imm = || format!("d_{}", read_byte());
+        let read_8_sig = || format!("s_{:02x}", self.mem[addr + 1] as i8);
         let read_16_imm = || {
             let fst_byte = self.mem[addr + 1];
             let snd_byte = self.mem[addr + 2];
@@ -406,6 +407,7 @@ impl Cpu {
             opcodes::ADD_HL_DE => println!("ADD\tHL,DE"),
             opcodes::ADD_HL_HL => println!("ADD\tHL,HL"),
             opcodes::ADD_HL_SP => println!("ADD\tHL,SP"),
+            opcodes::ADD_SP_R8 => println!("ADD\tSP,{}", read_8_sig()),
 
             opcodes::AND_A_A => println!("AND\tA,A"),
             opcodes::AND_A_B => println!("AND\tA,B"),
@@ -595,6 +597,7 @@ impl Cpu {
             opcodes::ADD_HL_DE => self.add_hl(Cpu::get_de),
             opcodes::ADD_HL_HL => self.add_hl(Cpu::get_hl),
             opcodes::ADD_HL_SP => self.add_hl(|cpu| cpu.sp),
+            opcodes::ADD_SP_R8 => self.add_sp_imm(),
 
             opcodes::AND_A_A => self.and_a(|cpu| cpu.a),
             opcodes::AND_A_B => self.and_a(|cpu| cpu.b),
@@ -1037,6 +1040,33 @@ impl Cpu {
         self.set_flag_to(Flag::Carry, (old_value as u32) + (n as u32) > 0xffff);
 
         self.set_hl(result);
+    }
+
+    ///**Description:**
+    ///  Add n to SP.
+    ///
+    ///**Use with:**
+    ///  n = one byte signed immediate value
+    ///
+    ///**Flags affected:**
+    ///  Z - Reset.
+    ///  N - Reset.
+    ///  H - Set if carry from bit 11 (always set on subtraction).
+    ///  C - Set if carry from bit 15 (always set on subtraction).
+    fn add_sp_imm(&mut self) {
+        let old_value = self.sp;
+        let n = self.consume_byte() as i8 as i16 as u16;
+        let result = old_value.wrapping_add(n);
+
+        self.reset_flag(Flag::Zero);
+        self.reset_flag(Flag::Sub);
+        self.set_flag_to(
+            Flag::HalfCarry,
+            (old_value & 0x0fff) + (n & 0x0fff) > 0x0fff,
+        );
+        self.set_flag_to(Flag::Carry, (old_value as u32) + (n as u32) > 0xffff);
+
+        self.sp = result;
     }
 
     ///**Description:**

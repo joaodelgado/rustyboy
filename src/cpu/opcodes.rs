@@ -118,6 +118,7 @@ pub const ADD_HL_BC: u8 = 0x09;
 pub const ADD_HL_DE: u8 = 0x19;
 pub const ADD_HL_HL: u8 = 0x29;
 pub const ADD_HL_SP: u8 = 0x39;
+pub const ADD_SP_R8: u8 = 0xe8;
 pub const AND_A_A: u8 = 0xa7;
 pub const AND_A_B: u8 = 0xa0;
 pub const AND_A_C: u8 = 0xa1;
