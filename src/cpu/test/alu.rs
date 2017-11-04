@@ -727,3 +727,42 @@ fn test_add_sp_r8() {
     assert!(cpu.flag(Flag::HalfCarry));
     assert!(cpu.flag(Flag::Carry));
 }
+
+#[test]
+fn test_adc_a_a() {
+    let cpu = &mut Cpu::new();
+    cpu.mem[0] = opcodes::ADC_A_A;
+    cpu.a = 128;
+
+    cpu.tick().unwrap();
+
+    assert!(cpu.flag(Flag::Zero));
+    assert!(cpu.flag(Flag::Carry));
+
+    cpu.mem[cpu.pc as usize] = opcodes::ADC_A_A;
+    cpu.a = 127;
+    cpu.reset_status();
+    cpu.tick().unwrap();
+
+    assert!(!cpu.flag(Flag::Zero));
+    assert!(cpu.flag(Flag::HalfCarry));
+    assert!(!cpu.flag(Flag::Carry));
+
+    cpu.mem[cpu.pc as usize] = opcodes::ADC_A_A;
+    cpu.a = 10;
+    cpu.reset_status();
+    cpu.tick().unwrap();
+
+    assert!(!cpu.flag(Flag::Zero));
+    assert!(cpu.flag(Flag::HalfCarry));
+    assert!(!cpu.flag(Flag::Carry));
+
+    cpu.mem[cpu.pc as usize] = opcodes::ADC_A_A;
+    cpu.a = 4;
+    cpu.reset_status();
+    cpu.tick().unwrap();
+
+    assert!(!cpu.flag(Flag::Zero));
+    assert!(!cpu.flag(Flag::HalfCarry));
+    assert!(!cpu.flag(Flag::Carry));
+}

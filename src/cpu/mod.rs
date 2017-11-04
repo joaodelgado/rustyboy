@@ -455,6 +455,7 @@ impl Cpu {
             opcodes::CP_L => println!("CP\tA,L"),
             opcodes::CP_HL => println!("CP\tA,{}", read_16_addr()),
             opcodes::CP_D8 => println!("CP\tA,{}", read_8_imm()),
+            opcodes::ADC_A_A => println!("ADC\tA,A"),
 
             n => panic!("Unknown instruction {:02x}@{:04x}", n, addr),
         }
@@ -670,6 +671,9 @@ impl Cpu {
             opcodes::CP_L => self.cp_a(|cpu| cpu.l),
             opcodes::CP_HL => self.cp_hl(),
             opcodes::CP_D8 => self.cp_a(Cpu::consume_byte),
+
+            opcodes::ADC_A_A => self.adc_a(|cpu| cpu.a),
+
 
             opcodes::NOP => self.nop(),
             s => {
@@ -1298,5 +1302,22 @@ impl Cpu {
     {
         let addr = r1(self) as usize;
         self.mem[addr] = r2(self);
+    }
+
+    fn adc_a<F>(&mut self, f: F)
+    where
+        F: Fn(&Cpu) -> u8,
+    {
+        let a = self.a;
+        let carry = if self.flag(Flag::Carry) {1} else {0};
+        let n = f(self);
+        let res = a.wrapping_add(n).wrapping_add(carry);
+
+        self.set_flag_to(Flag::Zero, res == 0);
+        self.reset_flag(Flag::Sub);
+        self.set_flag_to(Flag::HalfCarry, (a & 0x0f) + (n & 0x0f) + carry > 0x0f);
+        self.set_flag_to(Flag::Carry, (a as u16) + (n as u16) + (carry as u16) > 0xff);
+
+        self.a = res;
     }
 }

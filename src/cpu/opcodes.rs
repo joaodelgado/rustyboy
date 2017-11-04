@@ -168,3 +168,4 @@ pub const CP_H: u8 = 0xbc;
 pub const CP_L: u8 = 0xbd;
 pub const CP_HL: u8 = 0xbe;
 pub const CP_D8: u8 = 0xfe;
+pub const ADC_A_A: u8 = 0x8f;
