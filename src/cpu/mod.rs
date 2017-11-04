@@ -393,6 +393,14 @@ impl Cpu {
             opcodes::DI => println!("DI"),
             opcodes::NOP => println!("NOP"),
 
+            opcodes::ADD_A_A => println!("ADD\tA,A"),
+            opcodes::ADD_A_B => println!("ADD\tA,B"),
+            opcodes::ADD_A_C => println!("ADD\tA,C"),
+            opcodes::ADD_A_D => println!("ADD\tA,D"),
+            opcodes::ADD_A_E => println!("ADD\tA,E"),
+            opcodes::ADD_A_H => println!("ADD\tA,H"),
+            opcodes::ADD_A_L => println!("ADD\tA,L"),
+
             opcodes::AND_A_A => println!("AND\tA,A"),
             opcodes::AND_A_B => println!("AND\tA,B"),
             opcodes::AND_A_C => println!("AND\tA,C"),
@@ -564,6 +572,19 @@ impl Cpu {
             opcodes::INC_DE => self.inc_r16(Cpu::get_de, Cpu::set_de),
             opcodes::INC_HL => self.inc_r16(Cpu::get_hl, Cpu::set_hl),
             opcodes::INC_SP => self.inc_r16(|cpu| cpu.sp, |cpu, n| cpu.sp = n),
+
+            opcodes::ADD_A_A => self.add_a(|cpu| cpu.a),
+            opcodes::ADD_A_B => self.add_a(|cpu| cpu.b),
+            opcodes::ADD_A_C => self.add_a(|cpu| cpu.c),
+            opcodes::ADD_A_D => self.add_a(|cpu| cpu.d),
+            opcodes::ADD_A_E => self.add_a(|cpu| cpu.e),
+            opcodes::ADD_A_H => self.add_a(|cpu| cpu.h),
+            opcodes::ADD_A_L => self.add_a(|cpu| cpu.l),
+            opcodes::ADD_A_HL => {
+                let addr = self.get_hl() as usize;
+                self.add_a(|cpu| cpu.mem[addr])
+            }
+            opcodes::ADD_A_D8 => self.add_a(|cpu| cpu.consume_byte()),
 
             opcodes::AND_A_A => self.and_a(|cpu| cpu.a),
             opcodes::AND_A_B => self.and_a(|cpu| cpu.b),
@@ -950,6 +971,33 @@ impl Cpu {
     {
         let curr_value = getter(self);
         setter(self, curr_value.wrapping_add(1));
+    }
+
+    ///**Description:**
+    ///  Add n to register A.
+    ///
+    ///**Use with:**
+    ///  n = A,B,C,D,E,H,L,(HL),#
+    ///
+    ///**Flags affected:**
+    ///  Z - Set if result is zero.
+    ///  N - Reset.
+    ///  H - Reset.
+    ///  C - Reset.
+    fn add_a<F>(&mut self, f: F)
+    where
+        F: Fn(&mut Cpu) -> u8,
+    {
+        let old_value = self.a;
+        let n = f(self);
+        let result = old_value.wrapping_add(n);
+
+        self.set_flag_to(Flag::Zero, result == 0);
+        self.reset_flag(Flag::Sub);
+        self.set_flag_to(Flag::HalfCarry, (old_value & 0x0f) + (n & 0x0f) > 0x0f);
+        self.set_flag_to(Flag::Carry, (old_value as u16) + (n as u16) > 0xff);
+
+        self.a = result;
     }
 
     ///**Description:**

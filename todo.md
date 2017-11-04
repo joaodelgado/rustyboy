@@ -139,14 +139,14 @@
     - [X] 0x7d LD	A,L
     - [X] 0x7e LD	A,(HL)
     - [X] 0x7f LD	A,A
-    - [ ] 0x80 ADD	A,B
-    - [ ] 0x81 ADD	A,C
-    - [ ] 0x82 ADD	A,D
-    - [ ] 0x83 ADD	A,E
-    - [ ] 0x84 ADD	A,H
-    - [ ] 0x85 ADD	A,L
-    - [ ] 0x86 ADD	A,(HL)
-    - [ ] 0x87 ADD	A,A
+    - [X] 0x80 ADD	A,B
+    - [X] 0x81 ADD	A,C
+    - [X] 0x82 ADD	A,D
+    - [X] 0x83 ADD	A,E
+    - [X] 0x84 ADD	A,H
+    - [X] 0x85 ADD	A,L
+    - [X] 0x86 ADD	A,(HL)
+    - [X] 0x87 ADD	A,A
     - [ ] 0x88 ADC	A,B
     - [ ] 0x89 ADC	A,C
     - [ ] 0x8a ADC	A,D

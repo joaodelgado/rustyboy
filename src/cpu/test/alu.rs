@@ -195,3 +195,143 @@ fn test_inc_de() {
 fn test_inc_hl() {
     _test_inc_reg16(opcodes::INC_HL, Cpu::get_hl, Cpu::set_hl);
 }
+
+
+//
+// ADD
+//
+
+fn _test_add_a_reg<S>(opcode: u8, r: S)
+where
+    S: Fn(&mut Cpu, u8),
+{
+    let new_cpu = || {
+        let mut cpu = Cpu::new();
+
+        cpu.set_flag(Flag::Zero);
+        cpu.set_flag(Flag::Sub);
+        cpu.set_flag(Flag::HalfCarry);
+        cpu.set_flag(Flag::Carry);
+
+        cpu
+    };
+
+    //
+    // Test zero add
+    //
+
+    let cpu = &mut new_cpu();
+    cpu.a = 0x00;
+    r(cpu, 0x00);
+    cpu.mem[0] = opcode;
+    let result = cpu.a + 0x00;
+    cpu.tick().unwrap();
+
+    assert_eq!(cpu.a, result);
+    assert!(cpu.flag(Flag::Zero));
+    assert!(!cpu.flag(Flag::Sub));
+    assert!(!cpu.flag(Flag::HalfCarry));
+    assert!(!cpu.flag(Flag::Carry));
+
+    //
+    // Test non carry add
+    //
+
+    let cpu = &mut new_cpu();
+    cpu.a = 0x00;
+    r(cpu, 0x01);
+    cpu.mem[0] = opcode;
+    let result = cpu.a + 0x01;
+    cpu.tick().unwrap();
+
+    assert_eq!(cpu.a, result);
+    assert!(!cpu.flag(Flag::Zero));
+    assert!(!cpu.flag(Flag::Sub));
+    assert!(!cpu.flag(Flag::HalfCarry));
+    assert!(!cpu.flag(Flag::Carry));
+
+    //
+    // Test half carry add
+    //
+
+    let cpu = &mut new_cpu();
+    cpu.a = 0x0f;
+    r(cpu, 0x0f);
+    cpu.mem[0] = opcode;
+    let result = cpu.a + 0x0f;
+    cpu.tick().unwrap();
+
+    assert_eq!(cpu.a, result);
+    assert!(!cpu.flag(Flag::Zero));
+    assert!(!cpu.flag(Flag::Sub));
+    assert!(cpu.flag(Flag::HalfCarry));
+    assert!(!cpu.flag(Flag::Carry));
+
+    //
+    // Test carry add
+    //
+
+    let cpu = &mut new_cpu();
+    cpu.a = 0xff;
+    r(cpu, 0xff);
+    cpu.mem[0] = opcode;
+    let result = cpu.a.wrapping_add(0xff);
+    cpu.tick().unwrap();
+
+    assert_eq!(cpu.a, result);
+    assert!(!cpu.flag(Flag::Zero));
+    assert!(!cpu.flag(Flag::Sub));
+    assert!(cpu.flag(Flag::HalfCarry));
+    assert!(cpu.flag(Flag::Carry));
+}
+
+#[test]
+fn test_add_a() {
+    _test_add_a_reg(opcodes::ADD_A_A, |cpu, n| cpu.a = n);
+}
+
+#[test]
+fn test_add_b() {
+    _test_add_a_reg(opcodes::ADD_A_B, |cpu, n| cpu.b = n);
+}
+
+#[test]
+fn test_add_c() {
+    _test_add_a_reg(opcodes::ADD_A_C, |cpu, n| cpu.c = n);
+}
+
+#[test]
+fn test_add_d() {
+    _test_add_a_reg(opcodes::ADD_A_D, |cpu, n| cpu.d = n);
+}
+
+#[test]
+fn test_add_e() {
+    _test_add_a_reg(opcodes::ADD_A_E, |cpu, n| cpu.e = n);
+}
+
+#[test]
+fn test_add_h() {
+    _test_add_a_reg(opcodes::ADD_A_H, |cpu, n| cpu.h = n);
+}
+
+#[test]
+fn test_add_l() {
+    _test_add_a_reg(opcodes::ADD_A_L, |cpu, n| cpu.l = n);
+}
+
+#[test]
+fn test_add_a_hl() {
+    _test_add_a_reg(opcodes::ADD_A_HL, |cpu, value| {
+        cpu.set_hl(0xffe1);
+        cpu.mem[0xffe1] = value
+    });
+}
+
+#[test]
+fn test_add_a_d8() {
+    _test_add_a_reg(opcodes::ADD_A_D8, |cpu, value| {
+        let i = (cpu.pc + 1) as usize;
+        cpu.mem[i] = value;
+    });
+}

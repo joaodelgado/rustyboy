@@ -17,47 +17,101 @@ where
 
 #[test]
 fn test_ld_bc_a() {
-    _test_ld_addr_r8(Cpu::set_bc, |cpu, n| cpu.a = n, 0x72, 0x3401, opcodes::LD_BC_A);
+    _test_ld_addr_r8(
+        Cpu::set_bc,
+        |cpu, n| cpu.a = n,
+        0x72,
+        0x3401,
+        opcodes::LD_BC_A,
+    );
 }
 
 #[test]
 fn test_ld_de_a() {
-    _test_ld_addr_r8(Cpu::set_de, |cpu, n| cpu.a = n, 0x72, 0x3401, opcodes::LD_DE_A);
+    _test_ld_addr_r8(
+        Cpu::set_de,
+        |cpu, n| cpu.a = n,
+        0x72,
+        0x3401,
+        opcodes::LD_DE_A,
+    );
 }
 
 #[test]
 fn test_ld_hl_a() {
-    _test_ld_addr_r8(Cpu::set_hl, |cpu, n| cpu.a = n, 0x72, 0x3401, opcodes::LD_HL_A);
+    _test_ld_addr_r8(
+        Cpu::set_hl,
+        |cpu, n| cpu.a = n,
+        0x72,
+        0x3401,
+        opcodes::LD_HL_A,
+    );
 }
 
 #[test]
 fn test_ld_hl_b() {
-    _test_ld_addr_r8(Cpu::set_hl, |cpu, n| cpu.b = n, 0x72, 0x3401, opcodes::LD_HL_B);
+    _test_ld_addr_r8(
+        Cpu::set_hl,
+        |cpu, n| cpu.b = n,
+        0x72,
+        0x3401,
+        opcodes::LD_HL_B,
+    );
 }
 
 #[test]
 fn test_ld_hl_c() {
-    _test_ld_addr_r8(Cpu::set_hl, |cpu, n| cpu.c = n, 0x72, 0x3401, opcodes::LD_HL_C);
+    _test_ld_addr_r8(
+        Cpu::set_hl,
+        |cpu, n| cpu.c = n,
+        0x72,
+        0x3401,
+        opcodes::LD_HL_C,
+    );
 }
 
 #[test]
 fn test_ld_hl_d() {
-    _test_ld_addr_r8(Cpu::set_hl, |cpu, n| cpu.d = n, 0x72, 0x3401, opcodes::LD_HL_D);
+    _test_ld_addr_r8(
+        Cpu::set_hl,
+        |cpu, n| cpu.d = n,
+        0x72,
+        0x3401,
+        opcodes::LD_HL_D,
+    );
 }
 
 #[test]
 fn test_ld_hl_e() {
-    _test_ld_addr_r8(Cpu::set_hl, |cpu, n| cpu.e = n, 0x72, 0x3401, opcodes::LD_HL_E);
+    _test_ld_addr_r8(
+        Cpu::set_hl,
+        |cpu, n| cpu.e = n,
+        0x72,
+        0x3401,
+        opcodes::LD_HL_E,
+    );
 }
 
 #[test]
 fn test_ld_hl_h() {
-    _test_ld_addr_r8(Cpu::set_hl, |cpu, n| cpu.h = n, 0x34, 0x3401, opcodes::LD_HL_H);
+    _test_ld_addr_r8(
+        Cpu::set_hl,
+        |cpu, n| cpu.h = n,
+        0x34,
+        0x3401,
+        opcodes::LD_HL_H,
+    );
 }
 
 #[test]
 fn test_ld_hl_l() {
-    _test_ld_addr_r8(Cpu::set_hl, |cpu, n| cpu.l = n, 0x01, 0x3401, opcodes::LD_HL_L);
+    _test_ld_addr_r8(
+        Cpu::set_hl,
+        |cpu, n| cpu.l = n,
+        0x01,
+        0x3401,
+        opcodes::LD_HL_L,
+    );
 }
 
 #[test]
