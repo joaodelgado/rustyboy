@@ -240,6 +240,11 @@ impl Cpu {
         self.status &= !flag.mask()
     }
 
+    /// Reset all status flags
+    fn reset_status(&mut self) {
+        self.status = 0;
+    }
+
     fn print_curr(&self) {
         self.print_instr(self.pc)
     }
