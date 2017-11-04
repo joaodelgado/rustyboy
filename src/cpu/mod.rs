@@ -52,7 +52,7 @@ impl fmt::Display for Cpu {
     f: {:02x},
     h: {:02x},
     l: {:02x},
-    status: {:02x},
+    status: {:#b},
     sp: {:04x},
     pc: {:04x},
 ]",
