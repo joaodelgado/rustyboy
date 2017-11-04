@@ -400,6 +400,8 @@ impl Cpu {
             opcodes::ADD_A_E => println!("ADD\tA,E"),
             opcodes::ADD_A_H => println!("ADD\tA,H"),
             opcodes::ADD_A_L => println!("ADD\tA,L"),
+            opcodes::ADD_A_HL => println!("ADD\tA,HL"),
+            opcodes::ADD_A_D8 => println!("ADD\tA,{}", read_8_imm()),
 
             opcodes::AND_A_A => println!("AND\tA,A"),
             opcodes::AND_A_B => println!("AND\tA,B"),
