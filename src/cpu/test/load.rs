@@ -203,6 +203,11 @@ fn test_ld_a_de() {
 }
 
 #[test]
+fn test_ld_b_a() {
+    _test_ld_reg_reg(|cpu| cpu.b, |cpu, n| cpu.a = n, 0x72, opcodes::LD_B_A);
+}
+
+#[test]
 fn test_ld_b_b() {
     _test_ld_reg_reg(|cpu| cpu.b, |cpu, n| cpu.b = n, 0x72, opcodes::LD_B_B);
 }

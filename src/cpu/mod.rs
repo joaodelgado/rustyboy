@@ -318,6 +318,7 @@ impl Cpu {
             opcodes::LD_A_BC => println!("LD\tA,(BC)"),
             opcodes::LD_A_DE => println!("LD\tA,(DE)"),
             opcodes::LD_A_A16 => println!("LD\tA,{}", read_16_addr()),
+            opcodes::LD_B_A => println!("LD\tB,A"),
             opcodes::LD_B_B => println!("LD\tB,B"),
             opcodes::LD_B_C => println!("LD\tB,C"),
             opcodes::LD_B_D => println!("LD\tB,D"),
@@ -526,6 +527,7 @@ impl Cpu {
             opcodes::LD_A_HL => self.ld_r8_r16(Cpu::get_hl, |cpu, n| cpu.a = n),
             opcodes::LD_A_A16 => self.ld_r8_a16(|cpu, n| cpu.a = n),
 
+            opcodes::LD_B_A => self.ld_r8_r8(|cpu| cpu.a, |cpu, n| cpu.b = n),
             opcodes::LD_B_B => self.ld_r8_r8(|cpu| cpu.b, |cpu, n| cpu.b = n),
             opcodes::LD_B_C => self.ld_r8_r8(|cpu| cpu.c, |cpu, n| cpu.b = n),
             opcodes::LD_B_D => self.ld_r8_r8(|cpu| cpu.d, |cpu, n| cpu.b = n),
