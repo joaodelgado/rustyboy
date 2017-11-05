@@ -465,6 +465,8 @@ impl Cpu {
             opcodes::ADC_A_D8 => println!("ADC\tA,{}", read_8_imm()),
             opcodes::RLCA => println!("RLCA"),
 
+            opcodes::LDHL_SP_R8 => println!("LDHL\tSP,{}", read_8_sig()),
+
             0xd3 | 0xdb | 0xdd | 0xe3 | 0xe4 | 0xeb | 0xec | 0xed | 0xf4 | 0xfc | 0xfd => {
                 println!("Undefined instruction {:02x}", opcode)
             }
@@ -697,6 +699,8 @@ impl Cpu {
             }
             opcodes::ADC_A_D8 => self.adc_a(|cpu| cpu.consume_byte()),
             opcodes::RLCA => self.rlc_a(),
+
+            opcodes::LDHL_SP_R8 => self.ldhl_sp_r8(),
 
             opcodes::NOP => self.nop(),
 
@@ -1382,5 +1386,26 @@ impl Cpu {
         self.set_flag_to(Flag::Carry, carry == 1);
         self.set_flag_to(Flag::Zero, res == 0);
         self.a = res;
+    }
+
+    ///**Description:**
+    ///  Put SP + n effective address into HL.
+    ///
+    ///**Use with:**
+    ///  n = one byte signed immediate value.
+    ///
+    ///**Flags affected:**
+    ///  Z - Reset.
+    ///  N - Reset.
+    ///  H - Set or reset according to operation.
+    ///  C - Set or reset according to operation.
+    fn ldhl_sp_r8(&mut self) {
+        let old_value = self.sp;
+
+        self.add_sp_imm();
+        let new_value = self.sp;
+
+        self.set_hl(new_value);
+        self.sp = old_value;
     }
 }

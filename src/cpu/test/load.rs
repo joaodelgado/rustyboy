@@ -560,3 +560,102 @@ fn test_ld_r8_a16() {
     cpu.tick().unwrap();
     assert_eq!(cpu.a, 15);
 }
+
+#[test]
+fn test_ldhl_sp_r8() {
+    let new_cpu = || {
+        let mut cpu = Cpu::new();
+
+        cpu.set_flag(Flag::Zero);
+        cpu.set_flag(Flag::Sub);
+        cpu.set_flag(Flag::HalfCarry);
+        cpu.set_flag(Flag::Carry);
+
+        cpu
+    };
+
+    //
+    // Test zero add
+    //
+
+    let cpu = &mut new_cpu();
+    cpu.sp = 0x0017;
+    cpu.mem[0] = opcodes::LDHL_SP_R8;
+    cpu.mem[1] = 0;
+    cpu.tick().unwrap();
+
+    assert_eq!(cpu.get_hl(), 0x0017);
+    assert_eq!(cpu.sp, 0x0017);
+    assert!(!cpu.flag(Flag::Zero));
+    assert!(!cpu.flag(Flag::Sub));
+    assert!(!cpu.flag(Flag::HalfCarry));
+    assert!(!cpu.flag(Flag::Carry));
+
+    //
+    // Test non carry positive add
+    //
+
+    let cpu = &mut new_cpu();
+    cpu.sp = 0x0017;
+    cpu.mem[0] = opcodes::LDHL_SP_R8;
+    cpu.mem[1] = 1;
+    cpu.tick().unwrap();
+
+    assert_eq!(cpu.get_hl(), 0x0018);
+    assert_eq!(cpu.sp, 0x0017);
+    assert!(!cpu.flag(Flag::Zero));
+    assert!(!cpu.flag(Flag::Sub));
+    assert!(!cpu.flag(Flag::HalfCarry));
+    assert!(!cpu.flag(Flag::Carry));
+
+    //
+    // Test negative add
+    //
+
+    let cpu = &mut new_cpu();
+    cpu.sp = 0x0017;
+    cpu.mem[0] = opcodes::LDHL_SP_R8;
+    cpu.mem[1] = -1 as i8 as u8;
+    cpu.tick().unwrap();
+
+    assert_eq!(cpu.get_hl(), 0x0016);
+    assert_eq!(cpu.sp, 0x0017);
+    assert!(!cpu.flag(Flag::Zero));
+    assert!(!cpu.flag(Flag::Sub));
+    assert!(cpu.flag(Flag::HalfCarry));
+    assert!(cpu.flag(Flag::Carry));
+
+    //
+    // Test half carry add
+    //
+
+    let cpu = &mut new_cpu();
+    cpu.sp = 0x0fff;
+    cpu.mem[0] = opcodes::LDHL_SP_R8;
+    cpu.mem[1] = 1;
+    cpu.tick().unwrap();
+
+    assert_eq!(cpu.get_hl(), 0x1000);
+    assert_eq!(cpu.sp, 0x0fff);
+    assert!(!cpu.flag(Flag::Zero));
+    assert!(!cpu.flag(Flag::Sub));
+    assert!(cpu.flag(Flag::HalfCarry));
+    assert!(!cpu.flag(Flag::Carry));
+
+    //
+    // Test carry add
+    //
+
+    let cpu = &mut new_cpu();
+    cpu.sp = 0xffff;
+    cpu.mem[0] = opcodes::LDHL_SP_R8;
+    cpu.mem[1] = 1;
+    cpu.tick().unwrap();
+
+    assert_eq!(cpu.get_hl(), 0);
+    assert_eq!(cpu.sp, 0xffff);
+    assert!(!cpu.flag(Flag::Zero));
+    assert!(!cpu.flag(Flag::Sub));
+    assert!(cpu.flag(Flag::HalfCarry));
+    assert!(cpu.flag(Flag::Carry));
+}
