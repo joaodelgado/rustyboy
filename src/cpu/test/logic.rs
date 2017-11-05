@@ -255,3 +255,33 @@ fn test_cp_hl() {
     cpu.tick().unwrap();
     assert!(cpu.flag(Flag::Zero));
 }
+
+#[test]
+fn test_rlca() {
+    let mut cpu = Cpu::new();
+    cpu.a = 0x01;
+    cpu.mem[0] = opcodes::RLCA;
+
+    cpu.tick().unwrap();
+    assert_eq!(cpu.a, 2);
+    assert!(!cpu.flag(Flag::Zero));
+    assert!(!cpu.flag(Flag::Carry));
+
+    cpu.reset_status();
+    cpu.a = 0;
+    cpu.mem[cpu.pc as usize] = opcodes::RLCA;
+
+    cpu.tick().unwrap();
+    assert_eq!(cpu.a, 0);
+    assert!(cpu.flag(Flag::Zero));
+    assert!(!cpu.flag(Flag::Carry));
+
+    cpu.reset_status();
+    cpu.a = 0b10000001;
+    cpu.mem[cpu.pc as usize] = opcodes::RLCA;
+
+    cpu.tick().unwrap();
+    assert_eq!(cpu.a, 0b00000011);
+    assert!(!cpu.flag(Flag::Zero));
+    assert!(cpu.flag(Flag::Carry));
+}

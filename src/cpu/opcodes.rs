@@ -177,3 +177,4 @@ pub const ADC_A_H: u8 = 0x8c;
 pub const ADC_A_L: u8 = 0x8d;
 pub const ADC_A_HL: u8 = 0x8e;
 pub const ADC_A_D8: u8 = 0xce;
+pub const RLCA: u8 = 0x07;

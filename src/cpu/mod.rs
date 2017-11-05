@@ -463,6 +463,7 @@ impl Cpu {
             opcodes::ADC_A_H => println!("ADC\tA,H"),
             opcodes::ADC_A_L => println!("ADC\tA,L"),
             opcodes::ADC_A_D8 => println!("ADC\tA,{}", read_8_imm()),
+            opcodes::RLCA => println!("RLCA"),
 
             n => panic!("Unknown instruction {:02x}@{:04x}", n, addr),
         }
@@ -691,6 +692,7 @@ impl Cpu {
                 self.adc_a(|cpu| cpu.mem[addr])
             }
             opcodes::ADC_A_D8 => self.adc_a(|cpu| cpu.consume_byte()),
+            opcodes::RLCA => self.rlc_a(),
 
             opcodes::NOP => self.nop(),
             s => {
@@ -1335,6 +1337,30 @@ impl Cpu {
         self.set_flag_to(Flag::HalfCarry, (a & 0x0f) + (n & 0x0f) + carry > 0x0f);
         self.set_flag_to(Flag::Carry, (a as u16) + (n as u16) + (carry as u16) > 0xff);
 
+        self.a = res;
+    }
+
+    ///**Description:**
+    ///  Rotate A left. Old bit 7 to Carry flag.
+    ///
+    ///**Flags affected:**
+    ///  Z - Set if result is zero.
+    ///  N - Reset.
+    ///  H - Reset.
+    ///  C - Contains old bit 7 data.
+    ///
+    /// TODO check possible inconsitencies between
+    /// game boy manual and other sources
+    fn rlc_a(&mut self) {
+        self.reset_flag(Flag::Sub);
+        self.reset_flag(Flag::HalfCarry);
+
+        let a = self.a;
+        let carry = a >> 7;
+        let res = ((a & 0x7f) << 1) | carry; // a & 0b01111111
+
+        self.set_flag_to(Flag::Carry, carry == 1);
+        self.set_flag_to(Flag::Zero, res == 0);
         self.a = res;
     }
 }
