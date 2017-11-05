@@ -76,7 +76,62 @@ fn test_ret() {
     assert_eq!(0x3524, cpu.pc);
 }
 
-fn test_push_16() {
+fn test_push_stack() {
+    let mut cpu = Cpu::new();
+    cpu.sp = 0x1234;
+
+    cpu.push_stack(&[0xff]);
+    assert_eq!(cpu.mem[0x1234], 0xff);
+    assert_eq!(cpu.sp, 0x1233);
+
+    cpu.push_stack(&[0x76, 0x91]);
+    assert_eq!(cpu.mem[0x1233], 0x91);
+    assert_eq!(cpu.mem[0x1232], 0x72);
+    assert_eq!(cpu.sp, 0x1231);
+}
+
+fn test_push_stack_u16() {
+    let mut cpu = Cpu::new();
+    cpu.sp = 0x1234;
+
+    cpu.push_stack_u16(0xffff);
+    assert_eq!(cpu.mem[0x1234], 0xff);
+    assert_eq!(cpu.mem[0x1233], 0xff);
+    assert_eq!(cpu.sp, 0x1232);
+
+    cpu.push_stack_u16(0x7291);
+    assert_eq!(cpu.mem[0x1232], 0x91);
+    assert_eq!(cpu.mem[0x1231], 0x72);
+    assert_eq!(cpu.sp, 0x1230);
+}
+
+fn test_pop_stack() {
+    let mut cpu = Cpu::new();
+    cpu.sp = 0x1234;
+    cpu.mem[0x1234] = 0xff;
+    cpu.mem[0x1235] = 0x91;
+    cpu.mem[0x1235] = 0x72;
+
+    assert_eq!(cpu.pop_stack(1), [0xff]);
+    assert_eq!(cpu.pop_stack(1), [0x91]);
+    assert_eq!(cpu.pop_stack(1), [0x72]);
+    assert_eq!(cpu.sp, 0x1234 + 3);
+}
+
+fn test_pop_stack_u16() {
+    let mut cpu = Cpu::new();
+    cpu.sp = 0x1234;
+    cpu.mem[0x1234] = 0xff;
+    cpu.mem[0x1235] = 0xff;
+    cpu.mem[0x1236] = 0x91;
+    cpu.mem[0x1236] = 0x72;
+
+    assert_eq!(cpu.pop_stack_u16(), 0xffff);
+    assert_eq!(cpu.pop_stack_u16(), 0x7291);
+    assert_eq!(cpu.sp, 0x1234 + 4);
+}
+
+fn test_push_a16() {
     let mut cpu = Cpu::new();
     cpu.sp = 0x1234;
     cpu.set_af(0xff15);
@@ -90,7 +145,6 @@ fn test_push_16() {
     cpu.mem[3] = opcodes::PUSH_A16_HL;
 
     cpu.tick().unwrap();
-
     assert_eq!(cpu.mem[0x1234], 0x15);
     assert_eq!(cpu.mem[0x1233], 0xff);
 
@@ -106,7 +160,6 @@ fn test_push_16() {
     assert_eq!(cpu.mem[0x122e], 0xe2);
     assert_eq!(cpu.mem[0x122d], 0xfe);
 }
-
 
 fn test_pop_a16() {
     let mut cpu = Cpu::new();

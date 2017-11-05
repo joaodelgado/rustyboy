@@ -52,7 +52,7 @@ impl fmt::Display for Cpu {
     f: {:02x},
     h: {:02x},
     l: {:02x},
-    status: {:#b},
+    status: {:#08b},
     sp: {:04x},
     pc: {:04x},
 ]",
@@ -1253,9 +1253,9 @@ impl Cpu {
         F: Fn(&Cpu) -> bool,
     {
         if condition(&self) {
-            let offset = self.consume_byte() as i8;
+            let offset = self.consume_byte() as i8 as i16;
             let pc = self.pc as i16;
-            self.pc = pc.wrapping_add(offset as i16) as u16;
+            self.pc = pc.wrapping_add(offset) as u16;
         }
     }
 
