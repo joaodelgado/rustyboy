@@ -1323,6 +1323,17 @@ impl Cpu {
         self.mem[addr] = r2(self);
     }
 
+    ///**Description:**
+    ///  Add n + Carry flag to A.
+    ///
+    ///**Use with:**
+    ///  n = A,B,C,D,E,H,L,(HL),#
+    ///
+    ///**Flags affected:**
+    ///  Z - Set if result is zero.
+    ///  N - Reset.
+    ///  H - Set if carry from bit 3.
+    ///  C - Set if carry from bit 7.
     fn adc_a<F>(&mut self, f: F)
     where
         F: Fn(&mut Cpu) -> u8,
