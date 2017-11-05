@@ -1330,8 +1330,6 @@ impl Cpu {
         let n = f(self);
         let res = a.wrapping_add(n).wrapping_add(carry);
 
-        println!("ADC a: {} carry: {} n: {} result: {}", a, carry, n, res);
-
         self.set_flag_to(Flag::Zero, res == 0);
         self.reset_flag(Flag::Sub);
         self.set_flag_to(Flag::HalfCarry, (a & 0x0f) + (n & 0x0f) + carry > 0x0f);
