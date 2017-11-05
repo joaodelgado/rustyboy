@@ -704,8 +704,8 @@ impl Cpu {
 
             opcodes::NOP => self.nop(),
 
-            /// unimplemented instructions, do nothing
-            /// FIXME after testing this should panic instead
+            // unimplemented instructions, do nothing
+            // FIXME after testing this should panic instead
             0xd3 | 0xdb | 0xdd | 0xe3 | 0xe4 | 0xeb | 0xec | 0xed | 0xf4 | 0xfc | 0xfd => {}
 
             s => {
