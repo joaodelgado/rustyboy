@@ -8,3 +8,7 @@ authors = ["João Delgado <joaomtdelgado@gmail.com>", "Tiago Marques <samarques.
 [[bin]]
 name = "rustyboy"
 doc = false
+
+
+[features]
+debug = [] # feature has no explicit dependencies
