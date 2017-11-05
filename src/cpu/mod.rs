@@ -462,6 +462,7 @@ impl Cpu {
             opcodes::ADC_A_E => println!("ADC\tA,E"),
             opcodes::ADC_A_H => println!("ADC\tA,H"),
             opcodes::ADC_A_L => println!("ADC\tA,L"),
+            opcodes::ADC_A_D8 => println!("ADC\tA,{}", read_8_imm()),
 
             n => panic!("Unknown instruction {:02x}@{:04x}", n, addr),
         }
@@ -689,6 +690,7 @@ impl Cpu {
                 let addr = self.get_hl() as usize;
                 self.adc_a(|cpu| cpu.mem[addr])
             }
+            opcodes::ADC_A_D8 => self.adc_a(|cpu| cpu.consume_byte()),
 
             opcodes::NOP => self.nop(),
             s => {
@@ -1321,12 +1323,14 @@ impl Cpu {
 
     fn adc_a<F>(&mut self, f: F)
     where
-        F: Fn(&Cpu) -> u8,
+        F: Fn(&mut Cpu) -> u8,
     {
         let a = self.a;
         let carry = if self.flag(Flag::Carry) {1} else {0};
         let n = f(self);
         let res = a.wrapping_add(n).wrapping_add(carry);
+
+        println!("ADC a: {} carry: {} n: {} result: {}", a, carry, n, res);
 
         self.set_flag_to(Flag::Zero, res == 0);
         self.reset_flag(Flag::Sub);

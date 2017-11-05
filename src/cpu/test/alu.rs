@@ -877,3 +877,11 @@ fn test_adc_a_hl() {
         cpu.mem[0xffe1] = value
     }, false);
 }
+
+#[test]
+fn test_adc_a_d8() {
+    _test_adc_a(opcodes::ADC_A_D8, |cpu, value| {
+        let i = (cpu.pc + 1) as usize;
+        cpu.mem[i] = value;
+    }, false);
+}
