@@ -467,6 +467,8 @@ impl Cpu {
 
             opcodes::LDHL_SP_R8 => println!("LDHL\tSP,{}", read_8_sig()),
 
+            opcodes::LD_A16_SP => println!("LD\t{},SP", read_16_addr()),
+
             0xd3 | 0xdb | 0xdd | 0xe3 | 0xe4 | 0xeb | 0xec | 0xed | 0xf4 | 0xfc | 0xfd => {
                 println!("Undefined instruction {:02x}", opcode)
             }
@@ -701,6 +703,8 @@ impl Cpu {
             opcodes::RLCA => self.rlc_a(),
 
             opcodes::LDHL_SP_R8 => self.ldhl_sp_r8(),
+
+            opcodes::LD_A16_SP => self.ld_a16_sp(),
 
             opcodes::NOP => self.nop(),
 
@@ -1407,5 +1411,15 @@ impl Cpu {
 
         self.set_hl(new_value);
         self.sp = old_value;
+    }
+
+    ///**Description:**
+    ///  Put Stack Pointer (SP) at address n.
+    ///
+    ///**Use with:**
+    ///  nn = two byte immediate address.
+    fn ld_a16_sp(&mut self) {
+        let addr = self.consume_16_addr();
+        self.sp = addr;
     }
 }

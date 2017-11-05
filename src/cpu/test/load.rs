@@ -659,3 +659,15 @@ fn test_ldhl_sp_r8() {
     assert!(cpu.flag(Flag::HalfCarry));
     assert!(cpu.flag(Flag::Carry));
 }
+
+#[test]
+fn test_ld_a16_sp() {
+    let mut cpu = Cpu::new();
+    cpu.mem[0] = opcodes::LD_A16_SP;
+    cpu.mem[1] = 0x12;
+    cpu.mem[2] = 0x34;
+
+    cpu.tick().unwrap();
+
+    assert_eq!(cpu.sp, 0x3412);
+}
