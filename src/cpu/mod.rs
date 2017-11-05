@@ -467,8 +467,9 @@ impl Cpu {
             opcodes::RLCA => println!("RLCA"),
 
             opcodes::LDHL_SP_R8 => println!("LDHL\tSP,{}", read_8_sig()),
-
             opcodes::LD_A16_SP => println!("LD\t{},SP", read_16_addr()),
+
+            opcodes::EI => println!("EI"),
 
             0xd3 | 0xdb | 0xdd | 0xe3 | 0xe4 | 0xeb | 0xec | 0xed | 0xf4 | 0xfc | 0xfd => {
                 println!("Undefined instruction {:02x}", opcode)
@@ -705,8 +706,9 @@ impl Cpu {
             opcodes::RLCA => self.rlc_a(),
 
             opcodes::LDHL_SP_R8 => self.ldhl_sp_r8(),
-
             opcodes::LD_A16_SP => self.ld_a16_sp(),
+
+            opcodes::EI => self.ei(),
 
             opcodes::NOP => self.nop(),
 
@@ -921,6 +923,10 @@ impl Cpu {
     ///
     /// None
     fn di(&self) {
+        // TODO implement this
+    }
+
+    fn ei(&self) {
         // TODO implement this
     }
 
