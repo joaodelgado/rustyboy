@@ -465,6 +465,10 @@ impl Cpu {
             opcodes::ADC_A_D8 => println!("ADC\tA,{}", read_8_imm()),
             opcodes::RLCA => println!("RLCA"),
 
+            0xd3 | 0xdb | 0xdd | 0xe3 | 0xe4 | 0xeb | 0xec | 0xed | 0xf4 | 0xfc | 0xfd => {
+                println!("Undefined instruction {:02x}", opcode)
+            }
+
             n => panic!("Unknown instruction {:02x}@{:04x}", n, addr),
         }
     }
@@ -695,6 +699,11 @@ impl Cpu {
             opcodes::RLCA => self.rlc_a(),
 
             opcodes::NOP => self.nop(),
+
+            /// unimplemented instructions, do nothing
+            /// FIXME after testing this should panic instead
+            0xd3 | 0xdb | 0xdd | 0xe3 | 0xe4 | 0xeb | 0xec | 0xed | 0xf4 | 0xfc | 0xfd => {}
+
             s => {
                 return Err(Error::new(
                     ErrorKind::UnknownInstruction,
