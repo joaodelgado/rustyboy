@@ -752,7 +752,7 @@ where
     r(cpu, 0x00);
     cpu.mem[0] = opcode;
     cpu.reset_flag(Flag::Carry);
-    let carry = if cpu.flag(Flag::Carry) {1} else {0};
+    let carry = if cpu.flag(Flag::Carry) { 1 } else { 0 };
     let result = cpu.a + 0x00 + carry;
     cpu.tick().unwrap();
 
@@ -770,7 +770,7 @@ where
     cpu.a = 0x00;
     r(cpu, 0x01);
     cpu.mem[0] = opcode;
-    let carry = if cpu.flag(Flag::Carry) {1} else {0};
+    let carry = if cpu.flag(Flag::Carry) { 1 } else { 0 };
     let result = cpu.a + 0x01 + carry;
     cpu.tick().unwrap();
 
@@ -788,7 +788,7 @@ where
     cpu.a = 0x0f;
     r(cpu, 0x0f);
     cpu.mem[0] = opcode;
-    let carry = if cpu.flag(Flag::Carry) {1} else {0};
+    let carry = if cpu.flag(Flag::Carry) { 1 } else { 0 };
     let result = cpu.a + 0x0f + carry;
     cpu.tick().unwrap();
 
@@ -806,7 +806,7 @@ where
     cpu.a = 0xff;
     r(cpu, 0xff);
     cpu.mem[0] = opcode;
-    let carry = if cpu.flag(Flag::Carry) {1} else {0};
+    let carry = if cpu.flag(Flag::Carry) { 1 } else { 0 };
     let result = cpu.a.wrapping_add(0xff).wrapping_add(carry);
     cpu.tick().unwrap();
 
@@ -821,7 +821,7 @@ where
         cpu.a = 0x80;
         r(cpu, 0x7f);
         cpu.mem[0] = opcode;
-        let carry = if cpu.flag(Flag::Carry) {1} else {0};
+        let carry = if cpu.flag(Flag::Carry) { 1 } else { 0 };
         let result = cpu.a.wrapping_add(0x7f).wrapping_add(carry);
         cpu.tick().unwrap();
 
@@ -872,16 +872,24 @@ fn test_adc_a_l() {
 }
 
 fn test_adc_a_hl() {
-    _test_adc_a(opcodes::ADC_A_HL, |cpu, value| {
-        cpu.set_hl(0xffe1);
-        cpu.mem[0xffe1] = value
-    }, false);
+    _test_adc_a(
+        opcodes::ADC_A_HL,
+        |cpu, value| {
+            cpu.set_hl(0xffe1);
+            cpu.mem[0xffe1] = value
+        },
+        false,
+    );
 }
 
 #[test]
 fn test_adc_a_d8() {
-    _test_adc_a(opcodes::ADC_A_D8, |cpu, value| {
-        let i = (cpu.pc + 1) as usize;
-        cpu.mem[i] = value;
-    }, false);
+    _test_adc_a(
+        opcodes::ADC_A_D8,
+        |cpu, value| {
+            let i = (cpu.pc + 1) as usize;
+            cpu.mem[i] = value;
+        },
+        false,
+    );
 }

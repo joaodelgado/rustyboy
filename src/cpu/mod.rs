@@ -1328,7 +1328,7 @@ impl Cpu {
         F: Fn(&mut Cpu) -> u8,
     {
         let a = self.a;
-        let carry = if self.flag(Flag::Carry) {1} else {0};
+        let carry = if self.flag(Flag::Carry) { 1 } else { 0 };
         let n = f(self);
         let res = a.wrapping_add(n).wrapping_add(carry);
 
