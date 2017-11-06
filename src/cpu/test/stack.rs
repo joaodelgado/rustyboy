@@ -194,4 +194,6 @@ fn test_pop_a16() {
 
     cpu.tick().unwrap();
     assert_eq!(cpu.get_hl(), 0xfee2);
+
+    assert_eq!(cpu.sp, 0x1234);
 }
