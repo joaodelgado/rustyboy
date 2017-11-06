@@ -1,6 +1,7 @@
 mod cartridge;
 mod cpu;
 mod errors;
+mod debugger;
 pub mod game_boy;
 
 use std::fs::File;

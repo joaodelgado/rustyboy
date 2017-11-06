@@ -3,7 +3,7 @@ use cartridge::Cartridge;
 use errors::{Error, ErrorKind, Result};
 use Config;
 use read_file;
-use std::io;
+use debugger::Debugger;
 
 const MEM_CARTRIDGE_INTERRUPTS_BEGIN: usize = 0x0000;
 const MEM_CARTRIDGE_INTERRUPTS_END: usize = 0x00ff;
@@ -54,18 +54,10 @@ const WX: usize = 0xff4b;
 // Interrupt enable flag
 const IE: usize = 0xffff;
 
-/// Debug commands
-// Print stack's current state
-const DEBUG_PRINT_MEM: &'static str = "s";
-// Print cpu's current state
-const DEBUG_PRINT_CPU: &'static str = "cpu";
-// Revert to previous game boy's state
-const DEBUG_BACKTRACK: &'static str = "p";
-
-
 pub struct GameBoy {
     cpu: Cpu,
     cartridge: Cartridge,
+    debugger: Debugger,
 }
 
 impl GameBoy {
@@ -77,6 +69,7 @@ impl GameBoy {
         Ok(GameBoy {
             cpu: Cpu::new(),
             cartridge: cartridge,
+            debugger: Debugger::new(),
         })
     }
 
@@ -90,38 +83,9 @@ impl GameBoy {
 
         // TODO game loop
         println!("Running rom with title: {}", self.cartridge.title());
-        let mut previous_state = self.cpu.clone();
         loop {
             if cfg!(feature = "debug") {
-
-                let mut cmd = String::new();
-                io::stdin().read_line(&mut cmd)?;
-                let cmd = cmd.trim();
-                match cmd {
-                    DEBUG_BACKTRACK => {
-                        self.cpu.load_from(&previous_state);
-                        println!("{}", self.cpu);
-                    }
-                    DEBUG_PRINT_CPU => println!("{}", self.cpu),
-                    DEBUG_PRINT_MEM => {
-                        let mut range = String::new();
-                        io::stdin().read_line(&mut range).expect("read error");
-                        let range = range.trim();
-                        let vec = range.split_whitespace()
-                            .map(|x| x.parse::<usize>().expect("parse error"))
-                            .collect::<Vec<usize>>();
-
-                        let mut i = vec[0];
-                        for &n in self.cpu.get_mem_range(vec[0], vec[1]) {
-                            println!("{}: {:X}", i, n);
-                            i += 1;
-                        }
-                    }
-                    _ => {
-                        previous_state = self.cpu.clone();
-                        self.cpu.tick()?;
-                    }
-                }
+                self.debugger.tick(&mut self.cpu)?;
             }
             else {
                 self.cpu.tick()?;
