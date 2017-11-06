@@ -40,6 +40,25 @@ pub struct Cpu {
     mem: [u8; MEM_SIZE],
 }
 
+impl Clone for Cpu {
+    fn clone(&self) -> Cpu {
+        let mut clone = Cpu::new();
+        clone.a = self.a;
+        clone.b = self.b;
+        clone.d = self.c;
+        clone.d = self.d;
+        clone.e = self.f;
+        clone.h = self.h;
+        clone.l = self.l;
+        clone.sp = self.sp;
+        clone.pc = self.pc;
+        clone.status = self.status;
+        clone.mem.clone_from_slice(&self.mem);
+
+        clone
+    }
+}
+
 impl fmt::Display for Cpu {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         return write!(f,

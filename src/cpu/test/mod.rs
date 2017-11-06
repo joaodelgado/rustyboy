@@ -249,3 +249,26 @@ fn test_di() {
 
     cpu.tick().unwrap();
 }
+
+#[test]
+fn test_clone() {
+    let mut cpu = Cpu::new();
+
+    cpu.pc = 0x40;
+    cpu.sp = 0xff12;
+    cpu.mem[0] = 0xff;
+
+    let clone = cpu.clone();
+
+    assert_eq!(clone.pc, 0x40);
+    assert_eq!(clone.sp, 0xff12);
+    assert_eq!(clone.mem[0], 0xff);
+
+    cpu.pc = 0x41;
+    cpu.sp = 0;
+    cpu.mem[0] = 0xf0;
+
+    assert_eq!(clone.pc, 0x40);
+    assert_eq!(clone.sp, 0xff12);
+    assert_eq!(clone.mem[0], 0xff);
+}
