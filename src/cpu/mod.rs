@@ -303,6 +303,7 @@ impl Cpu {
         };
 
         let opcode = self.mem[addr];
+        print!("{:X} : ", opcode);
         match opcode {
             opcodes::CALL_A16 => println!("CALL\t{}", read_16_addr()),
             opcodes::CALL_NZ_A16 => println!("CALL\tNZ,{}", read_16_addr()),

@@ -59,6 +59,8 @@ const IE: usize = 0xffff;
 const DEBUG_PRINT_MEM: &'static str = "s";
 // Print cpu's current state
 const DEBUG_PRINT_CPU: &'static str = "cpu";
+// Revert to previous game boy's state
+const DEBUG_BACKTRACK: &'static str = "p";
 
 
 pub struct GameBoy {
@@ -88,12 +90,18 @@ impl GameBoy {
 
         // TODO game loop
         println!("Running rom with title: {}", self.cartridge.title());
+        let mut previous_state = self.cpu.clone();
         loop {
             if cfg!(feature = "debug") {
+
                 let mut cmd = String::new();
                 io::stdin().read_line(&mut cmd)?;
                 let cmd = cmd.trim();
                 match cmd {
+                    DEBUG_BACKTRACK => {
+                        self.cpu.load_from(&previous_state);
+                        println!("{}", self.cpu);
+                    }
                     DEBUG_PRINT_CPU => println!("{}", self.cpu),
                     DEBUG_PRINT_MEM => {
                         let mut range = String::new();
@@ -109,7 +117,10 @@ impl GameBoy {
                             i += 1;
                         }
                     }
-                    _ => self.cpu.tick()?,
+                    _ => {
+                        previous_state = self.cpu.clone();
+                        self.cpu.tick()?;
+                    }
                 }
             }
             else {
