@@ -143,6 +143,21 @@ impl Cpu {
         println!("{}", self);
     }
 
+    /// Set this CPU's state to the given cpu
+    pub fn load_from(&mut self, cpu: &Cpu) {
+        self.a = cpu.a;
+        self.b = cpu.b;
+        self.d = cpu.c;
+        self.d = cpu.d;
+        self.e = cpu.f;
+        self.h = cpu.h;
+        self.l = cpu.l;
+        self.sp = cpu.sp;
+        self.pc = cpu.pc;
+        self.status = cpu.status;
+        self.mem.clone_from_slice(&cpu.mem);
+    }
+
     //
     // Manage memory
     //

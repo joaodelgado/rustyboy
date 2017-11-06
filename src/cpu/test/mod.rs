@@ -272,3 +272,20 @@ fn test_clone() {
     assert_eq!(clone.sp, 0xff12);
     assert_eq!(clone.mem[0], 0xff);
 }
+
+
+#[test]
+fn test_load_from() {
+    let mut cpu = Cpu::new();
+
+    cpu.pc = 0x40;
+    cpu.sp = 0xff12;
+    cpu.mem[0] = 0xff;
+
+    let mut cpu2 = Cpu::new();
+    cpu2.load_from(&cpu);
+
+    assert_eq!(cpu2.pc, 0x40);
+    assert_eq!(cpu2.sp, 0xff12);
+    assert_eq!(cpu2.mem[0], 0xff);
+}
