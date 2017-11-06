@@ -24,32 +24,40 @@ impl Debugger {
         }
     }
 
+    fn read_line(&self) -> Vec<String> {
+        let mut cmd = String::new();
+        io::stdin().read_line(&mut cmd).expect("read error");
+        let cmd = cmd.trim();
+
+        let mut vec = cmd.split_whitespace()
+            .map(|x| x.parse::<String>().expect("parse error"))
+            .collect::<Vec<String>>();
+
+        // step command
+        if vec.len() == 0 {
+            vec.push(String::new());
+        }
+
+        vec
+    }
+
     pub fn tick(&mut self, cpu: &mut Cpu) -> Result<()> {
         print!("rustyboy> ");
         stdout().flush()?;
 
-        let mut cmd = String::new();
-        io::stdin().read_line(&mut cmd)?;
-        let cmd = cmd.trim();
-        match cmd {
+        let cmd = self.read_line();
+        match cmd[0].as_str() {
             DEBUG_BACKTRACK => {
                 cpu.load_from(&self.previous_state);
                 println!("{}", cpu);
             }
             DEBUG_PRINT_CPU => println!("{}", cpu),
             DEBUG_PRINT_MEM => {
-                let mut range = String::new();
-                io::stdin().read_line(&mut range).expect("read error");
-                let range = range.trim();
-                let vec = range.split_whitespace()
-                    .map(|x| x.parse::<usize>().expect("parse error"))
-                    .collect::<Vec<usize>>();
+                let args = &cmd[1..3].iter()
+                    .map(|x| x.parse::<u16>().expect("parse error"))
+                    .collect::<Vec<u16>>();
 
-                let mut i = vec[0];
-                for &n in cpu.get_mem_range(vec[0], vec[1]) {
-                    println!("{}: {:X}", i, n);
-                    i += 1;
-                }
+                println!("{:?}", cpu.get_mem_range(args[0] as usize, args[1] as usize));
             }
             _ => {
                 self.previous_state = cpu.clone();
