@@ -1,7 +1,9 @@
 use cpu::Cpu;
-use errors::{Error, ErrorKind, Result};
+use std::io::{stdout};
+use errors::{Result};
 
 use std::io;
+use std::io::Write;
 
 /// Debug commands
 // Print stack's current state
@@ -23,6 +25,9 @@ impl Debugger {
     }
 
     pub fn tick(&mut self, cpu: &mut Cpu) -> Result<()> {
+        print!("rustyboy> ");
+        stdout().flush()?;
+
         let mut cmd = String::new();
         io::stdin().read_line(&mut cmd)?;
         let cmd = cmd.trim();
