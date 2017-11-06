@@ -57,7 +57,9 @@ impl Debugger {
                     .map(|x| x.parse::<u16>().expect("parse error"))
                     .collect::<Vec<u16>>();
 
-                println!("{:?}", cpu.get_mem_range(args[0] as usize, args[1] as usize));
+                for &n in cpu.get_mem_range(args[0] as usize, args[1] as usize) {
+                    println!("{:02x}", n);
+                }
             }
             _ => {
                 self.previous_state = cpu.clone();
