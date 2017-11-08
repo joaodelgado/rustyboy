@@ -23,7 +23,7 @@ fn test_jp_hl() {
 }
 
 #[test]
-fn test_jp_r8() {
+fn test_jr_r8() {
     let mut cpu = Cpu::new();
     cpu.mem[0] = opcodes::JR_R8;
     cpu.mem[1] = 15;
