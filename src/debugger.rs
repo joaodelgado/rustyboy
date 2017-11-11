@@ -1,6 +1,6 @@
 use cpu::Cpu;
-use std::io::{stdout};
-use errors::{Result};
+use std::io::stdout;
+use errors::Result;
 
 use std::io;
 use std::io::Write;
@@ -67,7 +67,8 @@ impl Debugger {
             }
             DEBUG_PRINT_CPU => println!("{}", cpu),
             DEBUG_PRINT_MEM => {
-                let args = &cmd[1..3].iter()
+                let args = &cmd[1..3]
+                    .iter()
                     .map(|x| x.parse::<u16>().expect("parse error"))
                     .collect::<Vec<u16>>();
 
@@ -76,11 +77,13 @@ impl Debugger {
                 }
             }
             DEBUG_UNTIL_N => {
-                let pc_val = &cmd[1..2].iter()
+                let pc_val = &cmd[1..2]
+                    .iter()
                     .map(|x| x.parse::<u16>().expect("parse error"))
-                    .collect::<Vec<u16>>()[0];
+                    .collect::<Vec<u16>>()
+                    [0];
 
-                for _ in 0..pc_val+1 {
+                for _ in 0..pc_val + 1 {
                     self.step(cpu)?;
                 }
             }

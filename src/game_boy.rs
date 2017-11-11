@@ -86,8 +86,7 @@ impl GameBoy {
         loop {
             if cfg!(feature = "debug") {
                 self.debugger.tick(&mut self.cpu)?;
-            }
-            else {
+            } else {
                 self.cpu.tick()?;
             }
         }
