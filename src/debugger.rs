@@ -14,15 +14,19 @@ const DEBUG_PRINT_MEM: &'static str = "s";
 const DEBUG_PRINT_CPU: &'static str = "cpu";
 // Revert to previous game boy's state
 const DEBUG_BACKTRACK: &'static str = "p";
+// Step n times
+const DEBUG_UNTIL_N: &'static str = "n";
 
 pub struct Debugger {
     previous_state: Cpu,
+    n_iteration: u64,
 }
 
 impl Debugger {
     pub fn new() -> Debugger {
         Debugger {
             previous_state: Cpu::new(),
+            n_iteration: 0,
         }
     }
 
@@ -43,14 +47,22 @@ impl Debugger {
         vec
     }
 
+    fn step(&mut self, cpu: &mut Cpu) -> Result<()> {
+        self.previous_state = cpu.clone();
+        cpu.tick()?;
+        self.n_iteration += 1;
+        Ok(())
+    }
+
     pub fn tick(&mut self, cpu: &mut Cpu) -> Result<()> {
-        print!("rustyboy> ");
+        print!("rustyboy({})> ", self.n_iteration);
         stdout().flush()?;
 
         let cmd = self.read_line();
         match cmd[0].as_str() {
             DEBUG_BACKTRACK => {
                 cpu.load_from(&self.previous_state);
+                self.n_iteration -= 1;
                 println!("{}", cpu);
             }
             DEBUG_PRINT_CPU => println!("{}", cpu),
@@ -63,9 +75,17 @@ impl Debugger {
                     println!("{:02x}", n);
                 }
             }
+            DEBUG_UNTIL_N => {
+                let pc_val = &cmd[1..2].iter()
+                    .map(|x| x.parse::<u16>().expect("parse error"))
+                    .collect::<Vec<u16>>()[0];
+
+                for _ in 0..pc_val+1 {
+                    self.step(cpu)?;
+                }
+            }
             _ => {
-                self.previous_state = cpu.clone();
-                cpu.tick()?;
+                self.step(cpu)?;
             }
         }
         Ok(())
