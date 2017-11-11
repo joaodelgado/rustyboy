@@ -11,4 +11,5 @@ doc = false
 
 
 [features]
-debug = [] # feature has no explicit dependencies
+verbose = []
+debug = ["verbose"] # feature has no explicit dependencies
