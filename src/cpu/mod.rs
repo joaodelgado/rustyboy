@@ -937,8 +937,8 @@ impl Cpu {
     ///
     ///  n = one byte signed immediate value
     fn jr_r8(&mut self) {
-        let n = self.consume_byte() as u16;
-        self.pc += n;
+        let n = self.consume_byte() as i8;
+        self.pc = self.pc.wrapping_add(n as u16);
     }
 
     /// **Description:**

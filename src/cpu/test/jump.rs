@@ -30,6 +30,13 @@ fn test_jr_r8() {
 
     cpu.tick().unwrap();
     assert_eq!(cpu.pc, 17);
+
+    cpu.pc = 0xffee;
+    cpu.mem[cpu.pc as usize] = opcodes::JR_R8;
+    cpu.mem[(cpu.pc + 1) as usize] = 0xf1;
+    cpu.tick().unwrap();
+
+    assert_eq!(cpu.pc, 0xffe1);
 }
 
 #[test]
