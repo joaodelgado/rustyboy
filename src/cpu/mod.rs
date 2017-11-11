@@ -436,11 +436,11 @@ impl Cpu {
             opcodes::POP_A16_HL => println!("POP\tHL"),
 
             opcodes::LD_B_D8 => println!("LD\tB,{}", read_8_imm()),
-            opcodes::LD_C_D8 => println!("LD\tB,{}", read_8_imm()),
-            opcodes::LD_D_D8 => println!("LD\tB,{}", read_8_imm()),
-            opcodes::LD_E_D8 => println!("LD\tB,{}", read_8_imm()),
-            opcodes::LD_H_D8 => println!("LD\tB,{}", read_8_imm()),
-            opcodes::LD_L_D8 => println!("LD\tB,{}", read_8_imm()),
+            opcodes::LD_C_D8 => println!("LD\tC,{}", read_8_imm()),
+            opcodes::LD_D_D8 => println!("LD\tD,{}", read_8_imm()),
+            opcodes::LD_E_D8 => println!("LD\tE,{}", read_8_imm()),
+            opcodes::LD_H_D8 => println!("LD\tH,{}", read_8_imm()),
+            opcodes::LD_L_D8 => println!("LD\tL,{}", read_8_imm()),
 
             opcodes::RET => println!("RET"),
 
