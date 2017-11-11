@@ -6,6 +6,8 @@ use std::io;
 use std::io::Write;
 
 /// Debug commands
+// Step command
+const DEBUG_STEP: &'static str = "";
 // Print stack's current state
 const DEBUG_PRINT_MEM: &'static str = "s";
 // Print cpu's current state
@@ -35,7 +37,7 @@ impl Debugger {
 
         // step command
         if vec.len() == 0 {
-            vec.push(String::new());
+            vec.push(DEBUG_STEP.to_string());
         }
 
         vec
