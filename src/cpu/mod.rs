@@ -504,6 +504,15 @@ impl Cpu {
             opcodes::LDHL_SP_R8 => println!("LDHL\tSP,{}", read_8_sig()),
             opcodes::LD_A16_SP => println!("LD\t{},SP", read_16_addr()),
 
+            opcodes::RST_00 => println!("RST\t{}", 00),
+            opcodes::RST_08 => println!("RST\t{}", 08),
+            opcodes::RST_10 => println!("RST\t{}", 10),
+            opcodes::RST_18 => println!("RST\t{}", 18),
+            opcodes::RST_20 => println!("RST\t{}", 20),
+            opcodes::RST_28 => println!("RST\t{}", 28),
+            opcodes::RST_30 => println!("RST\t{}", 30),
+            opcodes::RST_38 => println!("RST\t{}", 38),
+
             opcodes::EI => println!("EI"),
 
             0xd3 | 0xdb | 0xdd | 0xe3 | 0xe4 | 0xeb | 0xec | 0xed | 0xf4 | 0xfc | 0xfd => {
@@ -742,6 +751,15 @@ impl Cpu {
 
             opcodes::LDHL_SP_R8 => self.ldhl_sp_r8(),
             opcodes::LD_A16_SP => self.ld_a16_sp(),
+
+            opcodes::RST_00 => self.rst_a8(0),
+            opcodes::RST_08 => self.rst_a8(0x08),
+            opcodes::RST_10 => self.rst_a8(0x10),
+            opcodes::RST_18 => self.rst_a8(0x18),
+            opcodes::RST_20 => self.rst_a8(0x20),
+            opcodes::RST_28 => self.rst_a8(0x28),
+            opcodes::RST_30 => self.rst_a8(0x30),
+            opcodes::RST_38 => self.rst_a8(0x38),
 
             opcodes::EI => self.ei(),
 
@@ -1464,5 +1482,18 @@ impl Cpu {
     fn ld_a16_sp(&mut self) {
         let addr = self.consume_16_addr();
         self.sp = addr;
+    }
+
+    ///**Description:**
+    ///  Push present address onto stack.
+    ///  Jump to address $0000 + n.
+    ///
+    ///**Use with:**
+    ///  n = $00,$08,$10,$18,$20,$28,$30,$38
+    fn rst_a8(&mut self, n: u8) {
+        let curr_pc = self.pc;
+        self.push_stack_u16(curr_pc);
+
+        self.pc = n as u16;
     }
 }

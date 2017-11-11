@@ -676,3 +676,59 @@ fn test_ld_a16_sp() {
 
     assert_eq!(cpu.sp, 0x3412);
 }
+
+fn _test_rst_a8(opcode: u8, addr: u16) {
+    let mut cpu = Cpu::new();
+
+    cpu.sp = 0xfffe;
+    cpu.pc = 0xff12;
+    cpu.mem[cpu.pc as usize] = opcode;
+
+    cpu.tick().unwrap();
+
+    let pc = cpu.pop_stack_u16();
+    assert_eq!(pc, 0xff12 + 1);
+    assert_eq!(cpu.pc, addr);
+}
+
+#[test]
+fn test_rst_a8_00() {
+    _test_rst_a8(opcodes::RST_00, 0);
+}
+
+
+#[test]
+fn test_rst_a8_08() {
+    _test_rst_a8(opcodes::RST_08, 0x08);
+}
+
+
+#[test]
+fn test_rst_a8_10() {
+    _test_rst_a8(opcodes::RST_10, 0x10);
+}
+
+#[test]
+fn test_rst_a8_18() {
+    _test_rst_a8(opcodes::RST_18, 0x18);
+}
+
+#[test]
+fn test_rst_a8_20() {
+    _test_rst_a8(opcodes::RST_20, 0x20);
+}
+
+#[test]
+fn test_rst_a8_28() {
+    _test_rst_a8(opcodes::RST_28, 0x28);
+}
+
+#[test]
+fn test_rst_a8_30() {
+    _test_rst_a8(opcodes::RST_30, 0x30);
+}
+
+#[test]
+fn test_rst_a8_38() {
+    _test_rst_a8(opcodes::RST_38, 0x38);
+}
