@@ -76,6 +76,45 @@ fn test_ret() {
     assert_eq!(0x3524, cpu.pc);
 }
 
+fn _test_ret_cc<F>(f: F, opcode: u8)
+where
+    F: Fn(&mut Cpu),
+{
+    let cpu = &mut Cpu::new();
+
+    cpu.mem[0x0] = opcode;
+    cpu.mem[0xfffe] = 0x24;
+    cpu.mem[0xfffd] = 0x35;
+    cpu.sp = 0xfffc;
+    f(cpu);
+
+    cpu.tick().unwrap();
+
+    assert_eq!(0xfffe, cpu.sp);
+    assert_eq!(0x3524, cpu.pc);
+}
+
+#[test]
+fn test_ret_nz() {
+    _test_ret_cc(|cpu| cpu.reset_flag(Flag::Zero), opcodes::RET_NZ);
+}
+
+#[test]
+fn test_ret_z() {
+    _test_ret_cc(|cpu| cpu.set_flag(Flag::Zero), opcodes::RET_Z);
+}
+
+#[test]
+fn test_ret_nc() {
+    _test_ret_cc(|cpu| cpu.reset_flag(Flag::Carry), opcodes::RET_NC);
+}
+
+#[test]
+fn test_ret_c() {
+    _test_ret_cc(|cpu| cpu.set_flag(Flag::Carry), opcodes::RET_C);
+}
+
+
 #[test]
 fn test_push_stack() {
     let mut cpu = Cpu::new();

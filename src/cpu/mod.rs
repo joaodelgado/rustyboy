@@ -455,6 +455,10 @@ impl Cpu {
             opcodes::LD_L_D8 => info!("LD\tL,{}", read_8_imm()),
 
             opcodes::RET => info!("RET"),
+            opcodes::RET_NZ => info!("RET NZ"),
+            opcodes::RET_Z => info!("RET Z"),
+            opcodes::RET_NC => info!("RET NC"),
+            opcodes::RET_C => info!("RET C"),
 
             opcodes::DI => info!("DI"),
             opcodes::NOP => info!("NOP"),
@@ -648,7 +652,12 @@ impl Cpu {
 
             opcodes::LDH_A8_A => self.ldh_a8_a(),
             opcodes::LDI_A_HL => self.ldi_a_hl(),
+
             opcodes::RET => self.ret(),
+            opcodes::RET_NZ => self.ret_cc(|cpu| !cpu.flag(Flag::Zero)),
+            opcodes::RET_Z => self.ret_cc(|cpu| cpu.flag(Flag::Zero)),
+            opcodes::RET_NC => self.ret_cc(|cpu| !cpu.flag(Flag::Carry)),
+            opcodes::RET_C => self.ret_cc(|cpu| cpu.flag(Flag::Carry)),
 
             opcodes::PUSH_A16_AF => self.push_a16(Cpu::get_af),
             opcodes::PUSH_A16_BC => self.push_a16(Cpu::get_bc),
@@ -1044,6 +1053,22 @@ impl Cpu {
     /// Pop two bytes from stack & jump to that address.
     fn ret(&mut self) {
         self.pc = self.pop_stack_u16();
+    }
+
+    ///**Description:**
+    ///  Return if following condition is true:
+    ///
+    ///**Use with:**
+    ///  cc = NZ, Return if Z flag is reset.
+    ///  cc = Z, Return if Z flag is set.
+    ///  cc = NC, Return if C flag is reset
+    fn ret_cc<F>(&mut self, condition: F)
+    where
+        F: Fn(&Cpu) -> bool,
+    {
+        if condition(&self) {
+            self.ret();
+        }
     }
 
     ///
