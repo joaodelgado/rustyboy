@@ -185,6 +185,7 @@ pub const ADC_A_L: u8 = 0x8d;
 pub const ADC_A_HL: u8 = 0x8e;
 pub const ADC_A_D8: u8 = 0xce;
 pub const RLCA: u8 = 0x07;
+pub const RRCA: u8 = 0x0f;
 pub const EI: u8 = 0xfb;
 pub const RST_00: u8 = 0xc7;
 pub const RST_08: u8 = 0xcf;

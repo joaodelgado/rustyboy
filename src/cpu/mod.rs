@@ -516,6 +516,7 @@ impl Cpu {
             opcodes::ADC_A_L => info!("ADC\tA,L"),
             opcodes::ADC_A_D8 => info!("ADC\tA,{}", read_8_imm()),
             opcodes::RLCA => info!("RLCA"),
+            opcodes::RRCA => info!("RRCA"),
 
             opcodes::LDHL_SP_R8 => info!("LDHL\tSP,{}", read_8_sig()),
             opcodes::LD_A16_SP => info!("LD\t{},SP", read_16_addr()),
@@ -769,6 +770,7 @@ impl Cpu {
             }
             opcodes::ADC_A_D8 => self.adc_a(|cpu| cpu.consume_byte()),
             opcodes::RLCA => self.rlc_a(),
+            opcodes::RRCA => self.rrca(),
 
             opcodes::LDHL_SP_R8 => self.ldhl_sp_r8(),
             opcodes::LD_A16_SP => self.ld_a16_sp(),
@@ -1488,6 +1490,26 @@ impl Cpu {
         self.set_flag_to(Flag::Carry, carry == 1);
         self.set_flag_to(Flag::Zero, res == 0);
         self.a = res;
+    }
+
+    ///**Description:**
+    ///  Rotate A right. Old bit 0 to Carry flag.
+    ///
+    ///**Flags affected:**
+    ///  Z - Set if result is zero.
+    ///  N - Reset.
+    ///  H - Reset.
+    ///  C - Contains old bit 0 data.
+    fn rrca(&mut self) {
+        let lsb = self.a & 1;
+        let a = (lsb << 7) | (self.a >> 1);
+
+        self.set_flag_to(Flag::Zero, a == 0);
+        self.reset_flag(Flag::Sub);
+        self.reset_flag(Flag::HalfCarry);
+        self.set_flag_to(Flag::Carry, lsb == 1);
+
+        self.a = a;
     }
 
     ///**Description:**
