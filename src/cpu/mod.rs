@@ -1021,10 +1021,8 @@ impl Cpu {
     where
         F: Fn(&Cpu) -> bool,
     {
-        let addr = self.consume_16_addr();
-
         if condition(&self) {
-            self.pc = addr;
+            self.jp_a16();
         }
     }
 
