@@ -1355,9 +1355,7 @@ impl Cpu {
         F: Fn(&Cpu) -> bool,
     {
         if condition(&self) {
-            let offset = self.consume_byte() as i8 as i16;
-            let pc = self.pc as i16;
-            self.pc = pc.wrapping_add(offset) as u16;
+            self.jr_r8();
         }
     }
 
