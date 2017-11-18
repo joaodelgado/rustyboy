@@ -432,7 +432,7 @@ fn test_ld_sp_nn() {
     cpu.sp = 0;
 
     cpu.tick().unwrap();
-    assert_eq!(cpu.sp, 0x0134);
+    assert_eq!(cpu.sp, 0x3401);
 }
 
 #[test]
@@ -444,7 +444,7 @@ fn test_ld_sp_hl() {
     cpu.l = 0x34;
 
     cpu.tick().unwrap();
-    assert_eq!(cpu.sp, 0x0134);
+    assert_eq!(cpu.sp, 0x3401);
 }
 
 #[test]
@@ -481,7 +481,7 @@ fn test_ld_r16_d16() {
     cpu.mem[2] = 0x35;
 
     cpu.tick().unwrap();
-    assert_eq!(0x2435, cpu.get_hl());
+    assert_eq!(0x3524, cpu.get_hl());
 
     cpu.pc = 0;
     cpu.mem[0] = opcodes::LD_BC_D16;
@@ -489,7 +489,7 @@ fn test_ld_r16_d16() {
     cpu.mem[2] = 0x35;
 
     cpu.tick().unwrap();
-    assert_eq!(0x2435, cpu.get_bc());
+    assert_eq!(0x3524, cpu.get_bc());
 
     cpu.pc = 0;
     cpu.mem[0] = opcodes::LD_DE_D16;
@@ -497,7 +497,7 @@ fn test_ld_r16_d16() {
     cpu.mem[2] = 0x35;
 
     cpu.tick().unwrap();
-    assert_eq!(0x2435, cpu.get_de());
+    assert_eq!(0x3524, cpu.get_de());
 
     cpu.pc = 0;
     cpu.mem[0] = opcodes::LD_SP_D16;
@@ -505,7 +505,7 @@ fn test_ld_r16_d16() {
     cpu.mem[2] = 0x35;
 
     cpu.tick().unwrap();
-    assert_eq!(0x2435, cpu.sp);
+    assert_eq!(0x3524, cpu.sp);
 }
 
 #[test]

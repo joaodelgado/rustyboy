@@ -818,8 +818,8 @@ impl Cpu {
     }
 
     fn consume_16_imm(&mut self) -> u16 {
-        let fst_byte = self.consume_byte();
         let snd_byte = self.consume_byte();
+        let fst_byte = self.consume_byte();
 
         u8_to_u16(fst_byte, snd_byte)
     }
