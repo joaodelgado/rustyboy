@@ -31,7 +31,6 @@ pub struct Cpu {
     c: u8,
     d: u8,
     e: u8,
-    f: u8,
     h: u8,
     l: u8,
     sp: u16,
@@ -47,7 +46,7 @@ impl Clone for Cpu {
         clone.b = self.b;
         clone.d = self.c;
         clone.d = self.d;
-        clone.e = self.f;
+        clone.e = self.e;
         clone.h = self.h;
         clone.l = self.l;
         clone.sp = self.sp;
@@ -68,7 +67,6 @@ impl fmt::Display for Cpu {
     c: {:02x},
     d: {:02x},
     e: {:02x},
-    f: {:02x},
     h: {:02x},
     l: {:02x},
     status: {:#08b},
@@ -80,7 +78,6 @@ impl fmt::Display for Cpu {
             self.c,
             self.d,
             self.e,
-            self.f,
             self.h,
             self.l,
             self.status,
@@ -117,7 +114,6 @@ impl Cpu {
             c: 0,
             d: 0,
             e: 0,
-            f: 0,
             h: 0,
             l: 0,
             sp: 0,
@@ -149,7 +145,7 @@ impl Cpu {
         self.b = cpu.b;
         self.d = cpu.c;
         self.d = cpu.d;
-        self.e = cpu.f;
+        self.e = cpu.e;
         self.h = cpu.h;
         self.l = cpu.l;
         self.sp = cpu.sp;
@@ -207,13 +203,13 @@ impl Cpu {
     //
 
     fn get_af(&self) -> u16 {
-        u8_to_u16(self.a, self.f)
+        u8_to_u16(self.a, self.status)
     }
 
     fn set_af(&mut self, n: u16) {
         let (a, f) = u16_to_u8(n);
         self.a = a;
-        self.f = f;
+        self.status = f;
     }
 
     fn get_bc(&self) -> u16 {

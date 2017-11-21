@@ -114,7 +114,7 @@ fn test_reset_flag() {
 fn test_get_af() {
     let mut cpu = Cpu::new();
     cpu.a = 0x3f;
-    cpu.f = 0x7c;
+    cpu.status = 0x7c;
 
     assert_eq!(cpu.get_af(), 0x3f7c);
 }
@@ -125,7 +125,7 @@ fn test_set_af() {
     cpu.set_af(0x3f7c);
 
     assert_eq!(cpu.a, 0x3f);
-    assert_eq!(cpu.f, 0x7c);
+    assert_eq!(cpu.status, 0x7c);
 }
 
 #[test]
