@@ -444,7 +444,7 @@ fn test_ld_sp_hl() {
     cpu.l = 0x34;
 
     cpu.tick().unwrap();
-    assert_eq!(cpu.sp, 0x3401);
+    assert_eq!(cpu.sp, 0x0134);
 }
 
 #[test]
