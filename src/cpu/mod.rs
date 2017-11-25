@@ -44,7 +44,7 @@ impl Clone for Cpu {
         let mut clone = Cpu::new();
         clone.a = self.a;
         clone.b = self.b;
-        clone.d = self.c;
+        clone.c = self.c;
         clone.d = self.d;
         clone.e = self.e;
         clone.h = self.h;
@@ -143,7 +143,7 @@ impl Cpu {
     pub fn load_from(&mut self, cpu: &Cpu) {
         self.a = cpu.a;
         self.b = cpu.b;
-        self.d = cpu.c;
+        self.c = cpu.c;
         self.d = cpu.d;
         self.e = cpu.e;
         self.h = cpu.h;
