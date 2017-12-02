@@ -83,6 +83,10 @@ impl GameBoy {
 
         // TODO game loop
         println!("Running rom with title: {}", self.cartridge.title());
+        if let Some(rom_type) = self.cartridge.cartridge_type() {
+            println!("Running rom with type: {:?}", rom_type);
+        }
+
         loop {
             if cfg!(feature = "debug") {
                 self.debugger.tick(&mut self.cpu)?;

@@ -4,6 +4,7 @@ macro_rules! KB {
     ( $x:expr ) => { $x * 1024 };
 }
 
+#[derive(Debug)]
 pub enum CartridgeType {
     RomOnly,
     Mbc1,
