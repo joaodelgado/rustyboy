@@ -81,6 +81,8 @@ const HEADER_BEGIN: usize = 0x0100;
 const HEADER_END: usize = 0x014f;
 const BANK0_BEGIN: usize = 0x0150;
 const BANK0_END: usize = 0x3fff;
+const BANK1_BEGIN: usize = 0x4000;
+const BANK1_END: usize = 0x7fff;
 
 pub struct Cartridge {
     raw_data: Vec<u8>,
@@ -101,6 +103,10 @@ impl Cartridge {
 
     pub fn bank0(&self) -> &[u8] {
         &self.raw_data[BANK0_BEGIN..BANK0_END + 1]
+    }
+
+    pub fn bank1(&self) -> &[u8] {
+        &self.raw_data[BANK1_BEGIN..BANK1_END + 1]
     }
 
     pub fn nintendo_logo(&self) -> &[u8] {

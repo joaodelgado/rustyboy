@@ -11,6 +11,8 @@ const MEM_CARTRIDGE_HEADER_BEGIN: usize = 0x0100;
 const MEM_CARTRIDGE_HEADER_END: usize = 0x014f;
 const MEM_CARTRIDGE_BANK_0_BEGIN: usize = 0x0150;
 const MEM_CARTRIDGE_BANK_0_END: usize = 0x3fff;
+const MEM_CARTRIDGE_BANK_1_BEGIN: usize = 0x4000;
+const MEM_CARTRIDGE_BANK_1_END: usize = 0x7fff;
 
 const MEM_CHECKSUM_BEGIN: usize = 0x104;
 const MEM_CHECKSUM_END: usize = 0x133;
@@ -128,6 +130,12 @@ impl GameBoy {
             MEM_CARTRIDGE_BANK_0_BEGIN,
             MEM_CARTRIDGE_BANK_0_END,
             self.cartridge.bank0(),
+        );
+        // TODO implement this correctly using cartridge type
+        self.cpu.set_mem_range(
+            MEM_CARTRIDGE_BANK_1_BEGIN,
+            MEM_CARTRIDGE_BANK_1_END,
+            self.cartridge.bank1(),
         );
 
         // Initialize IO registers
