@@ -768,6 +768,7 @@ where
 
     let cpu = &mut new_cpu();
     cpu.a = 0x00;
+
     r(cpu, 0x01);
     cpu.mem[0] = opcode;
     let carry = if cpu.flag(Flag::Carry) { 1 } else { 0 };
@@ -892,4 +893,151 @@ fn test_adc_a_d8() {
         },
         false,
     );
+}
+
+//
+// SUB
+//
+
+fn _test_sub_a<S>(opcode: u8, r: S)
+where
+    S: Fn(&mut Cpu, u8),
+{
+    let new_cpu = || {
+        let mut cpu = Cpu::new();
+
+        cpu.set_flag(Flag::Zero);
+        cpu.reset_flag(Flag::Sub);
+        cpu.set_flag(Flag::HalfCarry);
+        cpu.set_flag(Flag::Carry);
+
+        cpu
+    };
+
+    //
+    // Test zero sub
+    //
+
+    let cpu = &mut new_cpu();
+    cpu.a = 0x00;
+    r(cpu, 0x00);
+    cpu.mem[0] = opcode;
+    let result = cpu.a - 0x00;
+    cpu.tick().unwrap();
+
+    assert_eq!(cpu.a, result);
+    assert!(cpu.flag(Flag::Zero));
+    assert!(cpu.flag(Flag::Sub));
+    assert!(!cpu.flag(Flag::HalfCarry));
+    assert!(!cpu.flag(Flag::Carry));
+
+    // Skip this test when subtracting a from a, since these cases can't occur
+    let cpu = &mut new_cpu();
+    cpu.a = 0x00;
+    r(cpu, 0x10);
+    if cpu.a == 0x10 {
+        return;
+    }
+
+    //
+    // Test non carry sub
+    //
+
+    let cpu = &mut new_cpu();
+    cpu.a = 0x04;
+    r(cpu, 0x01);
+    cpu.mem[0] = opcode;
+    let result = cpu.a - 0x01;
+    cpu.tick().unwrap();
+
+    assert_eq!(cpu.a, result);
+    assert!(!cpu.flag(Flag::Zero));
+    assert!(cpu.flag(Flag::Sub));
+    assert!(!cpu.flag(Flag::HalfCarry));
+    assert!(!cpu.flag(Flag::Carry));
+
+    //
+    // Test half carry sub
+    //
+
+    let cpu = &mut new_cpu();
+    cpu.a = 0x10;
+    r(cpu, 0x01);
+    cpu.mem[0] = opcode;
+    let result = cpu.a - 0x01;
+    cpu.tick().unwrap();
+
+    assert_eq!(cpu.a, result);
+    assert!(!cpu.flag(Flag::Zero));
+    assert!(cpu.flag(Flag::Sub));
+    assert!(cpu.flag(Flag::HalfCarry));
+    assert!(!cpu.flag(Flag::Carry));
+
+    //
+    // Test carry sub
+    //
+
+    let cpu = &mut new_cpu();
+    cpu.a = 0x01;
+    r(cpu, 0xff);
+    cpu.mem[0] = opcode;
+    let result = cpu.a.wrapping_sub(0xff);
+    cpu.tick().unwrap();
+
+    assert_eq!(cpu.a, result);
+    assert!(!cpu.flag(Flag::Zero));
+    assert!(cpu.flag(Flag::Sub));
+    assert!(cpu.flag(Flag::HalfCarry));
+    assert!(cpu.flag(Flag::Carry));
+}
+
+#[test]
+fn test_sub_a() {
+    _test_sub_a(opcodes::SUB_A_A, |cpu, n| cpu.a = n);
+}
+
+#[test]
+fn test_sub_b() {
+    _test_sub_a(opcodes::SUB_A_B, |cpu, n| cpu.b = n);
+}
+
+#[test]
+fn test_sub_c() {
+    _test_sub_a(opcodes::SUB_A_C, |cpu, n| cpu.c = n);
+}
+
+#[test]
+fn test_sub_d() {
+    _test_sub_a(opcodes::SUB_A_D, |cpu, n| cpu.d = n);
+}
+
+#[test]
+fn test_sub_e() {
+    _test_sub_a(opcodes::SUB_A_E, |cpu, n| cpu.e = n);
+}
+
+#[test]
+fn test_sub_h() {
+    _test_sub_a(opcodes::SUB_A_H, |cpu, n| cpu.h = n);
+}
+
+#[test]
+fn test_sub_l() {
+    _test_sub_a(opcodes::SUB_A_L, |cpu, n| cpu.l = n);
+}
+
+#[test]
+fn test_sub_a_hl() {
+    _test_sub_a(opcodes::SUB_A_HL, |cpu, value| {
+        cpu.set_hl(0xffe1);
+        cpu.mem[0xffe1] = value
+    });
+}
+
+#[test]
+fn test_sub_a_d8() {
+    _test_sub_a(opcodes::SUB_A_D8, |cpu, value| {
+        let i = (cpu.pc + 1) as usize;
+        cpu.mem[i] = value;
+    });
 }

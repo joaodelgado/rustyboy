@@ -462,6 +462,16 @@ impl Cpu {
             opcodes::ADD_HL_SP => println!("ADD\tHL,SP"),
             opcodes::ADD_SP_R8 => println!("ADD\tSP,{}", read_8_sig()),
 
+            opcodes::SUB_A_A => println!("SUB\tA,A"),
+            opcodes::SUB_A_B => println!("SUB\tA,B"),
+            opcodes::SUB_A_C => println!("SUB\tA,C"),
+            opcodes::SUB_A_D => println!("SUB\tA,D"),
+            opcodes::SUB_A_E => println!("SUB\tA,E"),
+            opcodes::SUB_A_H => println!("SUB\tA,H"),
+            opcodes::SUB_A_L => println!("SUB\tA,L"),
+            opcodes::SUB_A_HL => println!("SUB\tA,HL"),
+            opcodes::SUB_A_D8 => println!("SUB\tA,{}", read_8_imm()),
+
             opcodes::AND_A_A => println!("AND\tA,A"),
             opcodes::AND_A_B => println!("AND\tA,B"),
             opcodes::AND_A_C => println!("AND\tA,C"),
@@ -697,6 +707,19 @@ impl Cpu {
             opcodes::ADD_HL_HL => self.add_hl(Cpu::get_hl),
             opcodes::ADD_HL_SP => self.add_hl(|cpu| cpu.sp),
             opcodes::ADD_SP_R8 => self.add_sp_imm(),
+
+            opcodes::SUB_A_A => self.sub_a(|cpu| cpu.a),
+            opcodes::SUB_A_B => self.sub_a(|cpu| cpu.b),
+            opcodes::SUB_A_C => self.sub_a(|cpu| cpu.c),
+            opcodes::SUB_A_D => self.sub_a(|cpu| cpu.d),
+            opcodes::SUB_A_E => self.sub_a(|cpu| cpu.e),
+            opcodes::SUB_A_H => self.sub_a(|cpu| cpu.h),
+            opcodes::SUB_A_L => self.sub_a(|cpu| cpu.l),
+            opcodes::SUB_A_HL => {
+                let subr = self.get_hl() as usize;
+                self.sub_a(|cpu| cpu.mem[subr])
+            }
+            opcodes::SUB_A_D8 => self.sub_a(|cpu| cpu.consume_byte()),
 
             opcodes::AND_A_A => self.and_a(|cpu| cpu.a),
             opcodes::AND_A_B => self.and_a(|cpu| cpu.b),
@@ -1272,6 +1295,33 @@ impl Cpu {
         self.set_flag_to(Flag::Carry, (old_value as u32) + (n as u32) > 0xffff);
 
         self.sp = result;
+    }
+
+    ///**Description:**
+    ///  Sub n to register A.
+    ///
+    ///**Use with:**
+    ///  n = A,B,C,D,E,H,L,(HL),#
+    ///
+    ///**Flags affected:**
+    ///  Z - Set if result is zero.
+    ///  N - Reset.
+    ///  H - Reset.
+    ///  C - Reset.
+    fn sub_a<F>(&mut self, f: F)
+    where
+        F: Fn(&mut Cpu) -> u8,
+    {
+        let old_value = self.a;
+        let n = f(self);
+        let result = old_value.wrapping_sub(n);
+
+        self.set_flag_to(Flag::Zero, result == 0);
+        self.set_flag(Flag::Sub);
+        self.set_flag_to(Flag::HalfCarry, (old_value & 0x0f) < (n & 0x0f));
+        self.set_flag_to(Flag::Carry, (old_value as u16) < (n as u16));
+
+        self.a = result;
     }
 
     ///**Description:**
