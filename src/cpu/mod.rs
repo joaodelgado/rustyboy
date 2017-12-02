@@ -286,8 +286,8 @@ impl Cpu {
         let read_8_imm = || format!("d_{}", read_byte());
         let read_8_sig = || format!("s_{:02x}", self.mem[addr + 1] as i8);
         let read_16_imm = || {
-            let fst_byte = self.mem[addr + 1];
-            let snd_byte = self.mem[addr + 2];
+            let fst_byte = self.mem[addr + 2];
+            let snd_byte = self.mem[addr + 1];
 
             format!("d_{:04x}", u8_to_u16(fst_byte, snd_byte))
         };
