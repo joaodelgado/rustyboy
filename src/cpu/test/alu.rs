@@ -27,40 +27,40 @@ where
 
     // Test Zero flag
     cpu.mem[cpu.pc as usize] = opcode;
-    cpu.reset_flag(Flag::Zero);
+    cpu.reset_flag(&Flag::Zero);
     reg_setter(cpu, 0x01);
 
     cpu.tick().unwrap();
-    assert!(!cpu.flag(Flag::Zero)); // Should be reset if the result is non 0
+    assert!(!cpu.flag(&Flag::Zero)); // Should be reset if the result is non 0
 
     cpu.mem[cpu.pc as usize] = opcode;
-    cpu.set_flag(Flag::Zero);
+    cpu.set_flag(&Flag::Zero);
     reg_setter(cpu, 0xff);
 
     cpu.tick().unwrap();
-    assert!(cpu.flag(Flag::Zero)); // Should be set if the result is 0
+    assert!(cpu.flag(&Flag::Zero)); // Should be set if the result is 0
 
     // Test Sub flag
     cpu.mem[cpu.pc as usize] = opcode;
-    cpu.set_flag(Flag::Sub);
+    cpu.set_flag(&Flag::Sub);
 
     cpu.tick().unwrap();
-    assert!(!cpu.flag(Flag::Sub)); // Should always be reset
+    assert!(!cpu.flag(&Flag::Sub)); // Should always be reset
 
     // Test HalfCarry flag
     cpu.mem[cpu.pc as usize] = opcode;
-    cpu.set_flag(Flag::HalfCarry);
+    cpu.set_flag(&Flag::HalfCarry);
     reg_setter(cpu, 0b0000_0001);
 
     cpu.tick().unwrap();
-    assert!(!cpu.flag(Flag::HalfCarry)); // Should be reset if there's no carry on bit 3
+    assert!(!cpu.flag(&Flag::HalfCarry)); // Should be reset if there's no carry on bit 3
 
     cpu.mem[cpu.pc as usize] = opcode;
-    cpu.reset_flag(Flag::HalfCarry);
+    cpu.reset_flag(&Flag::HalfCarry);
     reg_setter(cpu, 0b0000_1111);
 
     cpu.tick().unwrap();
-    assert!(cpu.flag(Flag::HalfCarry)); // Should be set if there's carry on bit 3
+    assert!(cpu.flag(&Flag::HalfCarry)); // Should be set if there's carry on bit 3
 }
 
 #[test]
@@ -119,44 +119,44 @@ fn test_inc_ahl() {
 
     // Test Zero flag
     cpu.mem[cpu.pc as usize] = opcodes::INC_AHL;
-    cpu.reset_flag(Flag::Zero);
+    cpu.reset_flag(&Flag::Zero);
     cpu.set_hl(0xfee2);
     cpu.mem[0xfee2] = 0x01;
 
     cpu.tick().unwrap();
-    assert!(!cpu.flag(Flag::Zero)); // Should be reset if the result is non 0
+    assert!(!cpu.flag(&Flag::Zero)); // Should be reset if the result is non 0
 
     cpu.mem[cpu.pc as usize] = opcodes::INC_AHL;
-    cpu.set_flag(Flag::Zero);
+    cpu.set_flag(&Flag::Zero);
     cpu.set_hl(0xfee2);
     cpu.mem[0xfee2] = 0xff;
 
     cpu.tick().unwrap();
-    assert!(cpu.flag(Flag::Zero)); // Should be set if the result is 0
+    assert!(cpu.flag(&Flag::Zero)); // Should be set if the result is 0
 
     // Test Sub flag
     cpu.mem[cpu.pc as usize] = opcodes::INC_AHL;
-    cpu.set_flag(Flag::Sub);
+    cpu.set_flag(&Flag::Sub);
 
     cpu.tick().unwrap();
-    assert!(!cpu.flag(Flag::Sub)); // Should always be reset
+    assert!(!cpu.flag(&Flag::Sub)); // Should always be reset
 
     // Test HalfCarry flag
     cpu.mem[cpu.pc as usize] = opcodes::INC_AHL;
-    cpu.set_flag(Flag::HalfCarry);
+    cpu.set_flag(&Flag::HalfCarry);
     cpu.set_hl(0xfee2);
     cpu.mem[0xfee2] = 0b0000_0001;
 
     cpu.tick().unwrap();
-    assert!(!cpu.flag(Flag::HalfCarry)); // Should be reset if there's no carry on bit 3
+    assert!(!cpu.flag(&Flag::HalfCarry)); // Should be reset if there's no carry on bit 3
 
     cpu.mem[cpu.pc as usize] = opcodes::INC_AHL;
-    cpu.reset_flag(Flag::HalfCarry);
+    cpu.reset_flag(&Flag::HalfCarry);
     cpu.set_hl(0xfee2);
     cpu.mem[0xfee2] = 0b0000_1111;
 
     cpu.tick().unwrap();
-    assert!(cpu.flag(Flag::HalfCarry)); // Should be set if there's carry on bit 3
+    assert!(cpu.flag(&Flag::HalfCarry)); // Should be set if there's carry on bit 3
 }
 
 fn _test_inc_reg16<G, S>(opcode: u8, reg_getter: G, reg_setter: S)
@@ -222,40 +222,40 @@ where
 
     // Test Zero flag
     cpu.mem[cpu.pc as usize] = opcode;
-    cpu.reset_flag(Flag::Zero);
+    cpu.reset_flag(&Flag::Zero);
     reg_setter(cpu, 0x02);
 
     cpu.tick().unwrap();
-    assert!(!cpu.flag(Flag::Zero)); // Should be reset if the result is non 0
+    assert!(!cpu.flag(&Flag::Zero)); // Should be reset if the result is non 0
 
     cpu.mem[cpu.pc as usize] = opcode;
-    cpu.set_flag(Flag::Zero);
+    cpu.set_flag(&Flag::Zero);
     reg_setter(cpu, 0x01);
 
     cpu.tick().unwrap();
-    assert!(cpu.flag(Flag::Zero)); // Should be set if the result is 0
+    assert!(cpu.flag(&Flag::Zero)); // Should be set if the result is 0
 
     // Test Sub flag
     cpu.mem[cpu.pc as usize] = opcode;
-    cpu.set_flag(Flag::Sub);
+    cpu.set_flag(&Flag::Sub);
 
     cpu.tick().unwrap();
-    assert!(cpu.flag(Flag::Sub)); // Should always be set
+    assert!(cpu.flag(&Flag::Sub)); // Should always be set
 
     // Test HalfCarry flag
     cpu.mem[cpu.pc as usize] = opcode;
-    cpu.set_flag(Flag::HalfCarry);
+    cpu.set_flag(&Flag::HalfCarry);
     reg_setter(cpu, 0b0001_1111);
 
     cpu.tick().unwrap();
-    assert!(!cpu.flag(Flag::HalfCarry)); // Should be reset if there's no carry on bit 3
+    assert!(!cpu.flag(&Flag::HalfCarry)); // Should be reset if there's no carry on bit 3
 
     cpu.mem[cpu.pc as usize] = opcode;
-    cpu.reset_flag(Flag::HalfCarry);
+    cpu.reset_flag(&Flag::HalfCarry);
     reg_setter(cpu, 0b0001_0000);
 
     cpu.tick().unwrap();
-    assert!(cpu.flag(Flag::HalfCarry)); // Should be set if there's borrow on bit 3
+    assert!(cpu.flag(&Flag::HalfCarry)); // Should be set if there's borrow on bit 3
 }
 
 #[test]
@@ -314,44 +314,44 @@ fn test_dec_ahl() {
 
     // Test Zero flag
     cpu.mem[cpu.pc as usize] = opcodes::DEC_AHL;
-    cpu.reset_flag(Flag::Zero);
+    cpu.reset_flag(&Flag::Zero);
     cpu.set_hl(0xfee2);
     cpu.mem[0xfee2] = 0x02;
 
     cpu.tick().unwrap();
-    assert!(!cpu.flag(Flag::Zero)); // Should be reset if the result is non 0
+    assert!(!cpu.flag(&Flag::Zero)); // Should be reset if the result is non 0
 
     cpu.mem[cpu.pc as usize] = opcodes::DEC_AHL;
-    cpu.set_flag(Flag::Zero);
+    cpu.set_flag(&Flag::Zero);
     cpu.set_hl(0xfee2);
     cpu.mem[0xfee2] = 0x01;
 
     cpu.tick().unwrap();
-    assert!(cpu.flag(Flag::Zero)); // Should be set if the result is 0
+    assert!(cpu.flag(&Flag::Zero)); // Should be set if the result is 0
 
     // Test Sub flag
     cpu.mem[cpu.pc as usize] = opcodes::DEC_AHL;
-    cpu.set_flag(Flag::Sub);
+    cpu.set_flag(&Flag::Sub);
 
     cpu.tick().unwrap();
-    assert!(cpu.flag(Flag::Sub)); // Should always be reset
+    assert!(cpu.flag(&Flag::Sub)); // Should always be reset
 
     // Test HalfCarry flag
     cpu.mem[cpu.pc as usize] = opcodes::DEC_AHL;
-    cpu.set_flag(Flag::HalfCarry);
+    cpu.set_flag(&Flag::HalfCarry);
     cpu.set_hl(0xfee2);
     cpu.mem[0xfee2] = 0b0001_1111;
 
     cpu.tick().unwrap();
-    assert!(!cpu.flag(Flag::HalfCarry)); // Should be reset if there's no carry on bit 3
+    assert!(!cpu.flag(&Flag::HalfCarry)); // Should be reset if there's no carry on bit 3
 
     cpu.mem[cpu.pc as usize] = opcodes::DEC_AHL;
-    cpu.reset_flag(Flag::HalfCarry);
+    cpu.reset_flag(&Flag::HalfCarry);
     cpu.set_hl(0xfee2);
     cpu.mem[0xfee2] = 0b0001_0000;
 
     cpu.tick().unwrap();
-    assert!(cpu.flag(Flag::HalfCarry)); // Should be set if there's carry on bit 3
+    assert!(cpu.flag(&Flag::HalfCarry)); // Should be set if there's carry on bit 3
 }
 
 fn _test_dec_reg16<G, S>(opcode: u8, reg_getter: G, reg_setter: S)
@@ -402,10 +402,10 @@ where
     let new_cpu = || {
         let mut cpu = Cpu::new();
 
-        cpu.set_flag(Flag::Zero);
-        cpu.set_flag(Flag::Sub);
-        cpu.set_flag(Flag::HalfCarry);
-        cpu.set_flag(Flag::Carry);
+        cpu.set_flag(&Flag::Zero);
+        cpu.set_flag(&Flag::Sub);
+        cpu.set_flag(&Flag::HalfCarry);
+        cpu.set_flag(&Flag::Carry);
 
         cpu
     };
@@ -422,10 +422,10 @@ where
     cpu.tick().unwrap();
 
     assert_eq!(cpu.a, result);
-    assert!(cpu.flag(Flag::Zero));
-    assert!(!cpu.flag(Flag::Sub));
-    assert!(!cpu.flag(Flag::HalfCarry));
-    assert!(!cpu.flag(Flag::Carry));
+    assert!(cpu.flag(&Flag::Zero));
+    assert!(!cpu.flag(&Flag::Sub));
+    assert!(!cpu.flag(&Flag::HalfCarry));
+    assert!(!cpu.flag(&Flag::Carry));
 
     //
     // Test non carry add
@@ -439,10 +439,10 @@ where
     cpu.tick().unwrap();
 
     assert_eq!(cpu.a, result);
-    assert!(!cpu.flag(Flag::Zero));
-    assert!(!cpu.flag(Flag::Sub));
-    assert!(!cpu.flag(Flag::HalfCarry));
-    assert!(!cpu.flag(Flag::Carry));
+    assert!(!cpu.flag(&Flag::Zero));
+    assert!(!cpu.flag(&Flag::Sub));
+    assert!(!cpu.flag(&Flag::HalfCarry));
+    assert!(!cpu.flag(&Flag::Carry));
 
     //
     // Test half carry add
@@ -456,10 +456,10 @@ where
     cpu.tick().unwrap();
 
     assert_eq!(cpu.a, result);
-    assert!(!cpu.flag(Flag::Zero));
-    assert!(!cpu.flag(Flag::Sub));
-    assert!(cpu.flag(Flag::HalfCarry));
-    assert!(!cpu.flag(Flag::Carry));
+    assert!(!cpu.flag(&Flag::Zero));
+    assert!(!cpu.flag(&Flag::Sub));
+    assert!(cpu.flag(&Flag::HalfCarry));
+    assert!(!cpu.flag(&Flag::Carry));
 
     //
     // Test carry add
@@ -473,10 +473,10 @@ where
     cpu.tick().unwrap();
 
     assert_eq!(cpu.a, result);
-    assert!(!cpu.flag(Flag::Zero));
-    assert!(!cpu.flag(Flag::Sub));
-    assert!(cpu.flag(Flag::HalfCarry));
-    assert!(cpu.flag(Flag::Carry));
+    assert!(!cpu.flag(&Flag::Zero));
+    assert!(!cpu.flag(&Flag::Sub));
+    assert!(cpu.flag(&Flag::HalfCarry));
+    assert!(cpu.flag(&Flag::Carry));
 }
 
 #[test]
@@ -537,10 +537,10 @@ where
     let new_cpu = || {
         let mut cpu = Cpu::new();
 
-        cpu.set_flag(Flag::Zero);
-        cpu.set_flag(Flag::Sub);
-        cpu.set_flag(Flag::HalfCarry);
-        cpu.set_flag(Flag::Carry);
+        cpu.set_flag(&Flag::Zero);
+        cpu.set_flag(&Flag::Sub);
+        cpu.set_flag(&Flag::HalfCarry);
+        cpu.set_flag(&Flag::Carry);
 
         cpu
     };
@@ -557,10 +557,10 @@ where
     cpu.tick().unwrap();
 
     assert_eq!(cpu.get_hl(), result);
-    assert!(cpu.flag(Flag::Zero));
-    assert!(!cpu.flag(Flag::Sub));
-    assert!(!cpu.flag(Flag::HalfCarry));
-    assert!(!cpu.flag(Flag::Carry));
+    assert!(cpu.flag(&Flag::Zero));
+    assert!(!cpu.flag(&Flag::Sub));
+    assert!(!cpu.flag(&Flag::HalfCarry));
+    assert!(!cpu.flag(&Flag::Carry));
 
     //
     // Test non carry add
@@ -574,10 +574,10 @@ where
     cpu.tick().unwrap();
 
     assert_eq!(cpu.get_hl(), result);
-    assert!(cpu.flag(Flag::Zero));
-    assert!(!cpu.flag(Flag::Sub));
-    assert!(!cpu.flag(Flag::HalfCarry));
-    assert!(!cpu.flag(Flag::Carry));
+    assert!(cpu.flag(&Flag::Zero));
+    assert!(!cpu.flag(&Flag::Sub));
+    assert!(!cpu.flag(&Flag::HalfCarry));
+    assert!(!cpu.flag(&Flag::Carry));
 
     //
     // Test half carry add
@@ -591,10 +591,10 @@ where
     cpu.tick().unwrap();
 
     assert_eq!(cpu.get_hl(), result);
-    assert!(cpu.flag(Flag::Zero));
-    assert!(!cpu.flag(Flag::Sub));
-    assert!(cpu.flag(Flag::HalfCarry));
-    assert!(!cpu.flag(Flag::Carry));
+    assert!(cpu.flag(&Flag::Zero));
+    assert!(!cpu.flag(&Flag::Sub));
+    assert!(cpu.flag(&Flag::HalfCarry));
+    assert!(!cpu.flag(&Flag::Carry));
 
     //
     // Test carry add
@@ -608,10 +608,10 @@ where
     cpu.tick().unwrap();
 
     assert_eq!(cpu.get_hl(), result);
-    assert!(cpu.flag(Flag::Zero));
-    assert!(!cpu.flag(Flag::Sub));
-    assert!(cpu.flag(Flag::HalfCarry));
-    assert!(cpu.flag(Flag::Carry));
+    assert!(cpu.flag(&Flag::Zero));
+    assert!(!cpu.flag(&Flag::Sub));
+    assert!(cpu.flag(&Flag::HalfCarry));
+    assert!(cpu.flag(&Flag::Carry));
 }
 
 #[test]
@@ -639,10 +639,10 @@ fn test_add_sp_r8() {
     let new_cpu = || {
         let mut cpu = Cpu::new();
 
-        cpu.set_flag(Flag::Zero);
-        cpu.set_flag(Flag::Sub);
-        cpu.set_flag(Flag::HalfCarry);
-        cpu.set_flag(Flag::Carry);
+        cpu.set_flag(&Flag::Zero);
+        cpu.set_flag(&Flag::Sub);
+        cpu.set_flag(&Flag::HalfCarry);
+        cpu.set_flag(&Flag::Carry);
 
         cpu
     };
@@ -658,10 +658,10 @@ fn test_add_sp_r8() {
     cpu.tick().unwrap();
 
     assert_eq!(cpu.sp, 0x0017);
-    assert!(!cpu.flag(Flag::Zero));
-    assert!(!cpu.flag(Flag::Sub));
-    assert!(!cpu.flag(Flag::HalfCarry));
-    assert!(!cpu.flag(Flag::Carry));
+    assert!(!cpu.flag(&Flag::Zero));
+    assert!(!cpu.flag(&Flag::Sub));
+    assert!(!cpu.flag(&Flag::HalfCarry));
+    assert!(!cpu.flag(&Flag::Carry));
 
     //
     // Test non carry positive add
@@ -674,10 +674,10 @@ fn test_add_sp_r8() {
     cpu.tick().unwrap();
 
     assert_eq!(cpu.sp, 0x0018);
-    assert!(!cpu.flag(Flag::Zero));
-    assert!(!cpu.flag(Flag::Sub));
-    assert!(!cpu.flag(Flag::HalfCarry));
-    assert!(!cpu.flag(Flag::Carry));
+    assert!(!cpu.flag(&Flag::Zero));
+    assert!(!cpu.flag(&Flag::Sub));
+    assert!(!cpu.flag(&Flag::HalfCarry));
+    assert!(!cpu.flag(&Flag::Carry));
 
     //
     // Test negative add
@@ -690,10 +690,10 @@ fn test_add_sp_r8() {
     cpu.tick().unwrap();
 
     assert_eq!(cpu.sp, 0x0016);
-    assert!(!cpu.flag(Flag::Zero));
-    assert!(!cpu.flag(Flag::Sub));
-    assert!(cpu.flag(Flag::HalfCarry));
-    assert!(cpu.flag(Flag::Carry));
+    assert!(!cpu.flag(&Flag::Zero));
+    assert!(!cpu.flag(&Flag::Sub));
+    assert!(cpu.flag(&Flag::HalfCarry));
+    assert!(cpu.flag(&Flag::Carry));
 
     //
     // Test half carry add
@@ -706,10 +706,10 @@ fn test_add_sp_r8() {
     cpu.tick().unwrap();
 
     assert_eq!(cpu.sp, 0x1000);
-    assert!(!cpu.flag(Flag::Zero));
-    assert!(!cpu.flag(Flag::Sub));
-    assert!(cpu.flag(Flag::HalfCarry));
-    assert!(!cpu.flag(Flag::Carry));
+    assert!(!cpu.flag(&Flag::Zero));
+    assert!(!cpu.flag(&Flag::Sub));
+    assert!(cpu.flag(&Flag::HalfCarry));
+    assert!(!cpu.flag(&Flag::Carry));
 
     //
     // Test carry add
@@ -722,10 +722,10 @@ fn test_add_sp_r8() {
     cpu.tick().unwrap();
 
     assert_eq!(cpu.sp, 0);
-    assert!(!cpu.flag(Flag::Zero));
-    assert!(!cpu.flag(Flag::Sub));
-    assert!(cpu.flag(Flag::HalfCarry));
-    assert!(cpu.flag(Flag::Carry));
+    assert!(!cpu.flag(&Flag::Zero));
+    assert!(!cpu.flag(&Flag::Sub));
+    assert!(cpu.flag(&Flag::HalfCarry));
+    assert!(cpu.flag(&Flag::Carry));
 }
 
 fn _test_adc_a<S>(opcode: u8, r: S, is_a: bool)
@@ -735,10 +735,10 @@ where
     let new_cpu = || {
         let mut cpu = Cpu::new();
 
-        cpu.set_flag(Flag::Zero);
-        cpu.set_flag(Flag::Sub);
-        cpu.set_flag(Flag::HalfCarry);
-        cpu.set_flag(Flag::Carry);
+        cpu.set_flag(&Flag::Zero);
+        cpu.set_flag(&Flag::Sub);
+        cpu.set_flag(&Flag::HalfCarry);
+        cpu.set_flag(&Flag::Carry);
 
         cpu
     };
@@ -751,16 +751,16 @@ where
     cpu.a = 0x00;
     r(cpu, 0x00);
     cpu.mem[0] = opcode;
-    cpu.reset_flag(Flag::Carry);
-    let carry = if cpu.flag(Flag::Carry) { 1 } else { 0 };
+    cpu.reset_flag(&Flag::Carry);
+    let carry = if cpu.flag(&Flag::Carry) { 1 } else { 0 };
     let result = cpu.a + 0x00 + carry;
     cpu.tick().unwrap();
 
     assert_eq!(cpu.a, result);
-    assert!(cpu.flag(Flag::Zero));
-    assert!(!cpu.flag(Flag::Sub));
-    assert!(!cpu.flag(Flag::HalfCarry));
-    assert!(!cpu.flag(Flag::Carry));
+    assert!(cpu.flag(&Flag::Zero));
+    assert!(!cpu.flag(&Flag::Sub));
+    assert!(!cpu.flag(&Flag::HalfCarry));
+    assert!(!cpu.flag(&Flag::Carry));
 
     //
     // Test non carry add
@@ -771,15 +771,15 @@ where
 
     r(cpu, 0x01);
     cpu.mem[0] = opcode;
-    let carry = if cpu.flag(Flag::Carry) { 1 } else { 0 };
+    let carry = if cpu.flag(&Flag::Carry) { 1 } else { 0 };
     let result = cpu.a + 0x01 + carry;
     cpu.tick().unwrap();
 
     assert_eq!(cpu.a, result);
-    assert!(!cpu.flag(Flag::Zero));
-    assert!(!cpu.flag(Flag::Sub));
-    assert!(!cpu.flag(Flag::HalfCarry));
-    assert!(!cpu.flag(Flag::Carry));
+    assert!(!cpu.flag(&Flag::Zero));
+    assert!(!cpu.flag(&Flag::Sub));
+    assert!(!cpu.flag(&Flag::HalfCarry));
+    assert!(!cpu.flag(&Flag::Carry));
 
     //
     // Test half carry add
@@ -789,15 +789,15 @@ where
     cpu.a = 0x0f;
     r(cpu, 0x0f);
     cpu.mem[0] = opcode;
-    let carry = if cpu.flag(Flag::Carry) { 1 } else { 0 };
+    let carry = if cpu.flag(&Flag::Carry) { 1 } else { 0 };
     let result = cpu.a + 0x0f + carry;
     cpu.tick().unwrap();
 
     assert_eq!(cpu.a, result);
-    assert!(!cpu.flag(Flag::Zero));
-    assert!(!cpu.flag(Flag::Sub));
-    assert!(cpu.flag(Flag::HalfCarry));
-    assert!(!cpu.flag(Flag::Carry));
+    assert!(!cpu.flag(&Flag::Zero));
+    assert!(!cpu.flag(&Flag::Sub));
+    assert!(cpu.flag(&Flag::HalfCarry));
+    assert!(!cpu.flag(&Flag::Carry));
 
     //
     // Test carry add
@@ -807,30 +807,30 @@ where
     cpu.a = 0xff;
     r(cpu, 0xff);
     cpu.mem[0] = opcode;
-    let carry = if cpu.flag(Flag::Carry) { 1 } else { 0 };
+    let carry = if cpu.flag(&Flag::Carry) { 1 } else { 0 };
     let result = cpu.a.wrapping_add(0xff).wrapping_add(carry);
     cpu.tick().unwrap();
 
     assert_eq!(cpu.a, result);
-    assert!(!cpu.flag(Flag::Zero));
-    assert!(!cpu.flag(Flag::Sub));
-    assert!(cpu.flag(Flag::HalfCarry));
-    assert!(cpu.flag(Flag::Carry));
+    assert!(!cpu.flag(&Flag::Zero));
+    assert!(!cpu.flag(&Flag::Sub));
+    assert!(cpu.flag(&Flag::HalfCarry));
+    assert!(cpu.flag(&Flag::Carry));
 
     if !is_a {
         let cpu = &mut new_cpu();
         cpu.a = 0x80;
         r(cpu, 0x7f);
         cpu.mem[0] = opcode;
-        let carry = if cpu.flag(Flag::Carry) { 1 } else { 0 };
+        let carry = if cpu.flag(&Flag::Carry) { 1 } else { 0 };
         let result = cpu.a.wrapping_add(0x7f).wrapping_add(carry);
         cpu.tick().unwrap();
 
         assert_eq!(cpu.a, result);
-        assert!(cpu.flag(Flag::Zero));
-        assert!(!cpu.flag(Flag::Sub));
-        assert!(cpu.flag(Flag::HalfCarry));
-        assert!(cpu.flag(Flag::Carry));
+        assert!(cpu.flag(&Flag::Zero));
+        assert!(!cpu.flag(&Flag::Sub));
+        assert!(cpu.flag(&Flag::HalfCarry));
+        assert!(cpu.flag(&Flag::Carry));
     }
 }
 
@@ -906,10 +906,10 @@ where
     let new_cpu = || {
         let mut cpu = Cpu::new();
 
-        cpu.set_flag(Flag::Zero);
-        cpu.reset_flag(Flag::Sub);
-        cpu.set_flag(Flag::HalfCarry);
-        cpu.set_flag(Flag::Carry);
+        cpu.set_flag(&Flag::Zero);
+        cpu.reset_flag(&Flag::Sub);
+        cpu.set_flag(&Flag::HalfCarry);
+        cpu.set_flag(&Flag::Carry);
 
         cpu
     };
@@ -926,10 +926,10 @@ where
     cpu.tick().unwrap();
 
     assert_eq!(cpu.a, result);
-    assert!(cpu.flag(Flag::Zero));
-    assert!(cpu.flag(Flag::Sub));
-    assert!(!cpu.flag(Flag::HalfCarry));
-    assert!(!cpu.flag(Flag::Carry));
+    assert!(cpu.flag(&Flag::Zero));
+    assert!(cpu.flag(&Flag::Sub));
+    assert!(!cpu.flag(&Flag::HalfCarry));
+    assert!(!cpu.flag(&Flag::Carry));
 
     // Skip this test when subtracting a from a, since these cases can't occur
     let cpu = &mut new_cpu();
@@ -951,10 +951,10 @@ where
     cpu.tick().unwrap();
 
     assert_eq!(cpu.a, result);
-    assert!(!cpu.flag(Flag::Zero));
-    assert!(cpu.flag(Flag::Sub));
-    assert!(!cpu.flag(Flag::HalfCarry));
-    assert!(!cpu.flag(Flag::Carry));
+    assert!(!cpu.flag(&Flag::Zero));
+    assert!(cpu.flag(&Flag::Sub));
+    assert!(!cpu.flag(&Flag::HalfCarry));
+    assert!(!cpu.flag(&Flag::Carry));
 
     //
     // Test half carry sub
@@ -968,10 +968,10 @@ where
     cpu.tick().unwrap();
 
     assert_eq!(cpu.a, result);
-    assert!(!cpu.flag(Flag::Zero));
-    assert!(cpu.flag(Flag::Sub));
-    assert!(cpu.flag(Flag::HalfCarry));
-    assert!(!cpu.flag(Flag::Carry));
+    assert!(!cpu.flag(&Flag::Zero));
+    assert!(cpu.flag(&Flag::Sub));
+    assert!(cpu.flag(&Flag::HalfCarry));
+    assert!(!cpu.flag(&Flag::Carry));
 
     //
     // Test carry sub
@@ -985,10 +985,10 @@ where
     cpu.tick().unwrap();
 
     assert_eq!(cpu.a, result);
-    assert!(!cpu.flag(Flag::Zero));
-    assert!(cpu.flag(Flag::Sub));
-    assert!(cpu.flag(Flag::HalfCarry));
-    assert!(cpu.flag(Flag::Carry));
+    assert!(!cpu.flag(&Flag::Zero));
+    assert!(cpu.flag(&Flag::Sub));
+    assert!(cpu.flag(&Flag::HalfCarry));
+    assert!(cpu.flag(&Flag::Carry));
 }
 
 #[test]

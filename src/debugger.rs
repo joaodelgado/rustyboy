@@ -7,15 +7,15 @@ use std::io::Write;
 
 /// Debug commands
 // Step command
-const DEBUG_STEP: &'static str = "";
+const DEBUG_STEP: &str = "";
 // Print stack's current state
-const DEBUG_PRINT_MEM: &'static str = "s";
+const DEBUG_PRINT_MEM: &str = "s";
 // Print cpu's current state
-const DEBUG_PRINT_CPU: &'static str = "cpu";
+const DEBUG_PRINT_CPU: &str = "cpu";
 // Revert to previous game boy's state
-const DEBUG_BACKTRACK: &'static str = "p";
+const DEBUG_BACKTRACK: &str = "p";
 // Step n times
-const DEBUG_UNTIL_N: &'static str = "n";
+const DEBUG_UNTIL_N: &str = "n";
 
 pub struct Debugger {
     previous_state: Cpu,
@@ -40,7 +40,7 @@ impl Debugger {
             .collect::<Vec<String>>();
 
         // step command
-        if vec.len() == 0 {
+        if vec.is_empty() {
             vec.push(DEBUG_STEP.to_string());
         }
 

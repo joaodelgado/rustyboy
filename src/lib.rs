@@ -1,3 +1,6 @@
+#![cfg_attr(feature="clippy", feature(plugin))]
+#![cfg_attr(feature="clippy", plugin(clippy))]
+
 mod cartridge;
 mod cpu;
 mod errors;
@@ -32,7 +35,7 @@ impl Config {
     }
 }
 
-pub fn read_file(file_name: &String) -> Result<Vec<u8>> {
+pub fn read_file(file_name: &str) -> Result<Vec<u8>> {
     let mut file = File::open(file_name)?;
     let mut data: Vec<u8> = Vec::new();
 
@@ -43,7 +46,7 @@ pub fn read_file(file_name: &String) -> Result<Vec<u8>> {
 
 #[inline]
 pub fn u8_to_u16(b1: u8, b2: u8) -> u16 {
-    ((b1 as u16) << 8) | (b2 as u16)
+    (u16::from(b1) << 8) | u16::from(b2)
 }
 
 #[inline]

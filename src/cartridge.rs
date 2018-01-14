@@ -130,7 +130,7 @@ impl Cartridge {
     }
 
     pub fn rom_size(&self) -> u32 {
-        KB!(32) << self.raw_data[0x148]
+        (KB!(32)) << self.raw_data[0x148]
     }
 
     pub fn ram_size(&self) -> Option<u32> {

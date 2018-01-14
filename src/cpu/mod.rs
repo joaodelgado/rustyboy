@@ -98,10 +98,10 @@ impl Flag {
     #[cfg_attr(rustfmt, rustfmt_skip)]
     fn mask(&self) -> u8 {
         match *self {
-            Flag::Zero =>      0b10000000,
-            Flag::Sub =>       0b01000000,
-            Flag::HalfCarry => 0b00100000,
-            Flag::Carry =>     0b00010000,
+            Flag::Zero =>      0b1000_0000,
+            Flag::Sub =>       0b0100_0000,
+            Flag::HalfCarry => 0b0010_0000,
+            Flag::Carry =>     0b0001_0000,
         }
     }
 }
@@ -247,12 +247,12 @@ impl Cpu {
     //
 
     /// Check if a certain flag is set
-    fn flag(&self, flag: Flag) -> bool {
+    fn flag(&self, flag: &Flag) -> bool {
         (self.status & flag.mask()) > 0
     }
 
     /// Either set or reset a flag based on `value`
-    fn set_flag_to(&mut self, flag: Flag, value: bool) {
+    fn set_flag_to(&mut self, flag: &Flag, value: bool) {
         if value {
             self.set_flag(flag);
         } else {
@@ -261,12 +261,12 @@ impl Cpu {
     }
 
     /// Set the defined status flag
-    fn set_flag(&mut self, flag: Flag) {
+    fn set_flag(&mut self, flag: &Flag) {
         self.status |= flag.mask()
     }
 
     /// Reset the defined status flag
-    fn reset_flag(&mut self, flag: Flag) {
+    fn reset_flag(&mut self, flag: &Flag) {
         self.status &= !flag.mask()
     }
 
@@ -515,14 +515,14 @@ impl Cpu {
             opcodes::LDHL_SP_R8 => println!("LDHL\tSP,{}", read_8_sig()),
             opcodes::LD_A16_SP => println!("LD\t{},SP", read_16_addr()),
 
-            opcodes::RST_00 => println!("RST\t{}", 00),
-            opcodes::RST_08 => println!("RST\t{}", 08),
-            opcodes::RST_10 => println!("RST\t{}", 10),
-            opcodes::RST_18 => println!("RST\t{}", 18),
-            opcodes::RST_20 => println!("RST\t{}", 20),
-            opcodes::RST_28 => println!("RST\t{}", 28),
-            opcodes::RST_30 => println!("RST\t{}", 30),
-            opcodes::RST_38 => println!("RST\t{}", 38),
+            opcodes::RST_00 => println!("RST\t{}", 0x00),
+            opcodes::RST_08 => println!("RST\t{}", 0x08),
+            opcodes::RST_10 => println!("RST\t{}", 0x10),
+            opcodes::RST_18 => println!("RST\t{}", 0x18),
+            opcodes::RST_20 => println!("RST\t{}", 0x20),
+            opcodes::RST_28 => println!("RST\t{}", 0x28),
+            opcodes::RST_30 => println!("RST\t{}", 0x30),
+            opcodes::RST_38 => println!("RST\t{}", 0x38),
 
             opcodes::EI => println!("EI"),
 
@@ -544,10 +544,10 @@ impl Cpu {
         let opcode = self.consume_byte();
         match opcode {
             opcodes::CALL_A16 => self.call_a16(),
-            opcodes::CALL_NZ_A16 => self.call_cc_a16(|cpu| !cpu.flag(Flag::Zero)),
-            opcodes::CALL_Z_A16 => self.call_cc_a16(|cpu| cpu.flag(Flag::Zero)),
-            opcodes::CALL_NC_A16 => self.call_cc_a16(|cpu| !cpu.flag(Flag::Carry)),
-            opcodes::CALL_C_A16 => self.call_cc_a16(|cpu| cpu.flag(Flag::Carry)),
+            opcodes::CALL_NZ_A16 => self.call_cc_a16(|cpu| !cpu.flag(&Flag::Zero)),
+            opcodes::CALL_Z_A16 => self.call_cc_a16(|cpu| cpu.flag(&Flag::Zero)),
+            opcodes::CALL_NC_A16 => self.call_cc_a16(|cpu| !cpu.flag(&Flag::Carry)),
+            opcodes::CALL_C_A16 => self.call_cc_a16(|cpu| cpu.flag(&Flag::Carry)),
 
             opcodes::DI => self.di(),
 
@@ -555,15 +555,15 @@ impl Cpu {
             opcodes::JP_HL => self.jp_hl(),
             opcodes::JR_R8 => self.jr_r8(),
 
-            opcodes::JP_C_A16 => self.jp_cc_a16(|cpu| cpu.flag(Flag::Carry)),
-            opcodes::JP_NC_A16 => self.jp_cc_a16(|cpu| !cpu.flag(Flag::Carry)),
-            opcodes::JP_Z_A16 => self.jp_cc_a16(|cpu| cpu.flag(Flag::Zero)),
-            opcodes::JP_NZ_A16 => self.jp_cc_a16(|cpu| !cpu.flag(Flag::Zero)),
+            opcodes::JP_C_A16 => self.jp_cc_a16(|cpu| cpu.flag(&Flag::Carry)),
+            opcodes::JP_NC_A16 => self.jp_cc_a16(|cpu| !cpu.flag(&Flag::Carry)),
+            opcodes::JP_Z_A16 => self.jp_cc_a16(|cpu| cpu.flag(&Flag::Zero)),
+            opcodes::JP_NZ_A16 => self.jp_cc_a16(|cpu| !cpu.flag(&Flag::Zero)),
 
-            opcodes::JR_NZ_R8 => self.jr_cc_r8(|cpu| !cpu.flag(Flag::Zero)),
-            opcodes::JR_Z_R8 => self.jr_cc_r8(|cpu| cpu.flag(Flag::Zero)),
-            opcodes::JR_NC_R8 => self.jr_cc_r8(|cpu| !cpu.flag(Flag::Carry)),
-            opcodes::JR_C_R8 => self.jr_cc_r8(|cpu| cpu.flag(Flag::Carry)),
+            opcodes::JR_NZ_R8 => self.jr_cc_r8(|cpu| !cpu.flag(&Flag::Zero)),
+            opcodes::JR_Z_R8 => self.jr_cc_r8(|cpu| cpu.flag(&Flag::Zero)),
+            opcodes::JR_NC_R8 => self.jr_cc_r8(|cpu| !cpu.flag(&Flag::Carry)),
+            opcodes::JR_C_R8 => self.jr_cc_r8(|cpu| cpu.flag(&Flag::Carry)),
 
             opcodes::LD_BC_A => self.ld_addr_r8(Cpu::get_bc, |cpu| cpu.a),
             opcodes::LD_HL_A => self.ld_addr_r8(Cpu::get_hl, |cpu| cpu.a),
@@ -649,10 +649,10 @@ impl Cpu {
             opcodes::LDI_A_HL => self.ldi_a_hl(),
 
             opcodes::RET => self.ret(),
-            opcodes::RET_NZ => self.ret_cc(|cpu| !cpu.flag(Flag::Zero)),
-            opcodes::RET_Z => self.ret_cc(|cpu| cpu.flag(Flag::Zero)),
-            opcodes::RET_NC => self.ret_cc(|cpu| !cpu.flag(Flag::Carry)),
-            opcodes::RET_C => self.ret_cc(|cpu| cpu.flag(Flag::Carry)),
+            opcodes::RET_NZ => self.ret_cc(|cpu| !cpu.flag(&Flag::Zero)),
+            opcodes::RET_Z => self.ret_cc(|cpu| cpu.flag(&Flag::Zero)),
+            opcodes::RET_NC => self.ret_cc(|cpu| !cpu.flag(&Flag::Carry)),
+            opcodes::RET_C => self.ret_cc(|cpu| cpu.flag(&Flag::Carry)),
 
             opcodes::PUSH_A16_AF => self.push_a16(Cpu::get_af),
             opcodes::PUSH_A16_BC => self.push_a16(Cpu::get_bc),
@@ -1028,7 +1028,7 @@ impl Cpu {
     where
         F: Fn(&Cpu) -> bool,
     {
-        if condition(&self) {
+        if condition(self) {
             self.jp_a16();
         }
     }
@@ -1073,7 +1073,7 @@ impl Cpu {
     where
         F: Fn(&Cpu) -> bool,
     {
-        if condition(&self) {
+        if condition(self) {
             self.ret();
         }
     }
@@ -1119,9 +1119,9 @@ impl Cpu {
         let old_value = getter(self);
         let new_value = old_value.wrapping_add(1);
 
-        self.set_flag_to(Flag::Zero, new_value == 0);
-        self.set_flag_to(Flag::HalfCarry, old_value & 0xf == 0xf);
-        self.reset_flag(Flag::Sub);
+        self.set_flag_to(&Flag::Zero, new_value == 0);
+        self.set_flag_to(&Flag::HalfCarry, old_value & 0xf == 0xf);
+        self.reset_flag(&Flag::Sub);
 
         setter(self, new_value);
     }
@@ -1139,9 +1139,9 @@ impl Cpu {
         let old_value = self.mem[addr];
         let new_value = old_value.wrapping_add(1);
 
-        self.set_flag_to(Flag::Zero, new_value == 0);
-        self.set_flag_to(Flag::HalfCarry, old_value & 0xf == 0xf);
-        self.reset_flag(Flag::Sub);
+        self.set_flag_to(&Flag::Zero, new_value == 0);
+        self.set_flag_to(&Flag::HalfCarry, old_value & 0xf == 0xf);
+        self.reset_flag(&Flag::Sub);
 
         self.mem[addr] = new_value;
     }
@@ -1165,6 +1165,7 @@ impl Cpu {
     ///
     ///**Use with:**
     /// n = A,B,C,D,E,H,L
+    #[cfg_attr(feature = "clippy", allow(verbose_bit_mask))]
     fn dec_r8<G, S>(&mut self, getter: G, setter: S)
     where
         G: Fn(&Cpu) -> u8,
@@ -1173,9 +1174,9 @@ impl Cpu {
         let old_value = getter(self);
         let new_value = old_value.wrapping_sub(1);
 
-        self.set_flag_to(Flag::Zero, new_value == 0);
-        self.set_flag_to(Flag::HalfCarry, old_value & 0xf == 0);
-        self.set_flag(Flag::Sub);
+        self.set_flag_to(&Flag::Zero, new_value == 0);
+        self.set_flag_to(&Flag::HalfCarry, old_value & 0xf == 0);
+        self.set_flag(&Flag::Sub);
 
         setter(self, new_value);
     }
@@ -1185,6 +1186,7 @@ impl Cpu {
     ///
     ///**Use with:**
     /// n = A,B,C,D,E,H,L
+    #[cfg_attr(feature = "clippy", allow(verbose_bit_mask))]
     fn dec_addr<G>(&mut self, getter: G)
     where
         G: Fn(&Cpu) -> u16,
@@ -1193,9 +1195,9 @@ impl Cpu {
         let old_value = self.mem[addr];
         let new_value = old_value.wrapping_sub(1);
 
-        self.set_flag_to(Flag::Zero, new_value == 0);
-        self.set_flag_to(Flag::HalfCarry, old_value & 0xf == 0);
-        self.set_flag(Flag::Sub);
+        self.set_flag_to(&Flag::Zero, new_value == 0);
+        self.set_flag_to(&Flag::HalfCarry, old_value & 0xf == 0);
+        self.set_flag(&Flag::Sub);
 
         self.mem[addr] = new_value;
     }
@@ -1233,10 +1235,10 @@ impl Cpu {
         let n = f(self);
         let result = old_value.wrapping_add(n);
 
-        self.set_flag_to(Flag::Zero, result == 0);
-        self.reset_flag(Flag::Sub);
-        self.set_flag_to(Flag::HalfCarry, (old_value & 0x0f) + (n & 0x0f) > 0x0f);
-        self.set_flag_to(Flag::Carry, (old_value as u16) + (n as u16) > 0xff);
+        self.set_flag_to(&Flag::Zero, result == 0);
+        self.reset_flag(&Flag::Sub);
+        self.set_flag_to(&Flag::HalfCarry, (old_value & 0x0f) + (n & 0x0f) > 0x0f);
+        self.set_flag_to(&Flag::Carry, u16::from(old_value) + u16::from(n) > 0xff);
 
         self.a = result;
     }
@@ -1260,12 +1262,12 @@ impl Cpu {
         let n = f(self);
         let result = old_value.wrapping_add(n);
 
-        self.reset_flag(Flag::Sub);
+        self.reset_flag(&Flag::Sub);
         self.set_flag_to(
-            Flag::HalfCarry,
+            &Flag::HalfCarry,
             (old_value & 0x0fff) + (n & 0x0fff) > 0x0fff,
         );
-        self.set_flag_to(Flag::Carry, (old_value as u32) + (n as u32) > 0xffff);
+        self.set_flag_to(&Flag::Carry, u32::from(old_value) + u32::from(n) > 0xffff);
 
         self.set_hl(result);
     }
@@ -1281,18 +1283,19 @@ impl Cpu {
     ///  N - Reset.
     ///  H - Set if carry from bit 11 (always set on subtraction).
     ///  C - Set if carry from bit 15 (always set on subtraction).
+    #[cfg_attr(feature = "clippy", allow(cast_lossless))]
     fn add_sp_imm(&mut self) {
         let old_value = self.sp;
         let n = self.consume_byte() as i8 as i16 as u16;
         let result = old_value.wrapping_add(n);
 
-        self.reset_flag(Flag::Zero);
-        self.reset_flag(Flag::Sub);
+        self.reset_flag(&Flag::Zero);
+        self.reset_flag(&Flag::Sub);
         self.set_flag_to(
-            Flag::HalfCarry,
+            &Flag::HalfCarry,
             (old_value & 0x0fff) + (n & 0x0fff) > 0x0fff,
         );
-        self.set_flag_to(Flag::Carry, (old_value as u32) + (n as u32) > 0xffff);
+        self.set_flag_to(&Flag::Carry, (old_value as u32) + (n as u32) > 0xffff);
 
         self.sp = result;
     }
@@ -1316,10 +1319,10 @@ impl Cpu {
         let n = f(self);
         let result = old_value.wrapping_sub(n);
 
-        self.set_flag_to(Flag::Zero, result == 0);
-        self.set_flag(Flag::Sub);
-        self.set_flag_to(Flag::HalfCarry, (old_value & 0x0f) < (n & 0x0f));
-        self.set_flag_to(Flag::Carry, (old_value as u16) < (n as u16));
+        self.set_flag_to(&Flag::Zero, result == 0);
+        self.set_flag(&Flag::Sub);
+        self.set_flag_to(&Flag::HalfCarry, (old_value & 0x0f) < (n & 0x0f));
+        self.set_flag_to(&Flag::Carry, u16::from(old_value) < u16::from(n));
 
         self.a = result;
     }
@@ -1343,10 +1346,10 @@ impl Cpu {
         let result = self.a & f(self);
         self.a = result;
 
-        self.set_flag_to(Flag::Zero, result == 0);
-        self.reset_flag(Flag::Carry);
-        self.reset_flag(Flag::HalfCarry);
-        self.reset_flag(Flag::Sub);
+        self.set_flag_to(&Flag::Zero, result == 0);
+        self.reset_flag(&Flag::Carry);
+        self.reset_flag(&Flag::HalfCarry);
+        self.reset_flag(&Flag::Sub);
     }
 
     ///**Description:**
@@ -1368,10 +1371,10 @@ impl Cpu {
         let result = self.a | f(self);
         self.a = result;
 
-        self.set_flag_to(Flag::Zero, result == 0);
-        self.reset_flag(Flag::Carry);
-        self.reset_flag(Flag::HalfCarry);
-        self.reset_flag(Flag::Sub);
+        self.set_flag_to(&Flag::Zero, result == 0);
+        self.reset_flag(&Flag::Carry);
+        self.reset_flag(&Flag::HalfCarry);
+        self.reset_flag(&Flag::Sub);
     }
 
     ///**Description:**
@@ -1388,7 +1391,7 @@ impl Cpu {
     where
         F: Fn(&Cpu) -> bool,
     {
-        if condition(&self) {
+        if condition(self) {
             self.jr_r8();
         }
     }
@@ -1428,10 +1431,10 @@ impl Cpu {
         let n = f(self);
         let a = self.a;
 
-        self.set_flag_to(Flag::Zero, a == n);
-        self.set_flag_to(Flag::Carry, a < n);
-        self.set_flag_to(Flag::HalfCarry, (a & 0xF) < (n & 0xF));
-        self.set_flag(Flag::Sub);
+        self.set_flag_to(&Flag::Zero, a == n);
+        self.set_flag_to(&Flag::Carry, a < n);
+        self.set_flag_to(&Flag::HalfCarry, (a & 0xF) < (n & 0xF));
+        self.set_flag(&Flag::Sub);
     }
 
     ///**Description:**
@@ -1452,10 +1455,10 @@ impl Cpu {
         let n = self.mem[self.get_hl() as usize];
         let a = self.a;
 
-        self.set_flag_to(Flag::Zero, a == n);
-        self.set_flag_to(Flag::Carry, a < n);
-        self.set_flag_to(Flag::HalfCarry, (a & 0xF) < (n & 0xF));
-        self.set_flag(Flag::Sub);
+        self.set_flag_to(&Flag::Zero, a == n);
+        self.set_flag_to(&Flag::Carry, a < n);
+        self.set_flag_to(&Flag::HalfCarry, (a & 0xF) < (n & 0xF));
+        self.set_flag(&Flag::Sub);
     }
 
     /// **Description**
@@ -1486,14 +1489,17 @@ impl Cpu {
         F: Fn(&mut Cpu) -> u8,
     {
         let a = self.a;
-        let carry = if self.flag(Flag::Carry) { 1 } else { 0 };
+        let carry = if self.flag(&Flag::Carry) { 1 } else { 0 };
         let n = f(self);
         let res = a.wrapping_add(n).wrapping_add(carry);
 
-        self.set_flag_to(Flag::Zero, res == 0);
-        self.reset_flag(Flag::Sub);
-        self.set_flag_to(Flag::HalfCarry, (a & 0x0f) + (n & 0x0f) + carry > 0x0f);
-        self.set_flag_to(Flag::Carry, (a as u16) + (n as u16) + (carry as u16) > 0xff);
+        self.set_flag_to(&Flag::Zero, res == 0);
+        self.reset_flag(&Flag::Sub);
+        self.set_flag_to(&Flag::HalfCarry, (a & 0x0f) + (n & 0x0f) + carry > 0x0f);
+        self.set_flag_to(
+            &Flag::Carry,
+            u16::from(a) + u16::from(n) + u16::from(carry) > 0xff,
+        );
 
         self.a = res;
     }
@@ -1510,15 +1516,15 @@ impl Cpu {
     /// TODO check possible inconsitencies between
     /// game boy manual and other sources
     fn rlc_a(&mut self) {
-        self.reset_flag(Flag::Sub);
-        self.reset_flag(Flag::HalfCarry);
+        self.reset_flag(&Flag::Sub);
+        self.reset_flag(&Flag::HalfCarry);
 
         let a = self.a;
         let carry = a >> 7;
         let res = ((a & 0x7f) << 1) | carry; // a & 0b01111111
 
-        self.set_flag_to(Flag::Carry, carry == 1);
-        self.set_flag_to(Flag::Zero, res == 0);
+        self.set_flag_to(&Flag::Carry, carry == 1);
+        self.set_flag_to(&Flag::Zero, res == 0);
         self.a = res;
     }
 
@@ -1534,10 +1540,10 @@ impl Cpu {
         let lsb = self.a & 1;
         let a = (lsb << 7) | (self.a >> 1);
 
-        self.set_flag_to(Flag::Zero, a == 0);
-        self.reset_flag(Flag::Sub);
-        self.reset_flag(Flag::HalfCarry);
-        self.set_flag_to(Flag::Carry, lsb == 1);
+        self.set_flag_to(&Flag::Zero, a == 0);
+        self.reset_flag(&Flag::Sub);
+        self.reset_flag(&Flag::HalfCarry);
+        self.set_flag_to(&Flag::Carry, lsb == 1);
 
         self.a = a;
     }
@@ -1583,6 +1589,6 @@ impl Cpu {
         let curr_pc = self.pc;
         self.push_stack_u16(curr_pc);
 
-        self.pc = n as u16;
+        self.pc = u16::from(n);
     }
 }

@@ -43,12 +43,12 @@ where
 
 #[test]
 fn test_call_z_a16() {
-    _test_call_cc_a16(|cpu| cpu.set_flag(Flag::Zero), opcodes::CALL_Z_A16);
+    _test_call_cc_a16(|cpu| cpu.set_flag(&Flag::Zero), opcodes::CALL_Z_A16);
 }
 
 #[test]
 fn test_call_c_a16() {
-    _test_call_cc_a16(|cpu| cpu.set_flag(Flag::Carry), opcodes::CALL_C_A16);
+    _test_call_cc_a16(|cpu| cpu.set_flag(&Flag::Carry), opcodes::CALL_C_A16);
 }
 
 #[test]
@@ -96,22 +96,22 @@ where
 
 #[test]
 fn test_ret_nz() {
-    _test_ret_cc(|cpu| cpu.reset_flag(Flag::Zero), opcodes::RET_NZ);
+    _test_ret_cc(|cpu| cpu.reset_flag(&Flag::Zero), opcodes::RET_NZ);
 }
 
 #[test]
 fn test_ret_z() {
-    _test_ret_cc(|cpu| cpu.set_flag(Flag::Zero), opcodes::RET_Z);
+    _test_ret_cc(|cpu| cpu.set_flag(&Flag::Zero), opcodes::RET_Z);
 }
 
 #[test]
 fn test_ret_nc() {
-    _test_ret_cc(|cpu| cpu.reset_flag(Flag::Carry), opcodes::RET_NC);
+    _test_ret_cc(|cpu| cpu.reset_flag(&Flag::Carry), opcodes::RET_NC);
 }
 
 #[test]
 fn test_ret_c() {
-    _test_ret_cc(|cpu| cpu.set_flag(Flag::Carry), opcodes::RET_C);
+    _test_ret_cc(|cpu| cpu.set_flag(&Flag::Carry), opcodes::RET_C);
 }
 
 

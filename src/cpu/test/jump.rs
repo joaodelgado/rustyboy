@@ -57,7 +57,7 @@ fn test_jp_cc_a16() {
     cpu.mem[2] = 0x01;
     cpu.pc = 0;
 
-    cpu.set_flag(Flag::Zero);
+    cpu.set_flag(&Flag::Zero);
     cpu.tick().unwrap();
 
     assert_eq!(cpu.pc, 0x100);
@@ -77,7 +77,7 @@ fn test_jp_cc_a16() {
     cpu.mem[2] = 0x01;
     cpu.pc = 0;
 
-    cpu.set_flag(Flag::Carry);
+    cpu.set_flag(&Flag::Carry);
     cpu.tick().unwrap();
     assert_eq!(cpu.pc, 0x100);
 }
@@ -97,7 +97,7 @@ fn test_jr_cc_r8() {
     cpu.mem[102] = opcodes::JR_Z_R8;
     cpu.mem[103] = 0b11001110; // -50
 
-    cpu.set_flag(Flag::Zero);
+    cpu.set_flag(&Flag::Zero);
     cpu.tick().unwrap();
 
     assert_eq!(cpu.pc, 54);
@@ -113,7 +113,7 @@ fn test_jr_cc_r8() {
     cpu.mem[cpu.pc as usize] = opcodes::JR_C_R8;
     cpu.mem[(cpu.pc + 1) as usize] = 0b11101101; // -19
 
-    cpu.set_flag(Flag::Carry);
+    cpu.set_flag(&Flag::Carry);
     cpu.tick().unwrap();
     assert_eq!(cpu.pc, 59);
 }
