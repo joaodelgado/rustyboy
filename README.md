@@ -16,10 +16,10 @@ To run the test suite:
 
     $ cargo test
 
-To compile with clippy:
+To run clippy lints:
 
-    $ cargo +nightly build --features clippy
+    $ cargo +nightly clippy
 
-To compile with the debugger enabled:
+Make sure clippy is installed with:
 
-    $ cargo +nightly build --features debugger
+    $ cargo +nightly install clippy

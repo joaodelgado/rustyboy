@@ -1165,7 +1165,7 @@ impl Cpu {
     ///
     ///**Use with:**
     /// n = A,B,C,D,E,H,L
-    #[cfg_attr(feature = "clippy", allow(verbose_bit_mask))]
+    #[cfg_attr(feature = "cargo-clippy", allow(verbose_bit_mask))]
     fn dec_r8<G, S>(&mut self, getter: G, setter: S)
     where
         G: Fn(&Cpu) -> u8,
@@ -1186,7 +1186,7 @@ impl Cpu {
     ///
     ///**Use with:**
     /// n = A,B,C,D,E,H,L
-    #[cfg_attr(feature = "clippy", allow(verbose_bit_mask))]
+    #[cfg_attr(feature = "cargo-clippy", allow(verbose_bit_mask))]
     fn dec_addr<G>(&mut self, getter: G)
     where
         G: Fn(&Cpu) -> u16,
@@ -1286,7 +1286,7 @@ impl Cpu {
     #[cfg_attr(feature = "clippy", allow(cast_lossless))]
     fn add_sp_imm(&mut self) {
         let old_value = self.sp;
-        let n = self.consume_byte() as i8 as i16 as u16;
+        let n = i16::from(self.consume_byte() as i8) as u16;
         let result = old_value.wrapping_add(n);
 
         self.reset_flag(&Flag::Zero);
@@ -1295,7 +1295,7 @@ impl Cpu {
             &Flag::HalfCarry,
             (old_value & 0x0fff) + (n & 0x0fff) > 0x0fff,
         );
-        self.set_flag_to(&Flag::Carry, (old_value as u32) + (n as u32) > 0xffff);
+        self.set_flag_to(&Flag::Carry, (u32::from(old_value)) + (u32::from(n)) > 0xffff);
 
         self.sp = result;
     }
