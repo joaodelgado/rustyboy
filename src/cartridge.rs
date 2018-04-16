@@ -91,7 +91,7 @@ pub struct Cartridge {
 
 impl Cartridge {
     pub fn new(raw_data: Vec<u8>) -> Cartridge {
-        Cartridge { raw_data: raw_data }
+        Cartridge { raw_data }
     }
 
     pub fn interrupts(&self) -> &[u8] {

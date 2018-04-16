@@ -507,14 +507,14 @@ impl Cpu {
             opcodes::LDHL_SP_R8 => println!("LDHL\tSP,{}", read_8_sig()),
             opcodes::LD_A16_SP => println!("LD\t{},SP", read_16_addr()),
 
-            opcodes::RST_00 => println!("RST\t{}", 0x00),
-            opcodes::RST_08 => println!("RST\t{}", 0x08),
-            opcodes::RST_10 => println!("RST\t{}", 0x10),
-            opcodes::RST_18 => println!("RST\t{}", 0x18),
-            opcodes::RST_20 => println!("RST\t{}", 0x20),
-            opcodes::RST_28 => println!("RST\t{}", 0x28),
-            opcodes::RST_30 => println!("RST\t{}", 0x30),
-            opcodes::RST_38 => println!("RST\t{}", 0x38),
+            opcodes::RST_00 => println!("RST\t0x00"),
+            opcodes::RST_08 => println!("RST\t0x08"),
+            opcodes::RST_10 => println!("RST\t0x10"),
+            opcodes::RST_18 => println!("RST\t0x18"),
+            opcodes::RST_20 => println!("RST\t0x20"),
+            opcodes::RST_28 => println!("RST\t0x28"),
+            opcodes::RST_30 => println!("RST\t0x30"),
+            opcodes::RST_38 => println!("RST\t0x38"),
 
             opcodes::EI => println!("EI"),
 

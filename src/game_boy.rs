@@ -70,7 +70,7 @@ impl GameBoy {
 
         Ok(GameBoy {
             cpu: Cpu::new(),
-            cartridge: cartridge,
+            cartridge,
             debugger: Debugger::new(),
         })
     }

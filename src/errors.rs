@@ -48,7 +48,7 @@ impl Error {
     {
         Error {
             repr: Repr::Custom(Custom {
-                kind: kind,
+                kind,
                 error: error.into(),
             }),
         }
