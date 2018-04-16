@@ -1,7 +1,9 @@
 #![allow(dead_code)]
 
 macro_rules! KB {
-    ( $x:expr ) => { $x * 1024 };
+    ($x:expr) => {
+        $x * 1024
+    };
 }
 
 #[derive(Debug)]
@@ -71,7 +73,6 @@ impl CartridgeType {
             0xFF => Some(Huc1RamBattery),
             _ => None,
         }
-
     }
 }
 

@@ -1,9 +1,9 @@
-use cpu::Cpu;
-use cartridge::Cartridge;
-use errors::{Error, ErrorKind, Result};
 use Config;
-use read_file;
+use cartridge::Cartridge;
+use cpu::Cpu;
 use debugger::Debugger;
+use errors::{Error, ErrorKind, Result};
+use read_file;
 
 const MEM_CARTRIDGE_INTERRUPTS_BEGIN: usize = 0x0000;
 const MEM_CARTRIDGE_INTERRUPTS_END: usize = 0x00ff;

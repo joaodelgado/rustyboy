@@ -1,7 +1,7 @@
+use std;
 use std::error;
 use std::fmt;
 use std::result;
-use std;
 
 pub type Result<T> = result::Result<T, Error>;
 
@@ -30,7 +30,6 @@ pub enum ErrorKind {
     UnknownInstruction,
 }
 
-
 impl ErrorKind {
     fn as_str(&self) -> &'static str {
         match *self {
@@ -41,7 +40,6 @@ impl ErrorKind {
         }
     }
 }
-
 
 impl Error {
     pub fn new<E>(kind: ErrorKind, error: E) -> Error
@@ -57,7 +55,9 @@ impl Error {
     }
 
     pub fn simple(kind: ErrorKind) -> Error {
-        Error { repr: Repr::Simple(kind) }
+        Error {
+            repr: Repr::Simple(kind),
+        }
     }
 }
 

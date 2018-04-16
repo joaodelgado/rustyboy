@@ -212,7 +212,6 @@ fn test_ld_b_b() {
     _test_ld_reg_reg(|cpu| cpu.b, |cpu, n| cpu.b = n, 0x72, opcodes::LD_B_B);
 }
 
-
 #[test]
 fn test_ld_b_c() {
     _test_ld_reg_reg(|cpu| cpu.b, |cpu, n| cpu.c = n, 0x72, opcodes::LD_B_C);
@@ -247,7 +246,6 @@ fn test_ld_b_hl() {
 fn test_ld_c_b() {
     _test_ld_reg_reg(|cpu| cpu.c, |cpu, n| cpu.b = n, 0x72, opcodes::LD_C_B);
 }
-
 
 #[test]
 fn test_ld_c_c() {
@@ -284,7 +282,6 @@ fn test_ld_d_b() {
     _test_ld_reg_reg(|cpu| cpu.d, |cpu, n| cpu.b = n, 0x72, opcodes::LD_D_B);
 }
 
-
 #[test]
 fn test_ld_d_c() {
     _test_ld_reg_reg(|cpu| cpu.d, |cpu, n| cpu.c = n, 0x72, opcodes::LD_D_C);
@@ -319,7 +316,6 @@ fn test_ld_d_hl() {
 fn test_ld_e_b() {
     _test_ld_reg_reg(|cpu| cpu.e, |cpu, n| cpu.b = n, 0x72, opcodes::LD_E_B);
 }
-
 
 #[test]
 fn test_ld_e_c() {
@@ -356,7 +352,6 @@ fn test_ld_h_b() {
     _test_ld_reg_reg(|cpu| cpu.h, |cpu, n| cpu.b = n, 0x72, opcodes::LD_H_B);
 }
 
-
 #[test]
 fn test_ld_h_c() {
     _test_ld_reg_reg(|cpu| cpu.h, |cpu, n| cpu.c = n, 0x72, opcodes::LD_H_C);
@@ -391,7 +386,6 @@ fn test_ld_h_hl() {
 fn test_ld_l_b() {
     _test_ld_reg_reg(|cpu| cpu.l, |cpu, n| cpu.b = n, 0x72, opcodes::LD_L_B);
 }
-
 
 #[test]
 fn test_ld_l_c() {
@@ -454,7 +448,6 @@ fn test_ldh_a8_a() {
     cpu.mem[1] = 0x04;
     cpu.a = 0x54;
 
-
     cpu.tick().unwrap();
     assert_eq!(0x54, cpu.mem[MEM_HW_IO_REG_OFFSET + 0x04]);
 }
@@ -471,7 +464,6 @@ fn test_ldi_a_hl() {
     assert_eq!(cpu.a, cpu.mem[addr as usize]);
     assert_eq!(cpu.get_hl(), 0xb00c);
 }
-
 
 #[test]
 fn test_ld_r16_d16() {
@@ -696,12 +688,10 @@ fn test_rst_a8_00() {
     _test_rst_a8(opcodes::RST_00, 0);
 }
 
-
 #[test]
 fn test_rst_a8_08() {
     _test_rst_a8(opcodes::RST_08, 0x08);
 }
-
 
 #[test]
 fn test_rst_a8_10() {

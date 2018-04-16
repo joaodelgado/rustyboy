@@ -21,5 +21,4 @@ fn main() {
         eprintln!("Unexpected error while running: {}", e);
         process::exit(1);
     });
-
 }

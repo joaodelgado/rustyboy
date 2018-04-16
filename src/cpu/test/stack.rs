@@ -38,7 +38,6 @@ where
     assert_eq!(0x3524, cpu.pc);
     assert_eq!(0x16, cpu.mem[0xfffe]);
     assert_eq!(0xff, cpu.mem[0xfffd]);
-
 }
 
 #[test]
@@ -113,7 +112,6 @@ fn test_ret_nc() {
 fn test_ret_c() {
     _test_ret_cc(|cpu| cpu.set_flag(&Flag::Carry), opcodes::RET_C);
 }
-
 
 #[test]
 fn test_push_stack() {

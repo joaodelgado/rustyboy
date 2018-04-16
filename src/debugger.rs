@@ -1,6 +1,6 @@
 use cpu::Cpu;
-use std::io::stdout;
 use errors::Result;
+use std::io::stdout;
 
 use std::io;
 use std::io::Write;
@@ -80,8 +80,7 @@ impl Debugger {
                 let pc_val = &cmd[1..2]
                     .iter()
                     .map(|x| x.parse::<u16>().expect("parse error"))
-                    .collect::<Vec<u16>>()
-                    [0];
+                    .collect::<Vec<u16>>()[0];
 
                 for _ in 0..pc_val + 1 {
                     self.step(cpu)?;

@@ -178,7 +178,6 @@ where
 
     cpu.tick().unwrap();
     assert_eq!(reg_getter(cpu), 0x0000);
-
 }
 
 #[test]
@@ -373,7 +372,6 @@ where
 
     cpu.tick().unwrap();
     assert_eq!(reg_getter(cpu), 0xffff);
-
 }
 
 #[test]
@@ -834,18 +832,15 @@ where
     }
 }
 
-
 #[test]
 fn test_adc_a() {
     _test_adc_a(opcodes::ADC_A_A, |cpu, n| cpu.a = n, true);
 }
 
-
 #[test]
 fn test_adc_a_b() {
     _test_adc_a(opcodes::ADC_A_B, |cpu, n| cpu.b = n, false);
 }
-
 
 #[test]
 fn test_adc_a_c() {

@@ -5,8 +5,8 @@ mod test;
 
 use std::fmt;
 
-use {u8_to_u16, u16_to_u8};
 use errors::{Error, ErrorKind, Result};
+use {u16_to_u8, u8_to_u16};
 
 const MEM_SIZE: usize = 64 * 1024;
 
@@ -60,8 +60,9 @@ impl Clone for Cpu {
 
 impl fmt::Display for Cpu {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        return write!(f,
-                      "CPU [
+        return write!(
+            f,
+            "CPU [
     a: {:02x},
     b: {:02x},
     c: {:02x},
@@ -73,16 +74,7 @@ impl fmt::Display for Cpu {
     sp: {:04x},
     pc: {:04x},
 ]",
-            self.a,
-            self.b,
-            self.c,
-            self.d,
-            self.e,
-            self.h,
-            self.l,
-            self.status,
-            self.sp,
-            self.pc,
+            self.a, self.b, self.c, self.d, self.e, self.h, self.l, self.status, self.sp, self.pc,
         );
     }
 }
@@ -802,11 +794,7 @@ impl Cpu {
             s => {
                 return Err(Error::new(
                     ErrorKind::UnknownInstruction,
-                    format!(
-                    "Unimplemented opcode {:02x}@{:04x}",
-                    s,
-                    self.pc - 1,
-                ),
+                    format!("Unimplemented opcode {:02x}@{:04x}", s, self.pc - 1,),
                 ))
             }
         };
@@ -1295,7 +1283,10 @@ impl Cpu {
             &Flag::HalfCarry,
             (old_value & 0x0fff) + (n & 0x0fff) > 0x0fff,
         );
-        self.set_flag_to(&Flag::Carry, (u32::from(old_value)) + (u32::from(n)) > 0xffff);
+        self.set_flag_to(
+            &Flag::Carry,
+            (u32::from(old_value)) + (u32::from(n)) > 0xffff,
+        );
 
         self.sp = result;
     }
@@ -1342,7 +1333,6 @@ impl Cpu {
     where
         F: Fn(&mut Cpu) -> u8,
     {
-
         let result = self.a & f(self);
         self.a = result;
 
@@ -1367,7 +1357,6 @@ impl Cpu {
     where
         F: Fn(&mut Cpu) -> u8,
     {
-
         let result = self.a | f(self);
         self.a = result;
 

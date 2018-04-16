@@ -3,9 +3,9 @@ use super::*;
 
 mod alu;
 mod jump;
+mod load;
 mod logic;
 mod stack;
-mod load;
 
 #[test]
 fn test_get_flag() {
@@ -272,7 +272,6 @@ fn test_clone() {
     assert_eq!(clone.sp, 0xff12);
     assert_eq!(clone.mem[0], 0xff);
 }
-
 
 #[test]
 fn test_load_from() {

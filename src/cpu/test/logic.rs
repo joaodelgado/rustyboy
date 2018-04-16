@@ -99,7 +99,6 @@ where
     assert!(!cpu.flag(&Flag::Carry));
 }
 
-
 #[test]
 fn test_or_a_a() {
     _test_or_a_reg(|cpu, value| cpu.a = value, opcodes::OR_A_A);
