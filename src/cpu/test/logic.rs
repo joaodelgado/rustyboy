@@ -59,7 +59,7 @@ where
 
         cpu.set_flag(&Flag::Zero);
         cpu.set_flag(&Flag::Sub);
-        cpu.set_flag(&Flag::HalfCarry);
+        cpu.reset_flag(&Flag::HalfCarry);
         cpu.set_flag(&Flag::Carry);
 
         cpu
@@ -79,7 +79,7 @@ where
     assert_eq!(cpu.a, value);
     assert!(!cpu.flag(&Flag::Zero));
     assert!(!cpu.flag(&Flag::Sub));
-    assert!(!cpu.flag(&Flag::HalfCarry));
+    assert!(cpu.flag(&Flag::HalfCarry));
     assert!(!cpu.flag(&Flag::Carry));
 
     //
@@ -95,7 +95,7 @@ where
     assert_eq!(cpu.a, 0b0000_0000);
     assert!(cpu.flag(&Flag::Zero));
     assert!(!cpu.flag(&Flag::Sub));
-    assert!(!cpu.flag(&Flag::HalfCarry));
+    assert!(cpu.flag(&Flag::HalfCarry));
     assert!(!cpu.flag(&Flag::Carry));
 }
 

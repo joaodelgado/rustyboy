@@ -1327,7 +1327,7 @@ impl Cpu {
     ///**Flags affected:**
     ///  Z - Set if result is zero.
     ///  N - Reset.
-    ///  H - Reset.
+    ///  H - Set.
     ///  C - Reset.
     fn and_a<F>(&mut self, f: F)
     where
@@ -1338,7 +1338,7 @@ impl Cpu {
 
         self.set_flag_to(&Flag::Zero, result == 0);
         self.reset_flag(&Flag::Carry);
-        self.reset_flag(&Flag::HalfCarry);
+        self.set_flag(&Flag::HalfCarry);
         self.reset_flag(&Flag::Sub);
     }
 
