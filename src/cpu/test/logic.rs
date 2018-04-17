@@ -272,7 +272,7 @@ fn test_rlca() {
 
     cpu.tick().unwrap();
     assert_eq!(cpu.a, 0);
-    assert!(cpu.flag(&Flag::Zero));
+    assert!(!cpu.flag(&Flag::Zero));
     assert!(!cpu.flag(&Flag::Carry));
 
     cpu.reset_status();
@@ -303,7 +303,7 @@ fn test_rrca() {
     cpu.tick().unwrap();
     assert_eq!(cpu.a, 0);
     assert!(!cpu.flag(&Flag::Carry));
-    assert!(cpu.flag(&Flag::Zero));
+    assert!(!cpu.flag(&Flag::Zero));
 
     cpu.reset_status();
     cpu.mem[cpu.pc as usize] = opcodes::RRCA;

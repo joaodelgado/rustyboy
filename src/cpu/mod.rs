@@ -1497,13 +1497,10 @@ impl Cpu {
     ///  Rotate A left. Old bit 7 to Carry flag.
     ///
     ///**Flags affected:**
-    ///  Z - Set if result is zero.
+    ///  Z - Reset.
     ///  N - Reset.
     ///  H - Reset.
     ///  C - Contains old bit 7 data.
-    ///
-    /// TODO check possible inconsitencies between
-    /// game boy manual and other sources
     fn rlc_a(&mut self) {
         self.reset_flag(&Flag::Sub);
         self.reset_flag(&Flag::HalfCarry);
@@ -1512,8 +1509,10 @@ impl Cpu {
         let carry = a >> 7;
         let res = ((a & 0x7f) << 1) | carry; // a & 0b01111111
 
+        self.reset_flag(&Flag::Zero);
+        self.reset_flag(&Flag::Sub);
+        self.reset_flag(&Flag::HalfCarry);
         self.set_flag_to(&Flag::Carry, carry == 1);
-        self.set_flag_to(&Flag::Zero, res == 0);
         self.a = res;
     }
 
@@ -1521,7 +1520,7 @@ impl Cpu {
     ///  Rotate A right. Old bit 0 to Carry flag.
     ///
     ///**Flags affected:**
-    ///  Z - Set if result is zero.
+    ///  Z - Reset.
     ///  N - Reset.
     ///  H - Reset.
     ///  C - Contains old bit 0 data.
@@ -1529,7 +1528,7 @@ impl Cpu {
         let lsb = self.a & 1;
         let a = (lsb << 7) | (self.a >> 1);
 
-        self.set_flag_to(&Flag::Zero, a == 0);
+        self.reset_flag(&Flag::Zero);
         self.reset_flag(&Flag::Sub);
         self.reset_flag(&Flag::HalfCarry);
         self.set_flag_to(&Flag::Carry, lsb == 1);
