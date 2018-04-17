@@ -1213,8 +1213,8 @@ impl Cpu {
     ///**Flags affected:**
     ///  Z - Set if result is zero.
     ///  N - Reset.
-    ///  H - Reset.
-    ///  C - Reset.
+    ///  H - Set if carry from bit 3.
+    ///  C - Set if carry from bit 7.
     fn add_a<F>(&mut self, f: F)
     where
         F: Fn(&mut Cpu) -> u8,
@@ -1299,9 +1299,9 @@ impl Cpu {
     ///
     ///**Flags affected:**
     ///  Z - Set if result is zero.
-    ///  N - Reset.
-    ///  H - Reset.
-    ///  C - Reset.
+    ///  N - Set.
+    ///  H - Set if carry from bit 3.
+    ///  C - Set if carry from bit 7.
     fn sub_a<F>(&mut self, f: F)
     where
         F: Fn(&mut Cpu) -> u8,
