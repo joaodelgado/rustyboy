@@ -1006,6 +1006,9 @@ impl Cpu {
     {
         if condition(self) {
             self.jp_a16();
+        } else {
+            // Ensure that the address is consumed even if we don't jump
+            self.consume_16_addr();
         }
     }
 
@@ -1368,6 +1371,9 @@ impl Cpu {
     {
         if condition(self) {
             self.jr_r8();
+        } else {
+            // Ensure that the address is consumed even if we don't jump
+            self.consume_byte();
         }
     }
 
