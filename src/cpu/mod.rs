@@ -155,11 +155,11 @@ impl Cpu {
     }
 
     pub fn get_mem_range(&self, i: usize, j: usize) -> &[u8] {
-        &self.mem[i..j + 1]
+        &self.mem[i..=j]
     }
 
     pub fn set_mem_range(&mut self, i: usize, j: usize, data: &[u8]) {
-        self.mem[i..j + 1].copy_from_slice(data);
+        self.mem[i..=j].copy_from_slice(data);
     }
 
     pub fn push_stack(&mut self, data: &[u8]) {
@@ -1153,7 +1153,6 @@ impl Cpu {
     ///
     ///**Use with:**
     /// n = A,B,C,D,E,H,L
-    #[cfg_attr(feature = "cargo-clippy", allow(verbose_bit_mask))]
     fn dec_r8<G, S>(&mut self, getter: G, setter: S)
     where
         G: Fn(&Cpu) -> u8,
@@ -1174,7 +1173,6 @@ impl Cpu {
     ///
     ///**Use with:**
     /// n = A,B,C,D,E,H,L
-    #[cfg_attr(feature = "cargo-clippy", allow(verbose_bit_mask))]
     fn dec_addr<G>(&mut self, getter: G)
     where
         G: Fn(&Cpu) -> u16,

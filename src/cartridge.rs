@@ -95,19 +95,19 @@ impl Cartridge {
     }
 
     pub fn interrupts(&self) -> &[u8] {
-        &self.raw_data[INTERRUPTS_BEGIN..INTERRUPTS_END + 1]
+        &self.raw_data[INTERRUPTS_BEGIN..=INTERRUPTS_END]
     }
 
     pub fn header(&self) -> &[u8] {
-        &self.raw_data[HEADER_BEGIN..HEADER_END + 1]
+        &self.raw_data[HEADER_BEGIN..=HEADER_END]
     }
 
     pub fn bank0(&self) -> &[u8] {
-        &self.raw_data[BANK0_BEGIN..BANK0_END + 1]
+        &self.raw_data[BANK0_BEGIN..=BANK0_END]
     }
 
     pub fn bank1(&self) -> &[u8] {
-        &self.raw_data[BANK1_BEGIN..BANK1_END + 1]
+        &self.raw_data[BANK1_BEGIN..=BANK1_END]
     }
 
     pub fn nintendo_logo(&self) -> &[u8] {

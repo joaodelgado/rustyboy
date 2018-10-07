@@ -82,7 +82,7 @@ impl Debugger {
                     .map(|x| x.parse::<u16>().expect("parse error"))
                     .collect::<Vec<u16>>()[0];
 
-                for _ in 0..pc_val + 1 {
+                for _ in 0..=*pc_val {
                     self.step(cpu)?;
                 }
             }
