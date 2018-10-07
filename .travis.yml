@@ -2,7 +2,7 @@ language: rust
 rust: nightly
 cache: cargo
 before_script:
-    - cargo install clippy --force
+    - rustup component add clippy-preview
 script:
     - cargo build --verbose
     - cargo test --verbose
