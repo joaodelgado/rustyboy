@@ -62,18 +62,7 @@ impl fmt::Display for Cpu {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         return write!(
             f,
-            "CPU [
-    a: {:02x},
-    b: {:02x},
-    c: {:02x},
-    d: {:02x},
-    e: {:02x},
-    h: {:02x},
-    l: {:02x},
-    status: {:#08b},
-    sp: {:04x},
-    pc: {:04x},
-]",
+            "[a: {:02x}, b: {:02x}, c: {:02x}, d: {:02x}, e: {:02x}, h: {:02x}, l: {:02x}, status: {:08b}, sp: {:04x}, pc: {:04x}]",
             self.a, self.b, self.c, self.d, self.e, self.h, self.l, self.status, self.sp, self.pc,
         );
     }
@@ -531,9 +520,10 @@ impl Cpu {
     //
 
     pub fn tick(&mut self) -> Result<()> {
-        self.print_curr();
-
         let opcode = self.consume_byte();
+        print!("{:04x} - {:02x} ", self.pc, opcode);
+        println!("{}", self);
+
         match opcode {
             opcodes::CALL_A16 => self.call_a16(),
             opcodes::CALL_NZ_A16 => self.call_cc_a16(|cpu| !cpu.flag(&Flag::Zero)),
@@ -798,8 +788,6 @@ impl Cpu {
                 ))
             }
         };
-
-        println!("{}", self);
 
         Ok(())
     }
