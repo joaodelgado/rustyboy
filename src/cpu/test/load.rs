@@ -453,6 +453,17 @@ fn test_ldh_a8_a() {
 }
 
 #[test]
+fn test_ldh_a_a8() {
+    let mut cpu = Cpu::new();
+    cpu.mem[0] = opcodes::LDH_A_A8;
+    cpu.mem[1] = 0x04;
+    cpu.mem[MEM_HW_IO_REG_OFFSET + 0x04] = 0x54;
+
+    cpu.tick().unwrap();
+    assert_eq!(0x54, cpu.a);
+}
+
+#[test]
 fn test_ldi_a_hl() {
     let mut cpu = Cpu::new();
     let addr = 0xb00b;

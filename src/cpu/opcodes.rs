@@ -12,6 +12,7 @@ pub const JP_NZ_A16: u8 = 0xc2;
 pub const JP_Z_A16: u8 = 0xca;
 pub const JR_R8: u8 = 0x18;
 pub const LDH_A8_A: u8 = 0xe0;
+pub const LDH_A_A8: u8 = 0xf0;
 pub const LD_BC_A: u8 = 0x02;
 pub const LD_DE_A: u8 = 0x12;
 pub const LD_HL_A: u8 = 0x77;

@@ -387,6 +387,7 @@ impl Cpu {
             opcodes::LD_SP_HL => println!("LD\tSP,HL"),
 
             opcodes::LDH_A8_A => println!("LDH\ta_{},A", read_byte()),
+            opcodes::LDH_A_A8 => println!("LDH\tA,a_{}", read_byte()),
             opcodes::LDI_A_HL => println!("LDI\tA,(HL)"),
 
             opcodes::JP_A16 => println!("JP\t{}", read_16_addr()),
@@ -520,6 +521,7 @@ impl Cpu {
     //
 
     pub fn tick(&mut self) -> Result<()> {
+        self.print_curr();
         let opcode = self.consume_byte();
         print!("{:04x} - {:02x} ", self.pc, opcode);
         println!("{}", self);
@@ -628,6 +630,7 @@ impl Cpu {
             opcodes::LD_SP_D16 => self.ld_r16_d16(|cpu, n| cpu.sp = n),
 
             opcodes::LDH_A8_A => self.ldh_a8_a(),
+            opcodes::LDH_A_A8 => self.ldh_a_a8(),
             opcodes::LDI_A_HL => self.ldi_a_hl(),
 
             opcodes::RET => self.ret(),
@@ -1020,6 +1023,16 @@ impl Cpu {
     fn ldh_a8_a(&mut self) {
         let n = self.consume_byte() as usize;
         self.mem[MEM_HW_IO_REG_OFFSET + n] = self.a;
+    }
+
+    ///**Description:**
+    /// Put memory address $FF00+n into A
+    ///
+    ///**Use with:**
+    /// n = one byte immediate value.
+    fn ldh_a_a8(&mut self) {
+        let n = self.consume_byte() as usize;
+        self.a = self.mem[MEM_HW_IO_REG_OFFSET + n];
     }
 
     ///**Description:**
