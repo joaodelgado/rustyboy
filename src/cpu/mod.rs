@@ -464,6 +464,16 @@ impl Cpu {
             opcodes::AND_A_HL => println!("AND\tA,HL"),
             opcodes::AND_A_D8 => println!("AND\tA,{}", read_8_imm()),
 
+            opcodes::XOR_A_A => println!("XOR\tA,A"),
+            opcodes::XOR_A_B => println!("XOR\tA,B"),
+            opcodes::XOR_A_C => println!("XOR\tA,C"),
+            opcodes::XOR_A_D => println!("XOR\tA,D"),
+            opcodes::XOR_A_E => println!("XOR\tA,E"),
+            opcodes::XOR_A_H => println!("XOR\tA,H"),
+            opcodes::XOR_A_L => println!("XOR\tA,L"),
+            opcodes::XOR_A_HL => println!("XOR\tA,HL"),
+            opcodes::XOR_A_D8 => println!("XOR\tA,{}", read_8_imm()),
+
             opcodes::OR_A_A => println!("OR\tA,A"),
             opcodes::OR_A_B => println!("OR\tA,B"),
             opcodes::OR_A_C => println!("OR\tA,C"),
@@ -718,6 +728,19 @@ impl Cpu {
                 self.and_a(|cpu| cpu.mem[addr])
             }
             opcodes::AND_A_D8 => self.and_a(|cpu| cpu.consume_byte()),
+
+            opcodes::XOR_A_A => self.xor_a(|cpu| cpu.a),
+            opcodes::XOR_A_B => self.xor_a(|cpu| cpu.b),
+            opcodes::XOR_A_C => self.xor_a(|cpu| cpu.c),
+            opcodes::XOR_A_D => self.xor_a(|cpu| cpu.d),
+            opcodes::XOR_A_E => self.xor_a(|cpu| cpu.e),
+            opcodes::XOR_A_H => self.xor_a(|cpu| cpu.h),
+            opcodes::XOR_A_L => self.xor_a(|cpu| cpu.l),
+            opcodes::XOR_A_HL => {
+                let addr = self.get_hl() as usize;
+                self.xor_a(|cpu| cpu.mem[addr])
+            }
+            opcodes::XOR_A_D8 => self.xor_a(|cpu| cpu.consume_byte()),
 
             opcodes::OR_A_A => self.or_a(|cpu| cpu.a),
             opcodes::OR_A_B => self.or_a(|cpu| cpu.b),
@@ -1341,6 +1364,30 @@ impl Cpu {
         self.set_flag_to(&Flag::Zero, result == 0);
         self.reset_flag(&Flag::Carry);
         self.set_flag(&Flag::HalfCarry);
+        self.reset_flag(&Flag::Sub);
+    }
+
+    ///**Description:**
+    ///  Logical XOR n with register A, result in A.
+    ///
+    ///**Use with:**
+    ///  n = A,B,C,D,E,H,L,(HL),#
+    ///
+    ///**Flags affected:**
+    ///  Z - Set if result is zero.
+    ///  N - Reset.
+    ///  H - Reset.
+    ///  C - Reset.
+    fn xor_a<F>(&mut self, f: F)
+    where
+        F: Fn(&mut Cpu) -> u8,
+    {
+        let result = self.a ^ f(self);
+        self.a = result;
+
+        self.set_flag_to(&Flag::Zero, result == 0);
+        self.reset_flag(&Flag::Carry);
+        self.reset_flag(&Flag::HalfCarry);
         self.reset_flag(&Flag::Sub);
     }
 

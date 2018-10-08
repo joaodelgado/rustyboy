@@ -50,6 +50,59 @@ where
     assert!(!cpu.flag(&Flag::Carry));
 }
 
+fn _test_xor_a_reg<G>(r: G, opcode: u8)
+where
+    G: Fn(&mut Cpu, u8),
+{
+    let new_cpu = || {
+        let mut cpu = Cpu::new();
+
+        cpu.set_flag(&Flag::Zero);
+        cpu.set_flag(&Flag::Sub);
+        cpu.set_flag(&Flag::HalfCarry);
+        cpu.set_flag(&Flag::Carry);
+
+        cpu
+    };
+
+    //
+    // Non non zero reg
+    //
+
+    let cpu = &mut new_cpu();
+    cpu.a = 0b1001_0000;
+    cpu.mem[0] = opcode;
+    let value = 0b1001_0110;
+    r(cpu, value);
+
+    let expected = if cpu.a == value { 0 } else { 0b0000_0110 };
+
+    cpu.tick().unwrap();
+
+    assert_eq!(cpu.a, expected);
+    assert!(cpu.flag(&Flag::Zero) == (expected == 0));
+    assert!(!cpu.flag(&Flag::Sub));
+    assert!(!cpu.flag(&Flag::HalfCarry));
+    assert!(!cpu.flag(&Flag::Carry));
+
+    //
+    // Test zero reg
+    //
+
+    let cpu = &mut new_cpu();
+    cpu.a = 0b0000_0000;
+    cpu.mem[0] = opcode;
+    let value = 0b0000_0000;
+    r(cpu, value);
+    cpu.tick().unwrap();
+
+    assert_eq!(cpu.a, 0b0000_0000);
+    assert!(cpu.flag(&Flag::Zero));
+    assert!(!cpu.flag(&Flag::Sub));
+    assert!(!cpu.flag(&Flag::HalfCarry));
+    assert!(!cpu.flag(&Flag::Carry));
+}
+
 fn _test_and_a_reg<G>(r: G, opcode: u8)
 where
     G: Fn(&mut Cpu, u8),
@@ -153,6 +206,63 @@ fn test_or_a_d8() {
             cpu.mem[i] = value;
         },
         opcodes::OR_A_D8,
+    );
+}
+
+#[test]
+fn test_xor_a_a() {
+    _test_xor_a_reg(|cpu, value| cpu.a = value, opcodes::XOR_A_A);
+}
+
+#[test]
+fn test_xor_a_b() {
+    _test_xor_a_reg(|cpu, value| cpu.b = value, opcodes::XOR_A_B);
+}
+
+#[test]
+fn test_xor_a_c() {
+    _test_xor_a_reg(|cpu, value| cpu.c = value, opcodes::XOR_A_C);
+}
+
+#[test]
+fn test_xor_a_d() {
+    _test_xor_a_reg(|cpu, value| cpu.d = value, opcodes::XOR_A_D);
+}
+
+#[test]
+fn test_xor_a_e() {
+    _test_xor_a_reg(|cpu, value| cpu.e = value, opcodes::XOR_A_E);
+}
+
+#[test]
+fn test_xor_a_h() {
+    _test_xor_a_reg(|cpu, value| cpu.h = value, opcodes::XOR_A_H);
+}
+
+#[test]
+fn test_xor_a_l() {
+    _test_xor_a_reg(|cpu, value| cpu.l = value, opcodes::XOR_A_L);
+}
+
+#[test]
+fn test_xor_a_hl() {
+    _test_xor_a_reg(
+        |cpu, value| {
+            cpu.set_hl(0xffe1);
+            cpu.mem[0xffe1] = value
+        },
+        opcodes::XOR_A_HL,
+    );
+}
+
+#[test]
+fn test_xor_a_d8() {
+    _test_xor_a_reg(
+        |cpu, value| {
+            let i = (cpu.pc + 1) as usize;
+            cpu.mem[i] = value;
+        },
+        opcodes::XOR_A_D8,
     );
 }
 
