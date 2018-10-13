@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 mod opcodes;
 mod test;
 
@@ -252,6 +250,7 @@ impl Cpu {
     }
 
     /// Reset all status flags
+    #[allow(dead_code)]  // TODO This is currently being used by tests only. It should be moved
     fn reset_status(&mut self) {
         self.status = 0;
     }
@@ -508,6 +507,7 @@ impl Cpu {
             opcodes::ADC_A_E => println!("ADC\tA,E"),
             opcodes::ADC_A_H => println!("ADC\tA,H"),
             opcodes::ADC_A_L => println!("ADC\tA,L"),
+            opcodes::ADC_A_HL => println!("ADC\tA,(HL)"),
             opcodes::ADC_A_D8 => println!("ADC\tA,{}", read_8_imm()),
             opcodes::RLCA => println!("RLCA"),
             opcodes::RRCA => println!("RRCA"),

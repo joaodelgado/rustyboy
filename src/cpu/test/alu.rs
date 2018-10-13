@@ -867,6 +867,7 @@ fn test_adc_a_l() {
     _test_adc_a(opcodes::ADC_A_L, |cpu, n| cpu.l = n, false);
 }
 
+#[test]
 fn test_adc_a_hl() {
     _test_adc_a(
         opcodes::ADC_A_HL,
