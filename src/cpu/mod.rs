@@ -390,8 +390,9 @@ impl Cpu {
 
             opcodes::LDH_A8_A => println!("LDH\ta_{},A", read_byte()),
             opcodes::LDH_A_A8 => println!("LDH\tA,a_{}", read_byte()),
-            opcodes::LDI_A_HL => println!("LDI\tA,(HL+)"),
-            opcodes::LDI_HL_A => println!("LDI\t(HL+),A"),
+            opcodes::LDI_A_HL => println!("LDI\tA,(HL)"),
+            opcodes::LDI_HL_A => println!("LDI\t(HL),A"),
+            opcodes::LDD_HL_A => println!("LDD\t(HL),A"),
 
             opcodes::JP_A16 => println!("JP\t{}", read_16_addr()),
             opcodes::JP_HL => println!("JP\tHL"),
@@ -651,6 +652,7 @@ impl Cpu {
             opcodes::LDH_A_A8 => self.ldh_a_a8(),
             opcodes::LDI_A_HL => self.ldi_a_hl(),
             opcodes::LDI_HL_A => self.ldi_hl_a(),
+            opcodes::LDD_HL_A => self.ldd_hl_a(),
 
             opcodes::RET => self.ret(),
             opcodes::RET_NZ => self.ret_cc(|cpu| !cpu.flag(&Flag::Zero)),
@@ -1084,13 +1086,18 @@ impl Cpu {
     ///
     /// Put value at address HL into A. Increment HL.
     /// Same as: LD (HL),A - INC HL
-    ///
-    ///**Notes:**
-    ///
-    /// Implements LD (HL),A and LD,A(HLI+)
     fn ldi_hl_a(&mut self) {
         self.ld_addr_a(Cpu::get_hl);
         self.inc_r16(Cpu::get_hl, Cpu::set_hl);
+    }
+
+    ///**Description:**
+    ///
+    /// Put value at address HL into A. Increment HL.
+    /// Same as: LD (HL),A - DEC HL
+    fn ldd_hl_a(&mut self) {
+        self.ld_addr_a(Cpu::get_hl);
+        self.dec_r16(Cpu::get_hl, Cpu::set_hl);
     }
 
     ///**Description:**
