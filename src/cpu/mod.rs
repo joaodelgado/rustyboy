@@ -316,7 +316,6 @@ impl Cpu {
 
             opcodes::LD_BC_A => println!("LD\t(BC),A"),
             opcodes::LD_DE_A => println!("LD\t(DE),A"),
-            opcodes::LD_HL_A => println!("LD\t(HL),A"),
             opcodes::LD_A16_A => println!("LD\t{},A", read_16_addr()),
 
             opcodes::LD_A_A => println!("LD\tA,A"),
@@ -375,15 +374,17 @@ impl Cpu {
             opcodes::LD_L_L => println!("LD\tL,L"),
             opcodes::LD_L_HL => println!("LD\tL,(HL)"),
             opcodes::LD_L_A => println!("LD\tL,A"),
+            opcodes::LD_HL_A => println!("LD\t(HL),A"),
             opcodes::LD_HL_B => println!("LD\t(HL),B,"),
             opcodes::LD_HL_C => println!("LD\t(HL),C"),
             opcodes::LD_HL_D => println!("LD\t(HL),D"),
             opcodes::LD_HL_E => println!("LD\t(HL),E"),
             opcodes::LD_HL_H => println!("LD\t(HL),H"),
             opcodes::LD_HL_L => println!("LD\t(HL),L"),
+            opcodes::LD_HL_D8 => println!("LD\t(HL),{}", read_8_imm()),
+            opcodes::LD_HL_D16 => println!("LD\tHL,{}", read_16_imm()),
             opcodes::LD_A_D8 => println!("LD\tA,{}", read_8_imm()),
             opcodes::LD_BC_D16 => println!("LD\tBC,{}", read_16_imm()),
-            opcodes::LD_HL_D16 => println!("LD\tHL,{}", read_16_imm()),
             opcodes::LD_DE_D16 => println!("LD\tDE,{}", read_16_imm()),
             opcodes::LD_SP_D16 => println!("LD\tSP,{}", read_16_imm()),
             opcodes::LD_SP_HL => println!("LD\tSP,HL"),
@@ -648,6 +649,10 @@ impl Cpu {
             opcodes::LD_A_FF00C => self.ld_a(|cpu| cpu.mem[(0xff00 + cpu.c as u16) as usize]),
             opcodes::LD_FF00C_A => self.ld_addr_a(|cpu| 0xff00 + cpu.c as u16),
 
+            opcodes::LD_HL_D8 => {
+                let value = self.consume_byte();
+                self.ld_addr_r8(Cpu::get_hl, |_| value);
+            }
             opcodes::LD_HL_D16 => self.ld_r16_d16(Cpu::set_hl),
             opcodes::LD_SP_HL => self.ld_sp_hl(),
             opcodes::LD_DE_D16 => self.ld_r16_d16(Cpu::set_de),

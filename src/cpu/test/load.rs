@@ -115,6 +115,20 @@ fn test_ld_hl_l() {
 }
 
 #[test]
+fn test_ld_hl_d8() {
+    _test_ld_addr_r8(
+        Cpu::set_hl,
+        |cpu, n| {
+            let addr = (cpu.pc + 1) as usize;
+            cpu.mem[addr] = n;
+        },
+        0x01,
+        0x3401,
+        opcodes::LD_HL_D8,
+    );
+}
+
+#[test]
 fn test_ld_a16_a() {
     let mut cpu = Cpu::new();
     cpu.a = 0x72;
