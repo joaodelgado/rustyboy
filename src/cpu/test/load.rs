@@ -536,6 +536,19 @@ fn test_ldd_hl_a() {
 }
 
 #[test]
+fn test_ldd_a_hl() {
+    let mut cpu = Cpu::new();
+    let addr = 0xb00b;
+    cpu.mem[0] = opcodes::LDD_A_HL;
+    cpu.set_hl(addr as u16);
+    cpu.mem[cpu.get_hl() as usize] = 0x12;
+
+    cpu.tick().unwrap();
+    assert_eq!(cpu.a, 0x12);
+    assert_eq!(cpu.get_hl(), 0xb00a);
+}
+
+#[test]
 fn test_ld_r16_d16() {
     let mut cpu = Cpu::new();
     cpu.mem[0] = opcodes::LD_HL_D16;

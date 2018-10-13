@@ -395,6 +395,7 @@ impl Cpu {
             opcodes::LDI_A_HL => println!("LDI\tA,(HL)"),
             opcodes::LDI_HL_A => println!("LDI\t(HL),A"),
             opcodes::LDD_HL_A => println!("LDD\t(HL),A"),
+            opcodes::LDD_A_HL => println!("LDD\tA,(HL)"),
 
             opcodes::JP_A16 => println!("JP\t{}", read_16_addr()),
             opcodes::JP_HL => println!("JP\tHL"),
@@ -658,6 +659,7 @@ impl Cpu {
             opcodes::LDI_A_HL => self.ldi_a_hl(),
             opcodes::LDI_HL_A => self.ldi_hl_a(),
             opcodes::LDD_HL_A => self.ldd_hl_a(),
+            opcodes::LDD_A_HL => self.ldd_a_hl(),
 
             opcodes::RET => self.ret(),
             opcodes::RET_NZ => self.ret_cc(|cpu| !cpu.flag(&Flag::Zero)),
@@ -1102,6 +1104,15 @@ impl Cpu {
     /// Same as: LD (HL),A - DEC HL
     fn ldd_hl_a(&mut self) {
         self.ld_addr_a(Cpu::get_hl);
+        self.dec_r16(Cpu::get_hl, Cpu::set_hl);
+    }
+
+    ///**Description:**
+    ///
+    /// Put value at address HL into A. Decrement HL.
+    /// Same as: LD A,(HL) - DEC HL
+    fn ldd_a_hl(&mut self) {
+        self.ld_a(|cpu| cpu.mem[cpu.get_hl() as usize]);
         self.dec_r16(Cpu::get_hl, Cpu::set_hl);
     }
 

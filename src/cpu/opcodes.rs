@@ -90,6 +90,7 @@ pub const LDHL_SP_R8: u8 = 0xf8;
 pub const LDI_A_HL: u8 = 0x2a;
 pub const LDI_HL_A: u8 = 0x22;
 pub const LDD_HL_A: u8 = 0x32;
+pub const LDD_A_HL: u8 = 0x3a;
 pub const LD_A16_SP: u8 = 0x08;
 pub const LD_A_FF00C: u8 = 0xf2;
 pub const LD_FF00C_A: u8 = 0xe2;
