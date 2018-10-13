@@ -841,8 +841,16 @@ impl Cpu {
         Ok(())
     }
 
+    pub fn handle_prefix(&mut self) -> Result<()> {
+        unimplemented!();
+    }
+
+    fn peek_byte(&self) -> u8 {
+        self.mem[self.pc as usize]
+    }
+
     fn consume_byte(&mut self) -> u8 {
-        let result = self.mem[self.pc as usize];
+        let result = self.peek_byte();
 
         self.pc += 1;
 
