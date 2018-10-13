@@ -73,6 +73,7 @@ pub const LD_L_E: u8 = 0x6b;
 pub const LD_L_H: u8 = 0x6c;
 pub const LD_L_L: u8 = 0x6d;
 pub const LD_L_HL: u8 = 0x6e;
+pub const LD_L_A: u8 = 0x6f;
 pub const LD_HL_B: u8 = 0x70;
 pub const LD_HL_C: u8 = 0x71;
 pub const LD_HL_D: u8 = 0x72;

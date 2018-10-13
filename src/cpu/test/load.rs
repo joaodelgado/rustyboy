@@ -423,6 +423,11 @@ fn test_ld_l_hl() {
 }
 
 #[test]
+fn test_ld_l_a() {
+    _test_ld_reg_reg(|cpu| cpu.l, |cpu, n| cpu.a = n, 0x72, opcodes::LD_L_A);
+}
+
+#[test]
 fn test_ld_sp_nn() {
     let mut cpu = Cpu::new();
     cpu.mem[0] = 0x31;

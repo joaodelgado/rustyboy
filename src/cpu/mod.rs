@@ -374,6 +374,7 @@ impl Cpu {
             opcodes::LD_L_H => println!("LD\tL,H"),
             opcodes::LD_L_L => println!("LD\tL,L"),
             opcodes::LD_L_HL => println!("LD\tL,(HL)"),
+            opcodes::LD_L_A => println!("LD\tL,A"),
             opcodes::LD_HL_B => println!("LD\t(HL),B,"),
             opcodes::LD_HL_C => println!("LD\t(HL),C"),
             opcodes::LD_HL_D => println!("LD\t(HL),D"),
@@ -627,6 +628,7 @@ impl Cpu {
             opcodes::LD_L_H => self.ld_r8_r8(|cpu| cpu.h, |cpu, n| cpu.l = n),
             opcodes::LD_L_L => self.ld_r8_r8(|cpu| cpu.l, |cpu, n| cpu.l = n),
             opcodes::LD_L_HL => self.ld_r8_r16(Cpu::get_hl, |cpu, n| cpu.l = n),
+            opcodes::LD_L_A => self.ld_r8_r8(|cpu| cpu.a, |cpu, n| cpu.l = n),
 
             opcodes::LD_HL_B => self.ld_addr_r8(Cpu::get_hl, |cpu| cpu.b),
             opcodes::LD_HL_C => self.ld_addr_r8(Cpu::get_hl, |cpu| cpu.c),
