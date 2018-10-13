@@ -134,8 +134,20 @@ fn test_ld_ff00c_a() {
     cpu.mem[0] = opcodes::LD_FF00C_A;
 
     cpu.tick().unwrap();
-    assert_eq!(cpu.mem[(0xff00 + cpu.c as u16) as usize], 0x72);
+    assert_eq!(cpu.mem[(0xff04 as u16) as usize], 0x72);
 }
+
+#[test]
+fn test_ld_a_ff00c() {
+    let mut cpu = Cpu::new();
+    cpu.c = 0xff;
+    cpu.mem[0xffff] = 0x72;
+    cpu.mem[0] = opcodes::LD_A_FF00C;
+
+    cpu.tick().unwrap();
+    assert_eq!(cpu.a, 0x72);
+}
+
 
 fn _test_ld_reg_reg<G, F>(r1: G, r2: F, value: u8, opcode: u8)
 where
