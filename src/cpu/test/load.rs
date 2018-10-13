@@ -126,6 +126,17 @@ fn test_ld_a16_a() {
     assert_eq!(cpu.mem[0x3401], 0x72);
 }
 
+#[test]
+fn test_ld_ff00c_a() {
+    let mut cpu = Cpu::new();
+    cpu.a = 0x72;
+    cpu.c = 0x4;
+    cpu.mem[0] = opcodes::LD_FF00C_A;
+
+    cpu.tick().unwrap();
+    assert_eq!(cpu.mem[(0xff00 + cpu.c as u16) as usize], 0x72);
+}
+
 fn _test_ld_reg_reg<G, F>(r1: G, r2: F, value: u8, opcode: u8)
 where
     G: Fn(&Cpu) -> u8,

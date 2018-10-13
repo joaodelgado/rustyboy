@@ -387,6 +387,7 @@ impl Cpu {
             opcodes::LD_DE_D16 => println!("LD\tDE,{}", read_16_imm()),
             opcodes::LD_SP_D16 => println!("LD\tSP,{}", read_16_imm()),
             opcodes::LD_SP_HL => println!("LD\tSP,HL"),
+            opcodes::LD_FF00C_A => println!("LD\t(C),A"),
 
             opcodes::LDH_A8_A => println!("LDH\ta_{},A", read_byte()),
             opcodes::LDH_A_A8 => println!("LDH\tA,a_{}", read_byte()),
@@ -641,6 +642,8 @@ impl Cpu {
             opcodes::LD_HL_E => self.ld_addr_r8(Cpu::get_hl, |cpu| cpu.e),
             opcodes::LD_HL_H => self.ld_addr_r8(Cpu::get_hl, |cpu| cpu.h),
             opcodes::LD_HL_L => self.ld_addr_r8(Cpu::get_hl, |cpu| cpu.l),
+
+            opcodes::LD_FF00C_A => self.ld_addr_a(|cpu| 0xff00 + cpu.c as u16),
 
             opcodes::LD_HL_D16 => self.ld_r16_d16(Cpu::set_hl),
             opcodes::LD_SP_HL => self.ld_sp_hl(),
