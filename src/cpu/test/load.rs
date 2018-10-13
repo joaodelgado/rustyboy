@@ -383,6 +383,11 @@ fn test_ld_h_hl() {
 }
 
 #[test]
+fn test_ld_h_a() {
+    _test_ld_reg_reg(|cpu| cpu.h, |cpu, n| cpu.a = n, 0x72, opcodes::LD_H_A);
+}
+
+#[test]
 fn test_ld_l_b() {
     _test_ld_reg_reg(|cpu| cpu.l, |cpu, n| cpu.b = n, 0x72, opcodes::LD_L_B);
 }
