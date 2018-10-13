@@ -539,8 +539,13 @@ impl Cpu {
     //
 
     pub fn tick(&mut self) -> Result<()> {
+        if self.peek_byte() == opcodes::CB {
+            return self.handle_prefix();
+        }
+
         self.print_curr();
         let opcode = self.consume_byte();
+
         print!("{:04x} - {:02x} ", self.pc, opcode);
         println!("{}", self);
 
@@ -825,6 +830,7 @@ impl Cpu {
             opcodes::EI => self.ei(),
 
             opcodes::NOP => self.nop(),
+
 
             // unimplemented instructions, do nothing
             // FIXME after testing this should panic instead
