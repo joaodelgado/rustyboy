@@ -1,4 +1,3 @@
-#![feature(tool_lints)]
 #![allow(clippy::verbose_bit_mask)]
 mod cartridge;
 mod cpu;
