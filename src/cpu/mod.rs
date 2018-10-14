@@ -270,15 +270,15 @@ impl Cpu {
     //
 
     pub fn tick(&mut self) -> Result<()> {
+        self.print_curr();
         if self.peek_byte() == opcodes::CB {
-            return self.handle_cbprefixed();
+            self.handle_cbprefixed()
         } else {
-            return self.handle_unprefixed();
+            self.handle_unprefixed()
         }
     }
 
     pub fn handle_unprefixed(&mut self) -> Result<()> {
-        self.print_curr();
         let opcode = self.consume_byte();
 
         print!("{:04x} - {:02x} ", self.pc, opcode);
@@ -583,7 +583,18 @@ impl Cpu {
     }
 
     pub fn handle_cbprefixed(&mut self) -> Result<()> {
-        unimplemented!();
+        self.consume_byte(); // Consume the cb prefix
+        let opcode = self.consume_byte();
+
+        print!("{:04x} - {:02x} ", self.pc, opcode);
+        println!("{}", self);
+
+        match opcode {
+            s => Err(Error::new(
+                ErrorKind::UnknownInstruction,
+                format!("Unimplemented opcode {:02x}@{:04x}", s, self.pc - 1,),
+            )),
+        }
     }
 
     fn peek_byte(&self) -> u8 {
