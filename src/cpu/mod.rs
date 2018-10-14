@@ -251,12 +251,6 @@ impl Cpu {
         self.status &= !flag.mask()
     }
 
-    /// Reset all status flags
-    #[allow(dead_code)] // TODO This is currently being used by tests only. It should be moved
-    fn reset_status(&mut self) {
-        self.status = 0;
-    }
-
     fn print_curr(&self) {
         self.print_instr(self.pc)
     }

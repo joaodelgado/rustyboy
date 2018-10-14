@@ -376,7 +376,7 @@ fn test_rlca() {
     assert!(!cpu.flag(&Flag::Zero));
     assert!(!cpu.flag(&Flag::Carry));
 
-    cpu.reset_status();
+    cpu = Cpu::new();
     cpu.a = 0;
     cpu.mem[cpu.pc as usize] = opcodes::RLCA;
 
@@ -385,7 +385,7 @@ fn test_rlca() {
     assert!(!cpu.flag(&Flag::Zero));
     assert!(!cpu.flag(&Flag::Carry));
 
-    cpu.reset_status();
+    cpu = Cpu::new();
     cpu.a = 0b10000001;
     cpu.mem[cpu.pc as usize] = opcodes::RLCA;
 
@@ -406,7 +406,7 @@ fn test_rrca() {
     assert!(cpu.flag(&Flag::Carry));
     assert!(!cpu.flag(&Flag::Zero));
 
-    cpu.reset_status();
+    cpu = Cpu::new();
     cpu.mem[cpu.pc as usize] = opcodes::RRCA;
     cpu.a = 0;
 
@@ -415,7 +415,7 @@ fn test_rrca() {
     assert!(!cpu.flag(&Flag::Carry));
     assert!(!cpu.flag(&Flag::Zero));
 
-    cpu.reset_status();
+    cpu = Cpu::new();
     cpu.mem[cpu.pc as usize] = opcodes::RRCA;
     cpu.a = 0x80;
 
