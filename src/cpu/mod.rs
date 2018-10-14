@@ -583,11 +583,30 @@ impl Cpu {
         println!("{}", self);
 
         match opcode {
-            s => Err(Error::new(
-                ErrorKind::UnknownInstruction,
-                format!("Unimplemented opcode {:02x}@{:04x}", s, self.pc - 1,),
-            )),
+            opcodes::SRL_A => self.srl(|cpu| cpu.a, |cpu, n| cpu.a = n),
+            opcodes::SRL_B => self.srl(|cpu| cpu.b, |cpu, n| cpu.b = n),
+            opcodes::SRL_C => self.srl(|cpu| cpu.c, |cpu, n| cpu.c = n),
+            opcodes::SRL_D => self.srl(|cpu| cpu.d, |cpu, n| cpu.d = n),
+            opcodes::SRL_E => self.srl(|cpu| cpu.e, |cpu, n| cpu.e = n),
+            opcodes::SRL_H => self.srl(|cpu| cpu.h, |cpu, n| cpu.h = n),
+            opcodes::SRL_L => self.srl(|cpu| cpu.l, |cpu, n| cpu.l = n),
+            opcodes::SRL_HL => self.srl(
+                |cpu| cpu.mem[cpu.get_hl() as usize],
+                |cpu, n| {
+                    let addr = cpu.get_hl() as usize;
+                    cpu.set_mem(addr, n);
+                },
+            ),
+
+            s => {
+                return Err(Error::new(
+                    ErrorKind::UnknownInstruction,
+                    format!("Unimplemented opcode {:02x}@{:04x}", s, self.pc - 1,),
+                ))
+            }
         }
+
+        Ok(())
     }
 
     fn peek_byte(&self) -> u8 {
@@ -1433,5 +1452,29 @@ impl Cpu {
         self.push_stack_u16(curr_pc);
 
         self.pc = u16::from(n);
+    }
+
+    ///**Description:**
+    /// Shift n right into Carry.
+    ///
+    ///**Use with:**
+    ///  n = A,B,C,D,E,H,L,(HL)
+    ///**Flags affected:**
+    ///  Z - Set if result is zero.
+    ///  N - Reset.
+    ///  H - Reset.
+    ///  C - Set if the least significant bit of n is set.
+    fn srl<G, S>(&mut self, g: G, s: S)
+    where
+        G: Fn(&Cpu) -> u8,
+        S: Fn(&mut Cpu, u8),
+    {
+        let value = g(self);
+        let result = value >> 1;
+        let carry = value & 0x01 == 0x01;
+
+        s(self, value >> 1);
+        self.set_flag_to(&Flag::Carry, carry);
+        self.set_flag_to(&Flag::Zero, result == 0);
     }
 }

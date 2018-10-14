@@ -1037,3 +1037,85 @@ fn test_sub_a_d8() {
         cpu.mem[i] = value;
     });
 }
+
+//
+// SRL
+//
+
+fn _test_srl_reg<G, S>(opcode: u8, reg_getter: G, reg_setter: S)
+where
+    G: Fn(&Cpu) -> u8,
+    S: Fn(&mut Cpu, u8),
+{
+    let prepare_and_execute = |value| {
+        let mut cpu = Cpu::new();
+        reg_setter(&mut cpu, value);
+        cpu.mem[0] = opcodes::PREFIX_CB;
+        cpu.mem[1] = opcode;
+
+        cpu.tick().unwrap();
+
+        cpu
+    };
+
+    // Test shift
+    let cpu = prepare_and_execute(0b1111_0000);
+    assert_eq!(reg_getter(&cpu), 0b0111_1000);
+    assert!(!cpu.flag(&Flag::Zero));
+    assert!(!cpu.flag(&Flag::Sub));
+    assert!(!cpu.flag(&Flag::HalfCarry));
+    assert!(!cpu.flag(&Flag::Carry));
+
+    // Test carry and zero flags are set
+    let cpu = prepare_and_execute(1);
+    assert_eq!(reg_getter(&cpu), 0);
+    assert!(cpu.flag(&Flag::Zero));
+    assert!(cpu.flag(&Flag::Carry));
+}
+
+#[test]
+fn test_srl_a() {
+    _test_srl_reg(opcodes::SRL_A, |cpu| cpu.a, |cpu, n| cpu.a = n);
+}
+
+#[test]
+fn test_srl_b() {
+    _test_srl_reg(opcodes::SRL_B, |cpu| cpu.b, |cpu, n| cpu.b = n);
+}
+
+#[test]
+fn test_srl_c() {
+    _test_srl_reg(opcodes::SRL_C, |cpu| cpu.c, |cpu, n| cpu.c = n);
+}
+
+#[test]
+fn test_srl_d() {
+    _test_srl_reg(opcodes::SRL_D, |cpu| cpu.d, |cpu, n| cpu.d = n);
+}
+
+#[test]
+fn test_srl_e() {
+    _test_srl_reg(opcodes::SRL_E, |cpu| cpu.e, |cpu, n| cpu.e = n);
+}
+
+#[test]
+fn test_srl_h() {
+    _test_srl_reg(opcodes::SRL_H, |cpu| cpu.h, |cpu, n| cpu.h = n);
+}
+
+#[test]
+fn test_srl_l() {
+    _test_srl_reg(opcodes::SRL_L, |cpu| cpu.l, |cpu, n| cpu.l = n);
+}
+
+#[test]
+fn test_srl_hl() {
+    _test_srl_reg(
+        opcodes::SRL_HL,
+        |cpu| cpu.mem[cpu.get_hl() as usize],
+        |cpu, n| {
+            cpu.set_hl(0x55);
+            cpu.set_mem(0x55, n);
+        },
+    );
+}

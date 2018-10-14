@@ -327,6 +327,16 @@ impl<'a> Printer<'a> {
         let opcode = self.cpu.mem[addr];
         print!("({:02x}{:02x}) ", opcodes::PREFIX_CB, opcode);
         match opcode {
+
+            opcodes::SRL_A => println!("SRL A"),
+            opcodes::SRL_B => println!("SRL B"),
+            opcodes::SRL_C => println!("SRL C"),
+            opcodes::SRL_D => println!("SRL D"),
+            opcodes::SRL_E => println!("SRL E"),
+            opcodes::SRL_H => println!("SRL H"),
+            opcodes::SRL_L => println!("SRL L"),
+            opcodes::SRL_HL => println!("SRL (HL)"),
+
             n => panic!("Unknown instruction {:02x}@{:04x}", n, addr),
         }
     }

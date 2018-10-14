@@ -223,3 +223,12 @@ pub const RST_30: u8 = 0xf7;
 pub const RST_38: u8 = 0xff;
 
 pub const PREFIX_CB: u8 = 0xcb;
+
+pub const SRL_A: u8 = 0x3f;
+pub const SRL_B: u8 = 0x38;
+pub const SRL_C: u8 = 0x39;
+pub const SRL_D: u8 = 0x3a;
+pub const SRL_E: u8 = 0x3b;
+pub const SRL_H: u8 = 0x3c;
+pub const SRL_L: u8 = 0x3d;
+pub const SRL_HL: u8 = 0x3e;
