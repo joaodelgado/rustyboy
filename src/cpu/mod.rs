@@ -386,8 +386,8 @@ impl Cpu {
             opcodes::LD_HL_H => self.ld_addr_r8(Cpu::get_hl, |cpu| cpu.h),
             opcodes::LD_HL_L => self.ld_addr_r8(Cpu::get_hl, |cpu| cpu.l),
 
-            opcodes::LD_A_FF00C => self.ld_a(|cpu| cpu.mem[(0xff00 + cpu.c as u16) as usize]),
-            opcodes::LD_FF00C_A => self.ld_addr_a(|cpu| 0xff00 + cpu.c as u16),
+            opcodes::LD_A_FF00C => self.ld_a(|cpu| cpu.mem[(0xff00 + u16::from(cpu.c)) as usize]),
+            opcodes::LD_FF00C_A => self.ld_addr_a(|cpu| 0xff00 + u16::from(cpu.c)),
 
             opcodes::LD_HL_D8 => {
                 let value = self.consume_byte();
