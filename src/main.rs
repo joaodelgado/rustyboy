@@ -3,8 +3,8 @@ extern crate rustyboy;
 use std::env;
 use std::process;
 
-use rustyboy::Config;
 use rustyboy::game_boy::GameBoy;
+use rustyboy::Config;
 
 fn main() {
     let config = Config::new(env::args()).unwrap_or_else(|e| {

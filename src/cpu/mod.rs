@@ -4,9 +4,9 @@ mod test;
 
 use std::fmt;
 
+use self::printer::Printer;
 use errors::{Error, ErrorKind, Result};
 use {u16_to_u8, u8_to_u16};
-use self::printer::Printer;
 
 const MEM_SIZE: usize = 64 * 1024;
 
@@ -252,7 +252,7 @@ impl Cpu {
     }
 
     /// Reset all status flags
-    #[allow(dead_code)]  // TODO This is currently being used by tests only. It should be moved
+    #[allow(dead_code)] // TODO This is currently being used by tests only. It should be moved
     fn reset_status(&mut self) {
         self.status = 0;
     }
@@ -565,7 +565,6 @@ impl Cpu {
             opcodes::EI => self.ei(),
 
             opcodes::NOP => self.nop(),
-
 
             // unimplemented instructions, do nothing
             // FIXME after testing this should panic instead

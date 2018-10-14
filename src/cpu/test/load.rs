@@ -162,7 +162,6 @@ fn test_ld_a_ff00c() {
     assert_eq!(cpu.a, 0x72);
 }
 
-
 fn _test_ld_reg_reg<G, F>(r1: G, r2: F, value: u8, opcode: u8)
 where
     G: Fn(&Cpu) -> u8,

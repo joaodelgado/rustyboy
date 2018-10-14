@@ -35,7 +35,8 @@ impl Debugger {
         io::stdin().read_line(&mut cmd).expect("read error");
         let cmd = cmd.trim();
 
-        let mut vec = cmd.split_whitespace()
+        let mut vec = cmd
+            .split_whitespace()
             .map(|x| x.parse::<String>().expect("parse error"))
             .collect::<Vec<String>>();
 

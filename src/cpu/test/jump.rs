@@ -59,7 +59,6 @@ fn _test_jp_flag_set(opcode: u8, flag: Flag, should_jump: bool) {
     }
 }
 
-
 fn _test_jp_flag_reset(opcode: u8, flag: Flag, should_jump: bool) {
     let mut cpu = Cpu::new();
 
@@ -79,7 +78,6 @@ fn _test_jp_flag_reset(opcode: u8, flag: Flag, should_jump: bool) {
         assert_eq!(cpu.pc, inital_pc + 3);
     }
 }
-
 
 #[test]
 fn test_jp_nz_r8() {
@@ -105,7 +103,6 @@ fn test_jp_c_r8() {
     _test_jp_flag_reset(opcodes::JP_C_A16, Flag::Carry, false);
 }
 
-
 fn _test_jr_flag_set(opcode: u8, flag: Flag, should_jump: bool) {
     let mut cpu = Cpu::new();
 
@@ -126,7 +123,6 @@ fn _test_jr_flag_set(opcode: u8, flag: Flag, should_jump: bool) {
     }
 }
 
-
 fn _test_jr_flag_reset(opcode: u8, flag: Flag, should_jump: bool) {
     let mut cpu = Cpu::new();
 
@@ -146,7 +142,6 @@ fn _test_jr_flag_reset(opcode: u8, flag: Flag, should_jump: bool) {
         assert_eq!(cpu.pc, inital_pc + 2);
     }
 }
-
 
 #[test]
 fn test_jr_nz_r8() {

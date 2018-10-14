@@ -222,4 +222,4 @@ pub const RST_28: u8 = 0xef;
 pub const RST_30: u8 = 0xf7;
 pub const RST_38: u8 = 0xff;
 
-pub const CB:u8 = 0xcb;
+pub const CB: u8 = 0xcb;

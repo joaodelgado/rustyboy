@@ -1,9 +1,9 @@
-use Config;
 use cartridge::Cartridge;
 use cpu::Cpu;
 use debugger::Debugger;
 use errors::{Error, ErrorKind, Result};
 use read_file;
+use Config;
 
 const MEM_CARTRIDGE_INTERRUPTS_BEGIN: usize = 0x0000;
 const MEM_CARTRIDGE_INTERRUPTS_END: usize = 0x00ff;
@@ -100,7 +100,8 @@ impl GameBoy {
 
     fn check_rom(&self) -> Result<()> {
         // Validate ROM checksum
-        let sum = self.cpu
+        let sum = self
+            .cpu
             .get_mem_range(MEM_CHECKSUM_BEGIN, MEM_CHECKSUM_END)
             .iter()
             .fold(25u8, |sum, v| sum.wrapping_add(*v));
