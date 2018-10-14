@@ -1,38 +1,41 @@
-use cpu::Cpu;
 use cpu::opcodes;
-use {u8_to_u16};
+use cpu::Cpu;
+use u8_to_u16;
 
 pub struct Printer<'a> {
     cpu: &'a Cpu,
 }
 
 impl<'a> Printer<'a> {
-
     pub fn new(cpu: &'a Cpu) -> Printer<'a> {
         Printer { cpu }
     }
 
-    fn read_byte(&self, addr: usize) -> String {
+    fn peek_byte(&self, addr: usize) -> u8 {
+        self.cpu.mem[addr + 1]
+    }
+
+    fn print_byte(&self, addr: usize) -> String {
         format!("{:02x}", self.cpu.mem[addr + 1])
     }
 
-    fn read_8_rel(&self, addr: usize) -> String {
-        format!("r_{}", self.read_byte(addr))
+    fn print_8_rel(&self, addr: usize) -> String {
+        format!("r_{}", self.print_byte(addr))
     }
 
-    fn read_8_imm(&self, addr: usize) -> String {
-        format!("d_{}", self.read_byte(addr))
+    fn print_8_imm(&self, addr: usize) -> String {
+        format!("d_{}", self.print_byte(addr))
     }
 
-    fn read_8_sig(&self, addr: usize) -> String {
+    fn print_8_sig(&self, addr: usize) -> String {
         format!("s_{:02x}", self.cpu.mem[addr + 1] as i8)
     }
 
-    fn read_16_imm(&self, addr: usize) -> String {
-            let fst_byte = self.cpu.mem[addr + 2];
-            let snd_byte = self.cpu.mem[addr + 1];
+    fn print_16_imm(&self, addr: usize) -> String {
+        let fst_byte = self.cpu.mem[addr + 2];
+        let snd_byte = self.cpu.mem[addr + 1];
 
-            format!("d_{:04x}", u8_to_u16(fst_byte, snd_byte))
+        format!("d_{:04x}", u8_to_u16(fst_byte, snd_byte))
     }
 
     fn read_16_addr(&self, addr: usize) -> String {
@@ -43,12 +46,16 @@ impl<'a> Printer<'a> {
     }
 
     pub fn print_instr(&self, addr: u16) {
-        self.print_unprefixed(addr);
-    }
-
-    fn print_unprefixed(&self, addr: u16) {
         let addr = addr as usize;
 
+        if self.peek_byte(addr) == opcodes::CB {
+            self.print_cbprefixed(addr)
+        } else {
+            self.print_unprefixed(addr)
+        }
+    }
+
+    fn print_unprefixed(&self, addr: usize) {
         let opcode = self.cpu.mem[addr];
         print!("({:02x}) ", opcode);
         match opcode {
@@ -151,18 +158,18 @@ impl<'a> Printer<'a> {
             opcodes::LD_HL_E => println!("LD\t(HL),E"),
             opcodes::LD_HL_H => println!("LD\t(HL),H"),
             opcodes::LD_HL_L => println!("LD\t(HL),L"),
-            opcodes::LD_HL_D8 => println!("LD\t(HL),{}", self.read_8_imm(addr)),
-            opcodes::LD_HL_D16 => println!("LD\tHL,{}", self.read_16_imm(addr)),
-            opcodes::LD_A_D8 => println!("LD\tA,{}", self.read_8_imm(addr)),
-            opcodes::LD_BC_D16 => println!("LD\tBC,{}", self.read_16_imm(addr)),
-            opcodes::LD_DE_D16 => println!("LD\tDE,{}", self.read_16_imm(addr)),
-            opcodes::LD_SP_D16 => println!("LD\tSP,{}", self.read_16_imm(addr)),
+            opcodes::LD_HL_D8 => println!("LD\t(HL),{}", self.print_8_imm(addr)),
+            opcodes::LD_HL_D16 => println!("LD\tHL,{}", self.print_16_imm(addr)),
+            opcodes::LD_A_D8 => println!("LD\tA,{}", self.print_8_imm(addr)),
+            opcodes::LD_BC_D16 => println!("LD\tBC,{}", self.print_16_imm(addr)),
+            opcodes::LD_DE_D16 => println!("LD\tDE,{}", self.print_16_imm(addr)),
+            opcodes::LD_SP_D16 => println!("LD\tSP,{}", self.print_16_imm(addr)),
             opcodes::LD_SP_HL => println!("LD\tSP,HL"),
             opcodes::LD_A_FF00C => println!("LD\tA,(C)"),
             opcodes::LD_FF00C_A => println!("LD\t(C),A"),
 
-            opcodes::LDH_A8_A => println!("LDH\ta_{},A", self.read_byte(addr)),
-            opcodes::LDH_A_A8 => println!("LDH\tA,a_{}", self.read_byte(addr)),
+            opcodes::LDH_A8_A => println!("LDH\ta_{},A", self.print_byte(addr)),
+            opcodes::LDH_A_A8 => println!("LDH\tA,a_{}", self.print_byte(addr)),
             opcodes::LDI_A_HL => println!("LDI\tA,(HL)"),
             opcodes::LDI_HL_A => println!("LDI\t(HL),A"),
             opcodes::LDD_HL_A => println!("LDD\t(HL),A"),
@@ -175,11 +182,11 @@ impl<'a> Printer<'a> {
             opcodes::JP_NC_A16 => println!("JP\tNC,{}", self.read_16_addr(addr)),
             opcodes::JP_C_A16 => println!("JP\tC,{}", self.read_16_addr(addr)),
 
-            opcodes::JR_R8 => println!("JR\t{}", self.read_8_rel(addr)),
-            opcodes::JR_NZ_R8 => println!("JR\tNZ,{}", self.read_8_rel(addr)),
-            opcodes::JR_Z_R8 => println!("JR\tZ,{}", self.read_8_rel(addr)),
-            opcodes::JR_NC_R8 => println!("JR\tNC,{}", self.read_8_rel(addr)),
-            opcodes::JR_C_R8 => println!("JR\tC,{}", self.read_8_rel(addr)),
+            opcodes::JR_R8 => println!("JR\t{}", self.print_8_rel(addr)),
+            opcodes::JR_NZ_R8 => println!("JR\tNZ,{}", self.print_8_rel(addr)),
+            opcodes::JR_Z_R8 => println!("JR\tZ,{}", self.print_8_rel(addr)),
+            opcodes::JR_NC_R8 => println!("JR\tNC,{}", self.print_8_rel(addr)),
+            opcodes::JR_C_R8 => println!("JR\tC,{}", self.print_8_rel(addr)),
 
             opcodes::PUSH_A16_AF => println!("PUSH\tAF"),
             opcodes::PUSH_A16_BC => println!("PUSH\tBC"),
@@ -191,12 +198,12 @@ impl<'a> Printer<'a> {
             opcodes::POP_A16_DE => println!("POP\tDE"),
             opcodes::POP_A16_HL => println!("POP\tHL"),
 
-            opcodes::LD_B_D8 => println!("LD\tB,{}", self.read_8_imm(addr)),
-            opcodes::LD_C_D8 => println!("LD\tC,{}", self.read_8_imm(addr)),
-            opcodes::LD_D_D8 => println!("LD\tD,{}", self.read_8_imm(addr)),
-            opcodes::LD_E_D8 => println!("LD\tE,{}", self.read_8_imm(addr)),
-            opcodes::LD_H_D8 => println!("LD\tH,{}", self.read_8_imm(addr)),
-            opcodes::LD_L_D8 => println!("LD\tL,{}", self.read_8_imm(addr)),
+            opcodes::LD_B_D8 => println!("LD\tB,{}", self.print_8_imm(addr)),
+            opcodes::LD_C_D8 => println!("LD\tC,{}", self.print_8_imm(addr)),
+            opcodes::LD_D_D8 => println!("LD\tD,{}", self.print_8_imm(addr)),
+            opcodes::LD_E_D8 => println!("LD\tE,{}", self.print_8_imm(addr)),
+            opcodes::LD_H_D8 => println!("LD\tH,{}", self.print_8_imm(addr)),
+            opcodes::LD_L_D8 => println!("LD\tL,{}", self.print_8_imm(addr)),
 
             opcodes::RET => println!("RET"),
             opcodes::RET_NZ => println!("RET NZ"),
@@ -215,12 +222,12 @@ impl<'a> Printer<'a> {
             opcodes::ADD_A_H => println!("ADD\tA,H"),
             opcodes::ADD_A_L => println!("ADD\tA,L"),
             opcodes::ADD_A_HL => println!("ADD\tA,HL"),
-            opcodes::ADD_A_D8 => println!("ADD\tA,{}", self.read_8_imm(addr)),
+            opcodes::ADD_A_D8 => println!("ADD\tA,{}", self.print_8_imm(addr)),
             opcodes::ADD_HL_BC => println!("ADD\tHL,BC"),
             opcodes::ADD_HL_DE => println!("ADD\tHL,DE"),
             opcodes::ADD_HL_HL => println!("ADD\tHL,HL"),
             opcodes::ADD_HL_SP => println!("ADD\tHL,SP"),
-            opcodes::ADD_SP_R8 => println!("ADD\tSP,{}", self.read_8_sig(addr)),
+            opcodes::ADD_SP_R8 => println!("ADD\tSP,{}", self.print_8_sig(addr)),
 
             opcodes::SUB_A_A => println!("SUB\tA,A"),
             opcodes::SUB_A_B => println!("SUB\tA,B"),
@@ -230,7 +237,7 @@ impl<'a> Printer<'a> {
             opcodes::SUB_A_H => println!("SUB\tA,H"),
             opcodes::SUB_A_L => println!("SUB\tA,L"),
             opcodes::SUB_A_HL => println!("SUB\tA,HL"),
-            opcodes::SUB_A_D8 => println!("SUB\tA,{}", self.read_8_imm(addr)),
+            opcodes::SUB_A_D8 => println!("SUB\tA,{}", self.print_8_imm(addr)),
 
             opcodes::AND_A_A => println!("AND\tA,A"),
             opcodes::AND_A_B => println!("AND\tA,B"),
@@ -240,7 +247,7 @@ impl<'a> Printer<'a> {
             opcodes::AND_A_H => println!("AND\tA,H"),
             opcodes::AND_A_L => println!("AND\tA,L"),
             opcodes::AND_A_HL => println!("AND\tA,HL"),
-            opcodes::AND_A_D8 => println!("AND\tA,{}", self.read_8_imm(addr)),
+            opcodes::AND_A_D8 => println!("AND\tA,{}", self.print_8_imm(addr)),
 
             opcodes::XOR_A_A => println!("XOR\tA,A"),
             opcodes::XOR_A_B => println!("XOR\tA,B"),
@@ -250,7 +257,7 @@ impl<'a> Printer<'a> {
             opcodes::XOR_A_H => println!("XOR\tA,H"),
             opcodes::XOR_A_L => println!("XOR\tA,L"),
             opcodes::XOR_A_HL => println!("XOR\tA,HL"),
-            opcodes::XOR_A_D8 => println!("XOR\tA,{}", self.read_8_imm(addr)),
+            opcodes::XOR_A_D8 => println!("XOR\tA,{}", self.print_8_imm(addr)),
 
             opcodes::OR_A_A => println!("OR\tA,A"),
             opcodes::OR_A_B => println!("OR\tA,B"),
@@ -260,7 +267,7 @@ impl<'a> Printer<'a> {
             opcodes::OR_A_H => println!("OR\tA,H"),
             opcodes::OR_A_L => println!("OR\tA,L"),
             opcodes::OR_A_HL => println!("OR\tA,HL"),
-            opcodes::OR_A_D8 => println!("OR\tA,{}", self.read_8_imm(addr)),
+            opcodes::OR_A_D8 => println!("OR\tA,{}", self.print_8_imm(addr)),
 
             opcodes::CP_A => println!("CP\tA,A"),
             opcodes::CP_B => println!("CP\tA,B"),
@@ -270,7 +277,7 @@ impl<'a> Printer<'a> {
             opcodes::CP_H => println!("CP\tA,H"),
             opcodes::CP_L => println!("CP\tA,L"),
             opcodes::CP_HL => println!("CP\tA,{}", self.read_16_addr(addr)),
-            opcodes::CP_D8 => println!("CP\tA,{}", self.read_8_imm(addr)),
+            opcodes::CP_D8 => println!("CP\tA,{}", self.print_8_imm(addr)),
             opcodes::ADC_A_A => println!("ADC\tA,A"),
             opcodes::ADC_A_B => println!("ADC\tA,B"),
             opcodes::ADC_A_C => println!("ADC\tA,C"),
@@ -279,11 +286,11 @@ impl<'a> Printer<'a> {
             opcodes::ADC_A_H => println!("ADC\tA,H"),
             opcodes::ADC_A_L => println!("ADC\tA,L"),
             opcodes::ADC_A_HL => println!("ADC\tA,(HL)"),
-            opcodes::ADC_A_D8 => println!("ADC\tA,{}", self.read_8_imm(addr)),
+            opcodes::ADC_A_D8 => println!("ADC\tA,{}", self.print_8_imm(addr)),
             opcodes::RLCA => println!("RLCA"),
             opcodes::RRCA => println!("RRCA"),
 
-            opcodes::LDHL_SP_R8 => println!("LDHL\tSP,{}", self.read_8_sig(addr)),
+            opcodes::LDHL_SP_R8 => println!("LDHL\tSP,{}", self.print_8_sig(addr)),
             opcodes::LD_A16_SP => println!("LD\t{},SP", self.read_16_addr(addr)),
 
             opcodes::RST_00 => println!("RST\t0x00"),
@@ -301,6 +308,14 @@ impl<'a> Printer<'a> {
                 println!("Undefined instruction {:02x}", opcode)
             }
 
+            n => panic!("Unknown instruction {:02x}@{:04x}", n, addr),
+        }
+    }
+
+    fn print_cbprefixed(&self, addr: usize) {
+        let opcode = self.cpu.mem[addr];
+        print!("({:02x}) ", opcode);
+        match opcode {
             n => panic!("Unknown instruction {:02x}@{:04x}", n, addr),
         }
     }
