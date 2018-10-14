@@ -262,7 +262,7 @@ impl Cpu {
     }
 
     fn print_instr(&self, addr: u16) {
-        Printer::new(self).print_instr(addr)
+        Printer::new(self, addr).print_instr(addr)
     }
 
     //
@@ -271,7 +271,7 @@ impl Cpu {
 
     pub fn tick(&mut self) -> Result<()> {
         self.print_curr();
-        if self.peek_byte() == opcodes::CB {
+        if self.peek_byte() == opcodes::PREFIX_CB {
             self.handle_cbprefixed()
         } else {
             self.handle_unprefixed()
